@@ -1,0 +1,26 @@
+--- net/minecraft/network/FriendlyByteBuf.java
++++ net/minecraft/network/FriendlyByteBuf.java
+@@ -86,19 +86,21 @@
+ 
+    public <T> T readWithCodec(Codec<T> var1) {
+       CompoundTag var2 = this.readAnySizeNbt();
+       DataResult var3 = var1.parse(NbtOps.INSTANCE, var2);
+       var3.error().ifPresent((var1x) -> {
+-         throw new EncoderException("Failed to decode: " + var1x.message() + " " + var2);
++         String var10002 = var1x.message();
++         throw new EncoderException("Failed to decode: " + var10002 + " " + var2);
+       });
+       return var3.result().get();
+    }
+ 
+    public <T> void writeWithCodec(Codec<T> var1, T var2) {
+       DataResult var3 = var1.encodeStart(NbtOps.INSTANCE, var2);
+       var3.error().ifPresent((var1x) -> {
+-         throw new EncoderException("Failed to encode: " + var1x.message() + " " + var2);
++         String var10002 = var1x.message();
++         throw new EncoderException("Failed to encode: " + var10002 + " " + var2);
+       });
+       this.writeNbt((CompoundTag)var3.result().get());
+    }
+ 
+    public <T, C extends Collection<T>> C readCollection(IntFunction<C> var1, Function<FriendlyByteBuf, T> var2) {

@@ -1,0 +1,44 @@
+--- net/minecraft/tags/Tag.java
++++ net/minecraft/tags/Tag.java
+@@ -10,10 +10,11 @@
+ import com.mojang.serialization.DataResult;
+ import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Random;
+ import java.util.Set;
+ import java.util.function.Consumer;
+ import java.util.function.Function;
+@@ -240,11 +241,11 @@
+          Iterator var5 = this.entries.iterator();
+ 
+          while(var5.hasNext()) {
+             Tag.BuilderEntry var6 = (Tag.BuilderEntry)var5.next();
+             Tag.Entry var10000 = var6.getEntry();
+-            var3.getClass();
++            Objects.requireNonNull(var3);
+             if (!var10000.build(var1, var2, var3::add)) {
+                var4.add(var6);
+             }
+          }
+ 
+@@ -324,14 +325,14 @@
+          return var1;
+       }
+    }
+ 
+    public static class BuilderEntry {
+-      private final Tag.Entry entry;
++      final Tag.Entry entry;
+       private final String source;
+ 
+-      private BuilderEntry(Tag.Entry var1, String var2) {
++      BuilderEntry(Tag.Entry var1, String var2) {
+          this.entry = var1;
+          this.source = var2;
+       }
+ 
+       public Tag.Entry getEntry() {

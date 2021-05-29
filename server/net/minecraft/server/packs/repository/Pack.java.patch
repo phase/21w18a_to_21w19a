@@ -1,0 +1,102 @@
+--- net/minecraft/server/packs/repository/Pack.java
++++ net/minecraft/server/packs/repository/Pack.java
+@@ -31,42 +31,47 @@
+ 
+    @Nullable
+    public static Pack create(String var0, boolean var1, Supplier<PackResources> var2, Pack.PackConstructor var3, Pack.Position var4, PackSource var5) {
+       try {
+          PackResources var6 = (PackResources)var2.get();
+-         Throwable var7 = null;
+ 
+-         Pack var9;
+-         try {
+-            PackMetadataSection var8 = (PackMetadataSection)var6.getMetadataSection(PackMetadataSection.SERIALIZER);
+-            if (var8 == null) {
+-               LOGGER.warn((String)"Couldn't find pack meta for pack {}", (Object)var0);
+-               return null;
+-            }
+-
+-            var9 = var3.create(var0, new TextComponent(var6.getName()), var1, var2, var8, var4, var5);
+-         } catch (Throwable var20) {
+-            var7 = var20;
+-            throw var20;
+-         } finally {
+-            if (var6 != null) {
++         Pack var8;
++         label54: {
++            try {
++               PackMetadataSection var7 = (PackMetadataSection)var6.getMetadataSection(PackMetadataSection.SERIALIZER);
+                if (var7 != null) {
++                  var8 = var3.create(var0, new TextComponent(var6.getName()), var1, var2, var7, var4, var5);
++                  break label54;
++               }
++
++               LOGGER.warn((String)"Couldn't find pack meta for pack {}", (Object)var0);
++            } catch (Throwable var10) {
++               if (var6 != null) {
+                   try {
+                      var6.close();
+-                  } catch (Throwable var19) {
+-                     var7.addSuppressed(var19);
++                  } catch (Throwable var9) {
++                     var10.addSuppressed(var9);
+                   }
+-               } else {
+-                  var6.close();
+                }
++
++               throw var10;
+             }
+ 
++            if (var6 != null) {
++               var6.close();
++            }
++
++            return null;
+          }
+ 
+-         return var9;
+-      } catch (IOException var22) {
+-         LOGGER.warn((String)"Couldn't get pack info for: {}", (Object)var22.toString());
++         if (var6 != null) {
++            var6.close();
++         }
++
++         return var8;
++      } catch (IOException var11) {
++         LOGGER.warn((String)"Couldn't get pack info for: {}", (Object)var11.toString());
+          return null;
+       }
+    }
+ 
+    public Pack(String var1, boolean var2, Supplier<PackResources> var3, Component var4, Component var5, PackCompatibility var6, Pack.Position var7, boolean var8, PackSource var9) {
+@@ -143,10 +148,16 @@
+    }
+ 
+    public void close() {
+    }
+ 
++   @FunctionalInterface
++   public interface PackConstructor {
++      @Nullable
++      Pack create(String var1, Component var2, boolean var3, Supplier<PackResources> var4, PackMetadataSection var5, Pack.Position var6, PackSource var7);
++   }
++
+    public static enum Position {
+       TOP,
+       BOTTOM;
+ 
+       private Position() {
+@@ -181,12 +192,6 @@
+ 
+       public Pack.Position opposite() {
+          return this == TOP ? BOTTOM : TOP;
+       }
+    }
+-
+-   @FunctionalInterface
+-   public interface PackConstructor {
+-      @Nullable
+-      Pack create(String var1, Component var2, boolean var3, Supplier<PackResources> var4, PackMetadataSection var5, Pack.Position var6, PackSource var7);
+-   }
+ }

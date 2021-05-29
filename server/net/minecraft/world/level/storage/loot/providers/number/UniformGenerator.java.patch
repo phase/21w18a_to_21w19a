@@ -1,0 +1,20 @@
+--- net/minecraft/world/level/storage/loot/providers/number/UniformGenerator.java
++++ net/minecraft/world/level/storage/loot/providers/number/UniformGenerator.java
+@@ -9,14 +9,14 @@
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.level.storage.loot.LootContext;
+ import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+ 
+ public class UniformGenerator implements NumberProvider {
+-   private final NumberProvider min;
+-   private final NumberProvider max;
++   final NumberProvider min;
++   final NumberProvider max;
+ 
+-   private UniformGenerator(NumberProvider var1, NumberProvider var2) {
++   UniformGenerator(NumberProvider var1, NumberProvider var2) {
+       this.min = var1;
+       this.max = var2;
+    }
+ 
+    public LootNumberProviderType getType() {

@@ -1,0 +1,29 @@
+--- net/minecraft/world/entity/animal/MushroomCow.java
++++ net/minecraft/world/entity/animal/MushroomCow.java
+@@ -244,23 +244,23 @@
+ 
+    public static enum MushroomType {
+       RED("red", Blocks.RED_MUSHROOM.defaultBlockState()),
+       BROWN("brown", Blocks.BROWN_MUSHROOM.defaultBlockState());
+ 
+-      private final String type;
+-      private final BlockState blockState;
++      final String type;
++      final BlockState blockState;
+ 
+       private MushroomType(String var3, BlockState var4) {
+          this.type = var3;
+          this.blockState = var4;
+       }
+ 
+       public BlockState getBlockState() {
+          return this.blockState;
+       }
+ 
+-      private static MushroomCow.MushroomType byType(String var0) {
++      static MushroomCow.MushroomType byType(String var0) {
+          MushroomCow.MushroomType[] var1 = values();
+          int var2 = var1.length;
+ 
+          for(int var3 = 0; var3 < var2; ++var3) {
+             MushroomCow.MushroomType var4 = var1[var3];

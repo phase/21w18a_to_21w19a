@@ -1,0 +1,47 @@
+--- net/minecraft/client/renderer/GameRenderer.java
++++ net/minecraft/client/renderer/GameRenderer.java
+@@ -913,34 +913,27 @@
+                var3 = var2;
+             }
+ 
+             try {
+                NativeImage var6 = new NativeImage(64, 64, false);
+-               Throwable var7 = null;
+ 
+                try {
+                   var1.resizeSubRectTo(var4, var5, var2, var3, var6);
+                   var6.writeToFile(this.minecraft.getSingleplayerServer().getWorldScreenshotFile());
+-               } catch (Throwable var25) {
+-                  var7 = var25;
+-                  throw var25;
+-               } finally {
+-                  if (var6 != null) {
+-                     if (var7 != null) {
+-                        try {
+-                           var6.close();
+-                        } catch (Throwable var24) {
+-                           var7.addSuppressed(var24);
+-                        }
+-                     } else {
+-                        var6.close();
+-                     }
++               } catch (Throwable var15) {
++                  try {
++                     var6.close();
++                  } catch (Throwable var14) {
++                     var15.addSuppressed(var14);
+                   }
+ 
++                  throw var15;
+                }
+-            } catch (IOException var27) {
+-               LOGGER.warn("Couldn't save auto screenshot", var27);
++
++               var6.close();
++            } catch (IOException var16) {
++               LOGGER.warn("Couldn't save auto screenshot", var16);
+             } finally {
+                var1.close();
+             }
+ 
+          });

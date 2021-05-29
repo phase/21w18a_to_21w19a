@@ -1,0 +1,164 @@
+--- net/minecraft/client/gui/screens/worldselection/WorldGenSettingsComponent.java
++++ net/minecraft/client/gui/screens/worldselection/WorldGenSettingsComponent.java
+@@ -13,10 +13,11 @@
+ import java.io.BufferedReader;
+ import java.io.IOException;
+ import java.nio.file.Files;
+ import java.nio.file.Paths;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.OptionalLong;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.concurrent.ExecutionException;
+ import java.util.stream.Collectors;
+@@ -106,12 +107,14 @@
+       }).create(var5, 100, 150, 20, new TranslatableComponent("selectWorld.mapType"), (var2x, var3x) -> {
+          this.preset = Optional.of(var3x);
+          this.settings = var3x.create(this.registryHolder, this.settings.seed(), this.settings.generateFeatures(), this.settings.generateBonusChest());
+          var1.refreshWorldGenSettingsVisibility();
+       }));
++      Optional var10000 = this.preset;
+       CycleButton var10001 = this.typeButton;
+-      this.preset.ifPresent(var10001::setValue);
++      Objects.requireNonNull(var10001);
++      var10000.ifPresent(var10001::setValue);
+       this.typeButton.visible = false;
+       this.customWorldDummyButton = (Button)var1.addButton(new Button(var5, 100, 150, 20, CommonComponents.optionNameValue(new TranslatableComponent("selectWorld.mapType"), CUSTOM_WORLD_DESCRIPTION), (var0) -> {
+       }));
+       this.customWorldDummyButton.active = false;
+       this.customWorldDummyButton.visible = false;
+@@ -135,76 +138,74 @@
+ 
+             ServerResources var7;
+             try {
+                MinecraftServer.configurePackRepository(var6, var1.dataPacks, false);
+                CompletableFuture var8 = ServerResources.loadResources(var6.openAllSelected(), var5, Commands.CommandSelection.INTEGRATED, 2, Util.backgroundExecutor(), var2);
++               Objects.requireNonNull(var8);
+                var2.managedBlock(var8::isDone);
+                var7 = (ServerResources)var8.get();
+-            } catch (ExecutionException | InterruptedException var24) {
+-               LOGGER.error("Error loading data packs when importing world settings", var24);
++            } catch (ExecutionException | InterruptedException var15) {
++               LOGGER.error("Error loading data packs when importing world settings", var15);
+                TranslatableComponent var9 = new TranslatableComponent("selectWorld.import_worldgen_settings.failure");
+-               TextComponent var10 = new TextComponent(var24.getMessage());
++               TextComponent var10 = new TextComponent(var15.getMessage());
+                var2.getToasts().addToast(SystemToast.multiline(var2, SystemToast.SystemToastIds.WORLD_GEN_SETTINGS_TRANSFER, var9, var10));
+                var6.close();
+                return;
+             }
+ 
+-            RegistryReadOps var27 = RegistryReadOps.createAndLoad(JsonOps.INSTANCE, (ResourceManager)var7.getResourceManager(), var5);
+-            JsonParser var28 = new JsonParser();
++            RegistryReadOps var18 = RegistryReadOps.createAndLoad(JsonOps.INSTANCE, (ResourceManager)var7.getResourceManager(), var5);
++            JsonParser var19 = new JsonParser();
+ 
+-            DataResult var29;
++            DataResult var20;
+             try {
+                BufferedReader var11 = Files.newBufferedReader(Paths.get(var4));
+-               Throwable var12 = null;
+ 
+                try {
+-                  JsonElement var13 = var28.parse(var11);
+-                  var29 = WorldGenSettings.CODEC.parse(var27, var13);
+-               } catch (Throwable var23) {
+-                  var12 = var23;
+-                  throw var23;
+-               } finally {
++                  JsonElement var12 = var19.parse(var11);
++                  var20 = WorldGenSettings.CODEC.parse(var18, var12);
++               } catch (Throwable var16) {
+                   if (var11 != null) {
+-                     if (var12 != null) {
+-                        try {
+-                           var11.close();
+-                        } catch (Throwable var22) {
+-                           var12.addSuppressed(var22);
+-                        }
+-                     } else {
++                     try {
+                         var11.close();
++                     } catch (Throwable var14) {
++                        var16.addSuppressed(var14);
+                      }
+                   }
+ 
++                  throw var16;
+                }
+-            } catch (JsonIOException | JsonSyntaxException | IOException var26) {
+-               var29 = DataResult.error("Failed to parse file: " + var26.getMessage());
++
++               if (var11 != null) {
++                  var11.close();
++               }
++            } catch (JsonIOException | JsonSyntaxException | IOException var17) {
++               var20 = DataResult.error("Failed to parse file: " + var17.getMessage());
+             }
+ 
+-            if (var29.error().isPresent()) {
+-               TranslatableComponent var30 = new TranslatableComponent("selectWorld.import_worldgen_settings.failure");
+-               String var32 = ((PartialResult)var29.error().get()).message();
+-               LOGGER.error("Error parsing world settings: {}", var32);
+-               TextComponent var33 = new TextComponent(var32);
+-               var2.getToasts().addToast(SystemToast.multiline(var2, SystemToast.SystemToastIds.WORLD_GEN_SETTINGS_TRANSFER, var30, var33));
++            if (var20.error().isPresent()) {
++               TranslatableComponent var21 = new TranslatableComponent("selectWorld.import_worldgen_settings.failure");
++               String var23 = ((PartialResult)var20.error().get()).message();
++               LOGGER.error("Error parsing world settings: {}", var23);
++               TextComponent var13 = new TextComponent(var23);
++               var2.getToasts().addToast(SystemToast.multiline(var2, SystemToast.SystemToastIds.WORLD_GEN_SETTINGS_TRANSFER, var21, var13));
+             }
+ 
+             var7.close();
+-            Lifecycle var31 = var29.lifecycle();
++            Lifecycle var22 = var20.lifecycle();
+             Logger var10001 = LOGGER;
+-            var10001.getClass();
+-            var29.resultOrPartial(var10001::error).ifPresent((var5x) -> {
++            Objects.requireNonNull(var10001);
++            var20.resultOrPartial(var10001::error).ifPresent((var5x) -> {
+                BooleanConsumer var6 = (var5xx) -> {
+                   var2.setScreen(var1);
+                   if (var5xx) {
+                      this.importSettings(var5, var5x);
+                   }
+ 
+                };
+-               if (var31 == Lifecycle.stable()) {
++               if (var22 == Lifecycle.stable()) {
+                   this.importSettings(var5, var5x);
+-               } else if (var31 == Lifecycle.experimental()) {
++               } else if (var22 == Lifecycle.experimental()) {
+                   var2.setScreen(new ConfirmScreen(var6, new TranslatableComponent("selectWorld.import_worldgen_settings.experimental.title"), new TranslatableComponent("selectWorld.import_worldgen_settings.experimental.question")));
+                } else {
+                   var2.setScreen(new ConfirmScreen(var6, new TranslatableComponent("selectWorld.import_worldgen_settings.deprecated.title"), new TranslatableComponent("selectWorld.import_worldgen_settings.deprecated.question")));
+                }
+ 
+@@ -236,11 +237,11 @@
+       this.seedEdit.render(var1, var2, var3, var4);
+       if (this.preset.equals(Optional.of(WorldPreset.AMPLIFIED))) {
+          MultiLineLabel var10000 = this.amplifiedWorldInfo;
+          int var10002 = this.typeButton.x + 2;
+          int var10003 = this.typeButton.y + 22;
+-         this.font.getClass();
++         Objects.requireNonNull(this.font);
+          var10000.renderLeftAligned(var1, var10002, var10003, 9, 10526880);
+       }
+ 
+    }
+ 
+@@ -324,11 +325,11 @@
+       RegistryReadOps var4 = RegistryReadOps.createAndLoad(JsonOps.INSTANCE, (ResourceManager)var1.getResourceManager(), var2);
+       DataResult var5 = WorldGenSettings.CODEC.encodeStart(var3, this.settings).flatMap((var1x) -> {
+          return WorldGenSettings.CODEC.parse(var4, var1x);
+       });
+       Logger var10002 = LOGGER;
+-      var10002.getClass();
++      Objects.requireNonNull(var10002);
+       var5.resultOrPartial(Util.prefix("Error parsing worldgen settings after loading data packs: ", var10002::error)).ifPresent((var2x) -> {
+          this.settings = var2x;
+          this.registryHolder = var2;
+       });
+    }

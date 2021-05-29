@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/boss/enderdragon/phases/DragonStrafePlayerPhase.java
++++ net/minecraft/world/entity/boss/enderdragon/phases/DragonStrafePlayerPhase.java
+@@ -49,11 +49,11 @@
+             this.findNewTarget();
+          }
+ 
+          var3 = 64.0D;
+          if (this.attackTarget.distanceToSqr(this.dragon) < 4096.0D) {
+-            if (this.dragon.canSee(this.attackTarget)) {
++            if (this.dragon.hasLineOfSight(this.attackTarget)) {
+                ++this.fireballCharge;
+                Vec3 var25 = (new Vec3(this.attackTarget.getX() - this.dragon.getX(), 0.0D, this.attackTarget.getZ() - this.dragon.getZ())).normalize();
+                Vec3 var6 = (new Vec3((double)Mth.sin(this.dragon.getYRot() * 0.017453292F), 0.0D, (double)(-Mth.cos(this.dragon.getYRot() * 0.017453292F)))).normalize();
+                float var26 = (float)var6.dot(var25);
+                float var8 = (float)(Math.acos((double)var26) * 57.2957763671875D);

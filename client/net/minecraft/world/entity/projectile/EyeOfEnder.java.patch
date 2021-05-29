@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/projectile/EyeOfEnder.java
++++ net/minecraft/world/entity/projectile/EyeOfEnder.java
+@@ -36,11 +36,11 @@
+       this.setPos(var2, var4, var6);
+    }
+ 
+    public void setItem(ItemStack var1) {
+       if (!var1.is(Items.ENDER_EYE) || var1.hasTag()) {
+-         this.getEntityData().set(DATA_ITEM_STACK, Util.make(var1.copy(), (var0) -> {
++         this.getEntityData().set(DATA_ITEM_STACK, (ItemStack)Util.make(var1.copy(), (var0) -> {
+             var0.setCount(1);
+          }));
+       }
+ 
+    }

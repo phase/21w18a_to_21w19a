@@ -1,0 +1,15 @@
+--- net/minecraft/nbt/LongTag.java
++++ net/minecraft/nbt/LongTag.java
+@@ -24,11 +24,11 @@
+          return true;
+       }
+    };
+    private final long data;
+ 
+-   private LongTag(long var1) {
++   LongTag(long var1) {
+       this.data = var1;
+    }
+ 
+    public static LongTag valueOf(long var0) {
+       return var0 >= -128L && var0 <= 1024L ? LongTag.Cache.cache[(int)var0 - -128] : new LongTag(var0);

@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/ai/control/MoveControl.java
++++ net/minecraft/world/entity/ai/control/MoveControl.java
+@@ -158,11 +158,11 @@
+ 
+    public double getWantedZ() {
+       return this.wantedZ;
+    }
+ 
+-   public static enum Operation {
++   protected static enum Operation {
+       WAIT,
+       MOVE_TO,
+       STRAFE,
+       JUMPING;
+ 

@@ -1,0 +1,21 @@
+--- net/minecraft/world/level/storage/loot/functions/SetNameFunction.java
++++ net/minecraft/world/level/storage/loot/functions/SetNameFunction.java
+@@ -21,15 +21,15 @@
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class SetNameFunction extends LootItemConditionalFunction {
+    private static final Logger LOGGER = LogManager.getLogger();
+-   private final Component name;
++   final Component name;
+    @Nullable
+-   private final LootContext.EntityTarget resolutionContext;
++   final LootContext.EntityTarget resolutionContext;
+ 
+-   private SetNameFunction(LootItemCondition[] var1, @Nullable Component var2, @Nullable LootContext.EntityTarget var3) {
++   SetNameFunction(LootItemCondition[] var1, @Nullable Component var2, @Nullable LootContext.EntityTarget var3) {
+       super(var1);
+       this.name = var2;
+       this.resolutionContext = var3;
+    }
+ 

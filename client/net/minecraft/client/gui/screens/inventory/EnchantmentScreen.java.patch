@@ -1,0 +1,15 @@
+--- net/minecraft/client/gui/screens/inventory/EnchantmentScreen.java
++++ net/minecraft/client/gui/screens/inventory/EnchantmentScreen.java
+@@ -142,11 +142,11 @@
+          int var21 = ((EnchantmentMenu)this.menu).costs[var18];
+          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+          if (var21 == 0) {
+             this.blit(var1, var19, var6 + 14 + 19 * var18, 0, 185, 108, 19);
+          } else {
+-            String var22 = "" + var21;
++            String var22 = var21.makeConcatWithConstants<invokedynamic>(var21);
+             int var23 = 86 - this.font.width(var22);
+             FormattedText var24 = EnchantmentNames.getInstance().getRandomName(this.font, var23);
+             int var25 = 6839882;
+             if ((var17 < var18 + 1 || this.minecraft.player.experienceLevel < var21) && !this.minecraft.player.getAbilities().instabuild) {
+                this.blit(var1, var19, var6 + 14 + 19 * var18, 0, 185, 108, 19);

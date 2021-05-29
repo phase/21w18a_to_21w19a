@@ -1,0 +1,12 @@
+--- net/minecraft/util/valueproviders/UniformInt.java
++++ net/minecraft/util/valueproviders/UniformInt.java
+@@ -45,8 +45,8 @@
+    public IntProviderType<?> getType() {
+       return IntProviderType.UNIFORM;
+    }
+ 
+    public String toString() {
+-      return "[" + this.minInclusive + '-' + this.maxInclusive + ']';
++      return "[" + this.minInclusive + "-" + this.maxInclusive + "]";
+    }
+ }

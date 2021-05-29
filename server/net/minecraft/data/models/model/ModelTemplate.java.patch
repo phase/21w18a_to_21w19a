@@ -1,0 +1,25 @@
+--- net/minecraft/data/models/model/ModelTemplate.java
++++ net/minecraft/data/models/model/ModelTemplate.java
+@@ -4,10 +4,11 @@
+ import com.google.common.collect.ImmutableSet;
+ import com.google.common.collect.Streams;
+ import com.google.gson.JsonElement;
+ import com.google.gson.JsonObject;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Set;
+ import java.util.function.BiConsumer;
+ import java.util.function.Function;
+ import java.util.function.Supplier;
+@@ -59,9 +60,9 @@
+    }
+ 
+    private Map<TextureSlot, ResourceLocation> createMap(TextureMapping var1) {
+       Stream var10000 = Streams.concat(this.requiredSlots.stream(), var1.getForced());
+       Function var10001 = Function.identity();
+-      var1.getClass();
++      Objects.requireNonNull(var1);
+       return (Map)var10000.collect(ImmutableMap.toImmutableMap(var10001, var1::get));
+    }
+ }

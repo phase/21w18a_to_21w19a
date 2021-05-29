@@ -1,0 +1,27 @@
+--- net/minecraft/client/gui/components/SubtitleOverlay.java
++++ net/minecraft/client/gui/components/SubtitleOverlay.java
+@@ -3,10 +3,11 @@
+ import com.google.common.collect.Lists;
+ import com.mojang.blaze3d.systems.RenderSystem;
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import net.minecraft.Util;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.GuiComponent;
+ import net.minecraft.client.resources.sounds.SoundInstance;
+ import net.minecraft.client.sounds.SoundEventListener;
+@@ -65,11 +66,11 @@
+             Vec3 var12 = var9.getLocation().subtract(var2).normalize();
+             double var13 = -var5.dot(var12);
+             double var15 = -var3.dot(var12);
+             boolean var17 = var15 > 0.5D;
+             int var18 = var7 / 2;
+-            this.minecraft.font.getClass();
++            Objects.requireNonNull(this.minecraft.font);
+             byte var19 = 9;
+             int var20 = var19 / 2;
+             float var21 = 1.0F;
+             int var22 = this.minecraft.font.width((FormattedText)var11);
+             int var23 = Mth.floor(Mth.clampedLerp(255.0D, 75.0D, (double)((float)(Util.getMillis() - var9.getTime()) / 3000.0F)));

@@ -1,0 +1,57 @@
+--- net/minecraft/world/item/enchantment/EnchantmentHelper.java
++++ net/minecraft/world/item/enchantment/EnchantmentHelper.java
+@@ -6,10 +6,12 @@
+ import java.util.Collection;
+ import java.util.Iterator;
+ import java.util.LinkedHashMap;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
++import java.util.Optional;
+ import java.util.Random;
+ import java.util.Map.Entry;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
+ import net.minecraft.Util;
+@@ -64,11 +66,11 @@
+       LinkedHashMap var1 = Maps.newLinkedHashMap();
+ 
+       for(int var2 = 0; var2 < var0.size(); ++var2) {
+          CompoundTag var3 = var0.getCompound(var2);
+          Registry.ENCHANTMENT.getOptional(ResourceLocation.tryParse(var3.getString("id"))).ifPresent((var2x) -> {
+-            Integer var10000 = (Integer)var1.put(var2x, var3.getInt("lvl"));
++            var1.put(var2x, var3.getInt("lvl"));
+          });
+       }
+ 
+       return var1;
+    }
+@@ -336,22 +338,26 @@
+          var2 += 1 + var0.nextInt(var6 / 4 + 1) + var0.nextInt(var6 / 4 + 1);
+          float var7 = (var0.nextFloat() + var0.nextFloat() - 1.0F) * 0.15F;
+          var2 = Mth.clamp((int)Math.round((float)var2 + (float)var2 * var7), (int)1, (int)Integer.MAX_VALUE);
+          List var8 = getAvailableEnchantmentResults(var2, var1, var3);
+          if (!var8.isEmpty()) {
+-            WeightedRandom.getRandomItem(var0, var8).ifPresent(var4::add);
++            Optional var10000 = WeightedRandom.getRandomItem(var0, var8);
++            Objects.requireNonNull(var4);
++            var10000.ifPresent(var4::add);
+ 
+             while(var0.nextInt(50) <= var2) {
+                if (!var4.isEmpty()) {
+                   filterCompatibleEnchantments(var8, (EnchantmentInstance)Util.lastOf(var4));
+                }
+ 
+                if (var8.isEmpty()) {
+                   break;
+                }
+ 
+-               WeightedRandom.getRandomItem(var0, var8).ifPresent(var4::add);
++               var10000 = WeightedRandom.getRandomItem(var0, var8);
++               Objects.requireNonNull(var4);
++               var10000.ifPresent(var4::add);
+                var2 /= 2;
+             }
+          }
+ 
+          return var4;

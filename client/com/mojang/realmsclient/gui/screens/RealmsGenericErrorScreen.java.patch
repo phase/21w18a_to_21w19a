@@ -1,0 +1,16 @@
+--- com/mojang/realmsclient/gui/screens/RealmsGenericErrorScreen.java
++++ com/mojang/realmsclient/gui/screens/RealmsGenericErrorScreen.java
+@@ -52,11 +52,12 @@
+       this.line1 = var1;
+       this.line2 = var2;
+    }
+ 
+    public void init() {
+-      NarrationHelper.now(this.line1.getString() + ": " + this.line2.getString());
++      String var10000 = this.line1.getString();
++      NarrationHelper.now(var10000 + ": " + this.line2.getString());
+       this.addButton(new Button(this.width / 2 - 100, this.height - 52, 200, 20, new TextComponent("Ok"), (var1) -> {
+          this.minecraft.setScreen(this.nextScreen);
+       }));
+    }
+ 

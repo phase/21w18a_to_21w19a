@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/boss/enderdragon/phases/DragonHoldingPatternPhase.java
++++ net/minecraft/world/entity/boss/enderdragon/phases/DragonHoldingPatternPhase.java
+@@ -13,11 +13,11 @@
+ import net.minecraft.world.level.pathfinder.Node;
+ import net.minecraft.world.level.pathfinder.Path;
+ import net.minecraft.world.phys.Vec3;
+ 
+ public class DragonHoldingPatternPhase extends AbstractDragonPhaseInstance {
+-   private static final TargetingConditions NEW_TARGET_TARGETING = (new TargetingConditions()).range(64.0D);
++   private static final TargetingConditions NEW_TARGET_TARGETING = TargetingConditions.forCombat().range(64.0D);
+    private Path currentPath;
+    private Vec3 targetLocation;
+    private boolean clockwise;
+ 
+    public DragonHoldingPatternPhase(EnderDragon var1) {

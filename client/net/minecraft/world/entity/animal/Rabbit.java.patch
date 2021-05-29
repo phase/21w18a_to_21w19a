@@ -1,0 +1,224 @@
+--- net/minecraft/world/entity/animal/Rabbit.java
++++ net/minecraft/world/entity/animal/Rabbit.java
+@@ -77,11 +77,11 @@
+    private static final int MORE_CARROTS_DELAY = 40;
+    private int jumpTicks;
+    private int jumpDuration;
+    private boolean wasOnGround;
+    private int jumpDelayTicks;
+-   private int moreCarrotTicks;
++   int moreCarrotTicks;
+ 
+    public Rabbit(EntityType<? extends Rabbit> var1, Level var2) {
+       super(var1, var2);
+       this.jumpControl = new Rabbit.RabbitJumpControl(this);
+       this.moveControl = new Rabbit.RabbitMoveControl(this);
+@@ -366,11 +366,11 @@
+    public static boolean checkRabbitSpawnRules(EntityType<Rabbit> var0, LevelAccessor var1, MobSpawnType var2, BlockPos var3, Random var4) {
+       BlockState var5 = var1.getBlockState(var3.below());
+       return (var5.is(Blocks.GRASS_BLOCK) || var5.is(Blocks.SNOW) || var5.is(Blocks.SAND)) && var1.getRawBrightness(var3, 0) > 8;
+    }
+ 
+-   private boolean wantsMoreFood() {
++   boolean wantsMoreFood() {
+       return this.moreCarrotTicks == 0;
+    }
+ 
+    public void handleEntityEvent(byte var1) {
+       if (var1 == 1) {
+@@ -390,20 +390,72 @@
+    static {
+       DATA_TYPE_ID = SynchedEntityData.defineId(Rabbit.class, EntityDataSerializers.INT);
+       KILLER_BUNNY = new ResourceLocation("killer_bunny");
+    }
+ 
+-   static class EvilRabbitAttackGoal extends MeleeAttackGoal {
+-      public EvilRabbitAttackGoal(Rabbit var1) {
+-         super(var1, 1.4D, true);
++   public class RabbitJumpControl extends JumpControl {
++      private final Rabbit rabbit;
++      private boolean canJump;
++
++      public RabbitJumpControl(Rabbit var2) {
++         super(var2);
++         this.rabbit = var2;
+       }
+ 
+-      protected double getAttackReachSqr(LivingEntity var1) {
+-         return (double)(4.0F + var1.getBbWidth());
++      public boolean wantJump() {
++         return this.jump;
+       }
++
++      public boolean canJump() {
++         return this.canJump;
++      }
++
++      public void setCanJump(boolean var1) {
++         this.canJump = var1;
++      }
++
++      public void tick() {
++         if (this.jump) {
++            this.rabbit.startJumping();
++            this.jump = false;
++         }
++
++      }
+    }
+ 
++   private static class RabbitMoveControl extends MoveControl {
++      private final Rabbit rabbit;
++      private double nextJumpSpeed;
++
++      public RabbitMoveControl(Rabbit var1) {
++         super(var1);
++         this.rabbit = var1;
++      }
++
++      public void tick() {
++         if (this.rabbit.onGround && !this.rabbit.jumping && !((Rabbit.RabbitJumpControl)this.rabbit.jumpControl).wantJump()) {
++            this.rabbit.setSpeedModifier(0.0D);
++         } else if (this.hasWanted()) {
++            this.rabbit.setSpeedModifier(this.nextJumpSpeed);
++         }
++
++         super.tick();
++      }
++
++      public void setWantedPosition(double var1, double var3, double var5, double var7) {
++         if (this.rabbit.isInWater()) {
++            var7 = 1.5D;
++         }
++
++         super.setWantedPosition(var1, var3, var5, var7);
++         if (var7 > 0.0D) {
++            this.nextJumpSpeed = var7;
++         }
++
++      }
++   }
++
+    static class RabbitPanicGoal extends PanicGoal {
+       private final Rabbit rabbit;
+ 
+       public RabbitPanicGoal(Rabbit var1, double var2) {
+          super(var1, var2);
+@@ -414,12 +466,25 @@
+          super.tick();
+          this.rabbit.setSpeedModifier(this.speedModifier);
+       }
+    }
+ 
+-   static class RaidGardenGoal extends MoveToBlockGoal {
++   private static class RabbitAvoidEntityGoal<T extends LivingEntity> extends AvoidEntityGoal<T> {
+       private final Rabbit rabbit;
++
++      public RabbitAvoidEntityGoal(Rabbit var1, Class<T> var2, float var3, double var4, double var6) {
++         super(var1, var2, var3, var4, var6);
++         this.rabbit = var1;
++      }
++
++      public boolean canUse() {
++         return this.rabbit.getRabbitType() != 99 && super.canUse();
++      }
++   }
++
++   private static class RaidGardenGoal extends MoveToBlockGoal {
++      private final Rabbit rabbit;
+       private boolean wantsToRaid;
+       private boolean canRaid;
+ 
+       public RaidGardenGoal(Rabbit var1) {
+          super(var1, 0.699999988079071D, 16);
+@@ -483,85 +548,20 @@
+ 
+          return false;
+       }
+    }
+ 
+-   static class RabbitAvoidEntityGoal<T extends LivingEntity> extends AvoidEntityGoal<T> {
+-      private final Rabbit rabbit;
+-
+-      public RabbitAvoidEntityGoal(Rabbit var1, Class<T> var2, float var3, double var4, double var6) {
+-         super(var1, var2, var3, var4, var6);
+-         this.rabbit = var1;
++   private static class EvilRabbitAttackGoal extends MeleeAttackGoal {
++      public EvilRabbitAttackGoal(Rabbit var1) {
++         super(var1, 1.4D, true);
+       }
+ 
+-      public boolean canUse() {
+-         return this.rabbit.getRabbitType() != 99 && super.canUse();
++      protected double getAttackReachSqr(LivingEntity var1) {
++         return (double)(4.0F + var1.getBbWidth());
+       }
+    }
+ 
+-   static class RabbitMoveControl extends MoveControl {
+-      private final Rabbit rabbit;
+-      private double nextJumpSpeed;
+-
+-      public RabbitMoveControl(Rabbit var1) {
+-         super(var1);
+-         this.rabbit = var1;
+-      }
+-
+-      public void tick() {
+-         if (this.rabbit.onGround && !this.rabbit.jumping && !((Rabbit.RabbitJumpControl)this.rabbit.jumpControl).wantJump()) {
+-            this.rabbit.setSpeedModifier(0.0D);
+-         } else if (this.hasWanted()) {
+-            this.rabbit.setSpeedModifier(this.nextJumpSpeed);
+-         }
+-
+-         super.tick();
+-      }
+-
+-      public void setWantedPosition(double var1, double var3, double var5, double var7) {
+-         if (this.rabbit.isInWater()) {
+-            var7 = 1.5D;
+-         }
+-
+-         super.setWantedPosition(var1, var3, var5, var7);
+-         if (var7 > 0.0D) {
+-            this.nextJumpSpeed = var7;
+-         }
+-
+-      }
+-   }
+-
+-   public class RabbitJumpControl extends JumpControl {
+-      private final Rabbit rabbit;
+-      private boolean canJump;
+-
+-      public RabbitJumpControl(Rabbit var2) {
+-         super(var2);
+-         this.rabbit = var2;
+-      }
+-
+-      public boolean wantJump() {
+-         return this.jump;
+-      }
+-
+-      public boolean canJump() {
+-         return this.canJump;
+-      }
+-
+-      public void setCanJump(boolean var1) {
+-         this.canJump = var1;
+-      }
+-
+-      public void tick() {
+-         if (this.jump) {
+-            this.rabbit.startJumping();
+-            this.jump = false;
+-         }
+-
+-      }
+-   }
+-
+    public static class RabbitGroupData extends AgeableMob.AgeableMobGroupData {
+       public final int rabbitType;
+ 
+       public RabbitGroupData(int var1) {
+          super(1.0F);

@@ -1,0 +1,171 @@
+--- net/minecraft/client/gui/screens/multiplayer/ServerSelectionList.java
++++ net/minecraft/client/gui/screens/multiplayer/ServerSelectionList.java
+@@ -41,20 +41,20 @@
+ import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class ServerSelectionList extends ObjectSelectionList<ServerSelectionList.Entry> {
+-   private static final Logger LOGGER = LogManager.getLogger();
+-   private static final ThreadPoolExecutor THREAD_POOL;
+-   private static final ResourceLocation ICON_MISSING;
+-   private static final ResourceLocation ICON_OVERLAY_LOCATION;
+-   private static final Component SCANNING_LABEL;
+-   private static final Component CANT_RESOLVE_TEXT;
+-   private static final Component CANT_CONNECT_TEXT;
+-   private static final Component INCOMPATIBLE_TOOLTIP;
+-   private static final Component NO_CONNECTION_TOOLTIP;
+-   private static final Component PINGING_TOOLTIP;
++   static final Logger LOGGER = LogManager.getLogger();
++   static final ThreadPoolExecutor THREAD_POOL;
++   static final ResourceLocation ICON_MISSING;
++   static final ResourceLocation ICON_OVERLAY_LOCATION;
++   static final Component SCANNING_LABEL;
++   static final Component CANT_RESOLVE_TEXT;
++   static final Component CANT_CONNECT_TEXT;
++   static final Component INCOMPATIBLE_TOOLTIP;
++   static final Component NO_CONNECTION_TOOLTIP;
++   static final Component PINGING_TOOLTIP;
+    private final JoinMultiplayerScreen screen;
+    private final List<ServerSelectionList.OnlineServerEntry> onlineServers = Lists.newArrayList();
+    private final ServerSelectionList.Entry lanHeader = new ServerSelectionList.LANHeader();
+    private final List<ServerSelectionList.NetworkServerEntry> networkServers = Lists.newArrayList();
+ 
+@@ -63,13 +63,17 @@
+       this.screen = var1;
+    }
+ 
+    private void refreshEntries() {
+       this.clearEntries();
+-      this.onlineServers.forEach(this::addEntry);
++      this.onlineServers.forEach((var1) -> {
++         this.addEntry(var1);
++      });
+       this.addEntry(this.lanHeader);
+-      this.networkServers.forEach(this::addEntry);
++      this.networkServers.forEach((var1) -> {
++         this.addEntry(var1);
++      });
+    }
+ 
+    public void setSelected(@Nullable ServerSelectionList.Entry var1) {
+       super.setSelected(var1);
+       if (this.getSelected() instanceof ServerSelectionList.OnlineServerEntry) {
+@@ -134,10 +138,47 @@
+       INCOMPATIBLE_TOOLTIP = new TranslatableComponent("multiplayer.status.incompatible");
+       NO_CONNECTION_TOOLTIP = new TranslatableComponent("multiplayer.status.no_connection");
+       PINGING_TOOLTIP = new TranslatableComponent("multiplayer.status.pinging");
+    }
+ 
++   public static class LANHeader extends ServerSelectionList.Entry {
++      private final Minecraft minecraft = Minecraft.getInstance();
++
++      public LANHeader() {
++      }
++
++      public void render(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10) {
++         int var10000 = var3 + var6 / 2;
++         Objects.requireNonNull(this.minecraft.font);
++         int var11 = var10000 - 9 / 2;
++         this.minecraft.font.draw(var1, ServerSelectionList.SCANNING_LABEL, (float)(this.minecraft.screen.width / 2 - this.minecraft.font.width((FormattedText)ServerSelectionList.SCANNING_LABEL) / 2), (float)var11, 16777215);
++         String var12;
++         switch((int)(Util.getMillis() / 300L % 4L)) {
++         case 0:
++         default:
++            var12 = "O o o";
++            break;
++         case 1:
++         case 3:
++            var12 = "o O o";
++            break;
++         case 2:
++            var12 = "o o O";
++         }
++
++         Font var13 = this.minecraft.font;
++         float var10003 = (float)(this.minecraft.screen.width / 2 - this.minecraft.font.width(var12) / 2);
++         Objects.requireNonNull(this.minecraft.font);
++         var13.draw(var1, var12, var10003, (float)(var11 + 9), 8421504);
++      }
++   }
++
++   public abstract static class Entry extends ObjectSelectionList.Entry<ServerSelectionList.Entry> {
++      public Entry() {
++      }
++   }
++
+    public class OnlineServerEntry extends ServerSelectionList.Entry {
+       private static final int ICON_WIDTH = 32;
+       private static final int ICON_HEIGHT = 32;
+       private static final int ICON_OVERLAY_X_MOVE_RIGHT = 0;
+       private static final int ICON_OVERLAY_X_MOVE_LEFT = 32;
+@@ -145,11 +186,11 @@
+       private static final int ICON_OVERLAY_X_MOVE_UP = 96;
+       private static final int ICON_OVERLAY_Y_UNSELECTED = 0;
+       private static final int ICON_OVERLAY_Y_SELECTED = 32;
+       private final JoinMultiplayerScreen screen;
+       private final Minecraft minecraft;
+-      private final ServerData serverData;
++      final ServerData serverData;
+       private final ResourceLocation iconLocation;
+       private String lastIconB64;
+       @Nullable
+       private DynamicTexture icon;
+       private long lastClickTime;
+@@ -195,11 +236,11 @@
+          for(int var13 = 0; var13 < Math.min(var12.size(), 2); ++var13) {
+             Font var10000 = this.minecraft.font;
+             FormattedCharSequence var10002 = (FormattedCharSequence)var12.get(var13);
+             float var10003 = (float)(var4 + 32 + 3);
+             int var10004 = var3 + 12;
+-            this.minecraft.font.getClass();
++            Objects.requireNonNull(this.minecraft.font);
+             var10000.draw(var1, var10002, var10003, (float)(var10004 + 9 * var13), 8421504);
+          }
+ 
+          Object var24 = var11 ? this.serverData.version.copy().withStyle(ChatFormatting.RED) : this.serverData.status;
+          int var14 = this.minecraft.font.width((FormattedText)var24);
+@@ -447,43 +488,6 @@
+ 
+       public LanServer getServerData() {
+          return this.serverData;
+       }
+    }
+-
+-   public static class LANHeader extends ServerSelectionList.Entry {
+-      private final Minecraft minecraft = Minecraft.getInstance();
+-
+-      public LANHeader() {
+-      }
+-
+-      public void render(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10) {
+-         int var10000 = var3 + var6 / 2;
+-         this.minecraft.font.getClass();
+-         int var11 = var10000 - 9 / 2;
+-         this.minecraft.font.draw(var1, ServerSelectionList.SCANNING_LABEL, (float)(this.minecraft.screen.width / 2 - this.minecraft.font.width((FormattedText)ServerSelectionList.SCANNING_LABEL) / 2), (float)var11, 16777215);
+-         String var12;
+-         switch((int)(Util.getMillis() / 300L % 4L)) {
+-         case 0:
+-         default:
+-            var12 = "O o o";
+-            break;
+-         case 1:
+-         case 3:
+-            var12 = "o O o";
+-            break;
+-         case 2:
+-            var12 = "o o O";
+-         }
+-
+-         Font var13 = this.minecraft.font;
+-         float var10003 = (float)(this.minecraft.screen.width / 2 - this.minecraft.font.width(var12) / 2);
+-         this.minecraft.font.getClass();
+-         var13.draw(var1, var12, var10003, (float)(var11 + 9), 8421504);
+-      }
+-   }
+-
+-   public abstract static class Entry extends ObjectSelectionList.Entry<ServerSelectionList.Entry> {
+-      public Entry() {
+-      }
+-   }
+ }

@@ -1,0 +1,12 @@
+--- net/minecraft/world/level/levelgen/heightproviders/VeryBiasedToBottomHeight.java
++++ net/minecraft/world/level/levelgen/heightproviders/VeryBiasedToBottomHeight.java
+@@ -50,8 +50,8 @@
+    public HeightProviderType<?> getType() {
+       return HeightProviderType.VERY_BIASED_TO_BOTTOM;
+    }
+ 
+    public String toString() {
+-      return "biased[" + this.minInclusive + '-' + this.maxInclusive + " inner: " + this.inner + "]";
++      return "biased[" + this.minInclusive + "-" + this.maxInclusive + " inner: " + this.inner + "]";
+    }
+ }

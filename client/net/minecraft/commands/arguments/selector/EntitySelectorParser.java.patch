@@ -1,0 +1,15 @@
+--- net/minecraft/commands/arguments/selector/EntitySelectorParser.java
++++ net/minecraft/commands/arguments/selector/EntitySelectorParser.java
+@@ -231,11 +231,11 @@
+             this.includesEntities = true;
+             this.currentEntity = true;
+          } else {
+             if (var2 != 'e') {
+                this.reader.setCursor(var1);
+-               throw ERROR_UNKNOWN_SELECTOR_TYPE.createWithContext(this.reader, '@' + String.valueOf(var2));
++               throw ERROR_UNKNOWN_SELECTOR_TYPE.createWithContext(this.reader, "@" + String.valueOf(var2));
+             }
+ 
+             this.maxResults = Integer.MAX_VALUE;
+             this.includesEntities = true;
+             this.order = ORDER_ARBITRARY;

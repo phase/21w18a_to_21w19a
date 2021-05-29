@@ -1,0 +1,76 @@
+--- net/minecraft/world/Snooper.java
++++ net/minecraft/world/Snooper.java
+@@ -14,24 +14,24 @@
+ 
+ public class Snooper {
+    private static final String POLL_HOST = "http://snoop.minecraft.net/";
+    private static final long DATA_SEND_FREQUENCY = 900000L;
+    private static final int SNOOPER_VERSION = 2;
+-   private final Map<String, Object> fixedData = Maps.newHashMap();
+-   private final Map<String, Object> dynamicData = Maps.newHashMap();
+-   private final String token = UUID.randomUUID().toString();
+-   private final URL url;
+-   private final SnooperPopulator populator;
++   final Map<String, Object> fixedData = Maps.newHashMap();
++   final Map<String, Object> dynamicData = Maps.newHashMap();
++   final String token = UUID.randomUUID().toString();
++   final URL url;
++   final SnooperPopulator populator;
+    private final Timer timer = new Timer("Snooper Timer", true);
+-   private final Object lock = new Object();
++   final Object lock = new Object();
+    private final long startupTime;
+    private boolean started;
+-   private int count;
++   int count;
+ 
+    public Snooper(String var1, SnooperPopulator var2, long var3) {
+       try {
+-         this.url = new URL("http://snoop.minecraft.net/" + var1 + "?version=" + 2);
++         this.url = new URL("http://snoop.minecraft.net/" + var1 + "?version=2");
+       } catch (MalformedURLException var6) {
+          throw new IllegalArgumentException();
+       }
+ 
+       this.populator = var2;
+@@ -57,15 +57,14 @@
+    }
+ 
+    private void setJvmArgs() {
+       int[] var1 = new int[]{0};
+       Util.getVmArguments().forEach((var2) -> {
+-         StringBuilder var10001 = (new StringBuilder()).append("jvm_arg[");
+-         int var10005 = var1[0];
+-         int var10002 = var1[0];
+-         var1[0] = var10005 + 1;
+-         this.setDynamicData(var10001.append(var10002).append("]").toString(), var2);
++         int var10004 = var1[0];
++         int var10001 = var1[0];
++         var1[0] = var10004 + 1;
++         this.setDynamicData("jvm_arg[" + var10001 + "]", var2);
+       });
+       this.setDynamicData("jvm_args", var1[0]);
+    }
+ 
+    public void prepare() {
+@@ -95,18 +94,18 @@
+          Iterator var3 = this.fixedData.entrySet().iterator();
+ 
+          Entry var4;
+          while(var3.hasNext()) {
+             var4 = (Entry)var3.next();
+-            var1.put(var4.getKey(), var4.getValue().toString());
++            var1.put((String)var4.getKey(), var4.getValue().toString());
+          }
+ 
+          var3 = this.dynamicData.entrySet().iterator();
+ 
+          while(var3.hasNext()) {
+             var4 = (Entry)var3.next();
+-            var1.put(var4.getKey(), var4.getValue().toString());
++            var1.put((String)var4.getKey(), var4.getValue().toString());
+          }
+ 
+          return var1;
+       }
+    }

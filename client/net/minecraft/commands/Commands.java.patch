@@ -1,0 +1,17 @@
+--- net/minecraft/commands/Commands.java
++++ net/minecraft/commands/Commands.java
+@@ -372,12 +372,12 @@
+    public static enum CommandSelection {
+       ALL(true, true),
+       DEDICATED(false, true),
+       INTEGRATED(true, false);
+ 
+-      private final boolean includeIntegrated;
+-      private final boolean includeDedicated;
++      final boolean includeIntegrated;
++      final boolean includeDedicated;
+ 
+       private CommandSelection(boolean var3, boolean var4) {
+          this.includeIntegrated = var3;
+          this.includeDedicated = var4;
+       }

@@ -1,0 +1,392 @@
+--- net/minecraft/server/level/ServerLevel.java
++++ net/minecraft/server/level/ServerLevel.java
+@@ -34,10 +34,11 @@
+ import java.util.stream.Stream;
+ import javax.annotation.Nonnull;
+ import javax.annotation.Nullable;
+ import net.minecraft.CrashReport;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.DefaultedRegistry;
+ import net.minecraft.core.Direction;
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.RegistryAccess;
+ import net.minecraft.core.SectionPos;
+ import net.minecraft.core.particles.ParticleOptions;
+@@ -148,41 +149,50 @@
+ 
+ public class ServerLevel extends Level implements WorldGenLevel {
+    public static final BlockPos END_SPAWN_POINT = new BlockPos(100, 50, 0);
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final int EMPTY_TIME_NO_TICK = 300;
+-   private final List<ServerPlayer> players = Lists.newArrayList();
++   final List<ServerPlayer> players;
+    private final ServerChunkCache chunkSource;
+    private final MinecraftServer server;
+    private final ServerLevelData serverLevelData;
+-   private final EntityTickList entityTickList = new EntityTickList();
++   final EntityTickList entityTickList;
+    private final PersistentEntitySectionManager<Entity> entityManager;
+    public boolean noSave;
+    private final SleepStatus sleepStatus;
+    private int emptyTime;
+    private final PortalForcer portalForcer;
+    private final ServerTickList<Block> blockTicks;
+    private final ServerTickList<Fluid> liquidTicks;
+-   private final Set<Mob> navigatingMobs;
++   final Set<Mob> navigatingMobs;
+    protected final Raids raids;
+    private final ObjectLinkedOpenHashSet<BlockEventData> blockEvents;
+    private boolean handlingTick;
+    private final List<CustomSpawner> customSpawners;
+    @Nullable
+    private final EndDragonFight dragonFight;
+-   private final Int2ObjectMap<EnderDragonPart> dragonParts;
++   final Int2ObjectMap<EnderDragonPart> dragonParts;
+    private final StructureFeatureManager structureFeatureManager;
+    private final boolean tickTime;
+ 
+    public ServerLevel(MinecraftServer var1, Executor var2, LevelStorageSource.LevelStorageAccess var3, ServerLevelData var4, ResourceKey<Level> var5, DimensionType var6, ChunkProgressListener var7, ChunkGenerator var8, boolean var9, long var10, List<CustomSpawner> var12, boolean var13) {
++      Objects.requireNonNull(var1);
+       super(var4, var5, var6, var1::getProfiler, false, var9, var10);
+-      this.blockTicks = new ServerTickList(this, (var0) -> {
++      this.players = Lists.newArrayList();
++      this.entityTickList = new EntityTickList();
++      Predicate var10004 = (var0) -> {
+          return var0 == null || var0.defaultBlockState().isAir();
+-      }, Registry.BLOCK::getKey, this::tickBlock);
+-      this.liquidTicks = new ServerTickList(this, (var0) -> {
++      };
++      DefaultedRegistry var10005 = Registry.BLOCK;
++      Objects.requireNonNull(var10005);
++      this.blockTicks = new ServerTickList(this, var10004, var10005::getKey, this::tickBlock);
++      var10004 = (var0) -> {
+          return var0 == null || var0 == Fluids.EMPTY;
+-      }, Registry.FLUID::getKey, this::tickLiquid);
++      };
++      var10005 = Registry.FLUID;
++      Objects.requireNonNull(var10005);
++      this.liquidTicks = new ServerTickList(this, var10004, var10005::getKey, this::tickLiquid);
+       this.navigatingMobs = new ObjectOpenHashSet();
+       this.blockEvents = new ObjectLinkedOpenHashSet();
+       this.dragonParts = new Int2ObjectOpenHashMap();
+       this.tickTime = var13;
+       this.server = var1;
+@@ -190,11 +200,15 @@
+       this.serverLevelData = var4;
+       boolean var14 = var1.forceSynchronousWrites();
+       DataFixer var15 = var1.getFixerUpper();
+       EntityStorage var16 = new EntityStorage(this, new File(var3.getDimensionPath(var5), "entities"), var15, var14, var1);
+       this.entityManager = new PersistentEntitySectionManager(Entity.class, new ServerLevel.EntityCallbacks(), var16);
+-      this.chunkSource = new ServerChunkCache(this, var3, var15, var1.getStructureManager(), var2, var8, var1.getPlayerList().getViewDistance(), var14, var7, this.entityManager::updateChunkStatus, () -> {
++      StructureManager var10006 = var1.getStructureManager();
++      int var10009 = var1.getPlayerList().getViewDistance();
++      PersistentEntitySectionManager var10012 = this.entityManager;
++      Objects.requireNonNull(var10012);
++      this.chunkSource = new ServerChunkCache(this, var3, var15, var10006, var2, var8, var10009, var14, var7, var10012::updateChunkStatus, () -> {
+          return var1.overworld().getDataStorage();
+       });
+       this.portalForcer = new PortalForcer(this);
+       this.updateSkyBrightness();
+       this.prepareWeather();
+@@ -785,11 +799,11 @@
+    }
+ 
+    public boolean tryAddFreshEntityWithPassengers(Entity var1) {
+       Stream var10000 = var1.getSelfAndPassengers().map(Entity::getUUID);
+       PersistentEntitySectionManager var10001 = this.entityManager;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       if (var10000.anyMatch(var10001::isLoaded)) {
+          return false;
+       } else {
+          this.addFreshEntityWithPassengers(var1);
+          return true;
+@@ -1148,169 +1162,151 @@
+    }
+ 
+    public void saveDebugReport(Path var1) throws IOException {
+       ChunkMap var2 = this.getChunkSource().chunkMap;
+       BufferedWriter var3 = Files.newBufferedWriter(var1.resolve("stats.txt"));
+-      Throwable var4 = null;
+ 
+       try {
+          var3.write(String.format("spawning_chunks: %d\n", var2.getDistanceManager().getNaturalSpawnChunkCount()));
+-         NaturalSpawner.SpawnState var5 = this.getChunkSource().getLastSpawnState();
+-         if (var5 != null) {
+-            ObjectIterator var6 = var5.getMobCategoryCounts().object2IntEntrySet().iterator();
++         NaturalSpawner.SpawnState var4 = this.getChunkSource().getLastSpawnState();
++         if (var4 != null) {
++            ObjectIterator var5 = var4.getMobCategoryCounts().object2IntEntrySet().iterator();
+ 
+-            while(var6.hasNext()) {
+-               Object2IntMap.Entry var7 = (Object2IntMap.Entry)var6.next();
+-               var3.write(String.format("spawn_count.%s: %d\n", ((MobCategory)var7.getKey()).getName(), var7.getIntValue()));
++            while(var5.hasNext()) {
++               Object2IntMap.Entry var6 = (Object2IntMap.Entry)var5.next();
++               var3.write(String.format("spawn_count.%s: %d\n", ((MobCategory)var6.getKey()).getName(), var6.getIntValue()));
+             }
+          }
+ 
+          var3.write(String.format("entities: %s\n", this.entityManager.gatherStats()));
+          var3.write(String.format("block_entity_tickers: %d\n", this.blockEntityTickers.size()));
+          var3.write(String.format("block_ticks: %d\n", this.getBlockTicks().size()));
+          var3.write(String.format("fluid_ticks: %d\n", this.getLiquidTicks().size()));
+          var3.write("distance_manager: " + var2.getDistanceManager().getDebugStatus() + "\n");
+          var3.write(String.format("pending_tasks: %d\n", this.getChunkSource().getPendingTasksCount()));
+-      } catch (Throwable var165) {
+-         var4 = var165;
+-         throw var165;
+-      } finally {
++      } catch (Throwable var22) {
+          if (var3 != null) {
+-            if (var4 != null) {
+-               try {
+-                  var3.close();
+-               } catch (Throwable var152) {
+-                  var4.addSuppressed(var152);
+-               }
+-            } else {
++            try {
+                var3.close();
++            } catch (Throwable var12) {
++               var22.addSuppressed(var12);
+             }
+          }
+ 
++         throw var22;
+       }
+ 
+-      CrashReport var167 = new CrashReport("Level dump", new Exception("dummy"));
+-      this.fillReportDetails(var167);
+-      BufferedWriter var168 = Files.newBufferedWriter(var1.resolve("example_crash.txt"));
+-      Throwable var169 = null;
++      if (var3 != null) {
++         var3.close();
++      }
+ 
++      CrashReport var23 = new CrashReport("Level dump", new Exception("dummy"));
++      this.fillReportDetails(var23);
++      BufferedWriter var24 = Files.newBufferedWriter(var1.resolve("example_crash.txt"));
++
+       try {
+-         var168.write(var167.getFriendlyReport());
+-      } catch (Throwable var159) {
+-         var169 = var159;
+-         throw var159;
+-      } finally {
+-         if (var168 != null) {
+-            if (var169 != null) {
+-               try {
+-                  var168.close();
+-               } catch (Throwable var151) {
+-                  var169.addSuppressed(var151);
+-               }
+-            } else {
+-               var168.close();
++         var24.write(var23.getFriendlyReport());
++      } catch (Throwable var17) {
++         if (var24 != null) {
++            try {
++               var24.close();
++            } catch (Throwable var11) {
++               var17.addSuppressed(var11);
+             }
+          }
+ 
++         throw var17;
+       }
+ 
+-      Path var170 = var1.resolve("chunks.csv");
+-      BufferedWriter var171 = Files.newBufferedWriter(var170);
+-      Throwable var172 = null;
++      if (var24 != null) {
++         var24.close();
++      }
+ 
++      Path var25 = var1.resolve("chunks.csv");
++      BufferedWriter var26 = Files.newBufferedWriter(var25);
++
+       try {
+-         var2.dumpChunks(var171);
+-      } catch (Throwable var158) {
+-         var172 = var158;
+-         throw var158;
+-      } finally {
+-         if (var171 != null) {
+-            if (var172 != null) {
+-               try {
+-                  var171.close();
+-               } catch (Throwable var154) {
+-                  var172.addSuppressed(var154);
+-               }
+-            } else {
+-               var171.close();
++         var2.dumpChunks(var26);
++      } catch (Throwable var20) {
++         if (var26 != null) {
++            try {
++               var26.close();
++            } catch (Throwable var15) {
++               var20.addSuppressed(var15);
+             }
+          }
+ 
++         throw var20;
+       }
+ 
+-      Path var173 = var1.resolve("entity_chunks.csv");
+-      BufferedWriter var174 = Files.newBufferedWriter(var173);
+-      Throwable var175 = null;
++      if (var26 != null) {
++         var26.close();
++      }
+ 
++      Path var27 = var1.resolve("entity_chunks.csv");
++      BufferedWriter var28 = Files.newBufferedWriter(var27);
++
+       try {
+-         this.entityManager.dumpSections(var174);
+-      } catch (Throwable var157) {
+-         var175 = var157;
+-         throw var157;
+-      } finally {
+-         if (var174 != null) {
+-            if (var175 != null) {
+-               try {
+-                  var174.close();
+-               } catch (Throwable var153) {
+-                  var175.addSuppressed(var153);
+-               }
+-            } else {
+-               var174.close();
++         this.entityManager.dumpSections(var28);
++      } catch (Throwable var19) {
++         if (var28 != null) {
++            try {
++               var28.close();
++            } catch (Throwable var14) {
++               var19.addSuppressed(var14);
+             }
+          }
+ 
++         throw var19;
+       }
+ 
+-      Path var176 = var1.resolve("entities.csv");
+-      BufferedWriter var177 = Files.newBufferedWriter(var176);
+-      Throwable var8 = null;
++      if (var28 != null) {
++         var28.close();
++      }
+ 
++      Path var29 = var1.resolve("entities.csv");
++      BufferedWriter var7 = Files.newBufferedWriter(var29);
++
+       try {
+-         dumpEntities(var177, this.getEntities().getAll());
+-      } catch (Throwable var156) {
+-         var8 = var156;
+-         throw var156;
+-      } finally {
+-         if (var177 != null) {
+-            if (var8 != null) {
+-               try {
+-                  var177.close();
+-               } catch (Throwable var149) {
+-                  var8.addSuppressed(var149);
+-               }
+-            } else {
+-               var177.close();
++         dumpEntities(var7, this.getEntities().getAll());
++      } catch (Throwable var21) {
++         if (var7 != null) {
++            try {
++               var7.close();
++            } catch (Throwable var16) {
++               var21.addSuppressed(var16);
+             }
+          }
+ 
++         throw var21;
+       }
+ 
+-      Path var178 = var1.resolve("block_entities.csv");
+-      BufferedWriter var179 = Files.newBufferedWriter(var178);
+-      Throwable var9 = null;
++      if (var7 != null) {
++         var7.close();
++      }
+ 
++      Path var30 = var1.resolve("block_entities.csv");
++      BufferedWriter var8 = Files.newBufferedWriter(var30);
++
+       try {
+-         this.dumpBlockEntityTickers(var179);
+-      } catch (Throwable var155) {
+-         var9 = var155;
+-         throw var155;
+-      } finally {
+-         if (var179 != null) {
+-            if (var9 != null) {
+-               try {
+-                  var179.close();
+-               } catch (Throwable var150) {
+-                  var9.addSuppressed(var150);
+-               }
+-            } else {
+-               var179.close();
++         this.dumpBlockEntityTickers(var8);
++      } catch (Throwable var18) {
++         if (var8 != null) {
++            try {
++               var8.close();
++            } catch (Throwable var13) {
++               var18.addSuppressed(var13);
+             }
+          }
+ 
++         throw var18;
+       }
+ 
++      if (var8 != null) {
++         var8.close();
++      }
++
+    }
+ 
+    private static void dumpEntities(Writer var0, Iterable<Entity> var1) throws IOException {
+       CsvOutput var2 = CsvOutput.builder().addColumn("x").addColumn("y").addColumn("z").addColumn("uuid").addColumn("type").addColumn("alive").addColumn("display_name").addColumn("custom_name").build(var0);
+       Iterator var3 = var1.iterator();
+@@ -1400,11 +1396,12 @@
+             String var5 = (String)var1.apply(var4);
+             var2.addTo(var5, 1);
+          }
+ 
+          return (String)var2.object2IntEntrySet().stream().sorted(Comparator.comparing(Object2IntMap.Entry::getIntValue).reversed()).limit(5L).map((var0x) -> {
+-            return (String)var0x.getKey() + ":" + var0x.getIntValue();
++            String var10000 = (String)var0x.getKey();
++            return var10000 + ":" + var0x.getIntValue();
+          }).collect(Collectors.joining(","));
+       } catch (Exception var6) {
+          return "";
+       }
+    }
+@@ -1438,15 +1435,16 @@
+       super.close();
+       this.entityManager.close();
+    }
+ 
+    public String gatherChunkSourceStats() {
+-      return "Chunks[S] W: " + this.chunkSource.gatherStats() + " E: " + this.entityManager.gatherStats();
++      String var10000 = this.chunkSource.gatherStats();
++      return "Chunks[S] W: " + var10000 + " E: " + this.entityManager.gatherStats();
+    }
+ 
+    final class EntityCallbacks implements LevelCallback<Entity> {
+-      private EntityCallbacks() {
++      EntityCallbacks() {
+       }
+ 
+       public void onCreated(Entity var1) {
+       }
+ 

@@ -1,0 +1,47 @@
+--- net/minecraft/world/entity/SpawnPlacements.java
++++ net/minecraft/world/entity/SpawnPlacements.java
+@@ -135,32 +135,32 @@
+       register(EntityType.VEX, SpawnPlacements.Type.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules);
+       register(EntityType.VINDICATOR, SpawnPlacements.Type.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules);
+       register(EntityType.WANDERING_TRADER, SpawnPlacements.Type.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Mob::checkMobSpawnRules);
+    }
+ 
++   static class Data {
++      final Heightmap.Types heightMap;
++      final SpawnPlacements.Type placement;
++      final SpawnPlacements.SpawnPredicate<?> predicate;
++
++      public Data(Heightmap.Types var1, SpawnPlacements.Type var2, SpawnPlacements.SpawnPredicate<?> var3) {
++         this.heightMap = var1;
++         this.placement = var2;
++         this.predicate = var3;
++      }
++   }
++
+    public static enum Type {
+       ON_GROUND,
+       IN_WATER,
+       NO_RESTRICTIONS,
+       IN_LAVA;
+ 
+       private Type() {
+       }
+    }
+ 
+-   static class Data {
+-      private final Heightmap.Types heightMap;
+-      private final SpawnPlacements.Type placement;
+-      private final SpawnPlacements.SpawnPredicate<?> predicate;
+-
+-      public Data(Heightmap.Types var1, SpawnPlacements.Type var2, SpawnPlacements.SpawnPredicate<?> var3) {
+-         this.heightMap = var1;
+-         this.placement = var2;
+-         this.predicate = var3;
+-      }
+-   }
+-
+    @FunctionalInterface
+    public interface SpawnPredicate<T extends Entity> {
+       boolean test(EntityType<T> var1, ServerLevelAccessor var2, MobSpawnType var3, BlockPos var4, Random var5);
+    }
+ }

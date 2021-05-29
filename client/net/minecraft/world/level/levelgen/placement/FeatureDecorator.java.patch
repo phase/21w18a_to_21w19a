@@ -1,0 +1,16 @@
+--- net/minecraft/world/level/levelgen/placement/FeatureDecorator.java
++++ net/minecraft/world/level/levelgen/placement/FeatureDecorator.java
+@@ -55,11 +55,12 @@
+    }
+ 
+    public abstract Stream<BlockPos> getPositions(DecorationContext var1, Random var2, DC var3, BlockPos var4);
+ 
+    public String toString() {
+-      return this.getClass().getSimpleName() + "@" + Integer.toHexString(this.hashCode());
++      String var10000 = this.getClass().getSimpleName();
++      return var10000 + "@" + Integer.toHexString(this.hashCode());
+    }
+ 
+    static {
+       NOPE = register("nope", new NopePlacementDecorator(NoneDecoratorConfiguration.CODEC));
+       DECORATED = register("decorated", new DecoratedDecorator(DecoratedDecoratorConfiguration.CODEC));

@@ -1,0 +1,15 @@
+--- net/minecraft/nbt/IntTag.java
++++ net/minecraft/nbt/IntTag.java
+@@ -24,11 +24,11 @@
+          return true;
+       }
+    };
+    private final int data;
+ 
+-   private IntTag(int var1) {
++   IntTag(int var1) {
+       this.data = var1;
+    }
+ 
+    public static IntTag valueOf(int var0) {
+       return var0 >= -128 && var0 <= 1024 ? IntTag.Cache.cache[var0 - -128] : new IntTag(var0);

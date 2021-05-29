@@ -1,0 +1,51 @@
+--- net/minecraft/client/gui/components/AbstractSelectionList.java
++++ net/minecraft/client/gui/components/AbstractSelectionList.java
+@@ -493,19 +493,18 @@
+       }
+ 
+       return var2;
+    }
+ 
+-   private void bindEntryToSelf(AbstractSelectionList.Entry<E> var1) {
++   void bindEntryToSelf(AbstractSelectionList.Entry<E> var1) {
+       var1.list = this;
+    }
+ 
+    class TrackedList extends AbstractList<E> {
+-      private final List<E> delegate;
++      private final List<E> delegate = Lists.newArrayList();
+ 
+-      private TrackedList() {
+-         this.delegate = Lists.newArrayList();
++      TrackedList() {
+       }
+ 
+       public E get(int var1) {
+          return (AbstractSelectionList.Entry)this.delegate.get(var1);
+       }
+@@ -530,11 +529,11 @@
+       }
+    }
+ 
+    public abstract static class Entry<E extends AbstractSelectionList.Entry<E>> implements GuiEventListener {
+       @Deprecated
+-      private AbstractSelectionList<E> list;
++      AbstractSelectionList<E> list;
+ 
+       public Entry() {
+       }
+ 
+       public abstract void render(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10);
+@@ -542,11 +541,11 @@
+       public boolean isMouseOver(double var1, double var3) {
+          return Objects.equals(this.list.getEntryAtPosition(var1, var3), this);
+       }
+    }
+ 
+-   public static enum SelectionDirection {
++   protected static enum SelectionDirection {
+       UP,
+       DOWN;
+ 
+       private SelectionDirection() {
+       }

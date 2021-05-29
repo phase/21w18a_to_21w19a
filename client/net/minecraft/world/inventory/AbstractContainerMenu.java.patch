@@ -1,0 +1,42 @@
+--- net/minecraft/world/inventory/AbstractContainerMenu.java
++++ net/minecraft/world/inventory/AbstractContainerMenu.java
+@@ -7,10 +7,11 @@
+ import com.google.common.collect.Sets;
+ import it.unimi.dsi.fastutil.ints.IntArrayList;
+ import it.unimi.dsi.fastutil.ints.IntList;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Set;
+ import javax.annotation.Nullable;
+ import net.minecraft.CrashReport;
+ import net.minecraft.CrashReportCategory;
+@@ -166,11 +167,11 @@
+ 
+    public void broadcastChanges() {
+       int var1;
+       for(var1 = 0; var1 < this.slots.size(); ++var1) {
+          ItemStack var2 = ((Slot)this.slots.get(var1)).getItem();
+-         var2.getClass();
++         Objects.requireNonNull(var2);
+          Supplier var3 = Suppliers.memoize(var2::copy);
+          this.triggerSlotListeners(var1, var2, var3);
+          this.synchronizeSlotToRemote(var1, var2, var3);
+       }
+ 
+@@ -777,12 +778,12 @@
+ 
+       for(var3 = 0; var3 < this.slots.size(); ++var3) {
+          var4 = (Slot)this.slots.get(var3);
+          Integer var5 = (Integer)var2.get(var4.container, var4.getContainerSlot());
+          if (var5 != null) {
+-            this.lastSlots.set(var3, var1.lastSlots.get(var5));
+-            this.remoteSlots.set(var3, var1.remoteSlots.get(var5));
++            this.lastSlots.set(var3, (ItemStack)var1.lastSlots.get(var5));
++            this.remoteSlots.set(var3, (ItemStack)var1.remoteSlots.get(var5));
+          }
+       }
+ 
+    }
+ }

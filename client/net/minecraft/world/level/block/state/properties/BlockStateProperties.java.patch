@@ -1,0 +1,14 @@
+--- net/minecraft/world/level/block/state/properties/BlockStateProperties.java
++++ net/minecraft/world/level/block/state/properties/BlockStateProperties.java
+@@ -90,10 +90,11 @@
+    public static final int MAX_LEVEL_8 = 8;
+    public static final IntegerProperty LEVEL_CAULDRON;
+    public static final IntegerProperty LEVEL_COMPOSTER;
+    public static final IntegerProperty LEVEL_FLOWING;
+    public static final IntegerProperty LEVEL_HONEY;
++   public static final int MAX_LEVEL_15 = 15;
+    public static final IntegerProperty LEVEL;
+    public static final IntegerProperty MOISTURE;
+    public static final IntegerProperty NOTE;
+    public static final IntegerProperty PICKLES;
+    public static final IntegerProperty POWER;

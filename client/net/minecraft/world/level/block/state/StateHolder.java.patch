@@ -1,0 +1,29 @@
+--- net/minecraft/world/level/block/state/StateHolder.java
++++ net/minecraft/world/level/block/state/StateHolder.java
+@@ -27,11 +27,12 @@
+       public String apply(@Nullable Entry<Property<?>, Comparable<?>> var1) {
+          if (var1 == null) {
+             return "<NULL>";
+          } else {
+             Property var2 = (Property)var1.getKey();
+-            return var2.getName() + "=" + this.getName(var2, (Comparable)var1.getValue());
++            String var10000 = var2.getName();
++            return var10000 + "=" + this.getName(var2, (Comparable)var1.getValue());
+          }
+       }
+ 
+       private <T extends Comparable<T>> String getName(Property<T> var1, Comparable<?> var2) {
+          return var1.getName(var2);
+@@ -97,11 +98,11 @@
+       }
+    }
+ 
+    public <T extends Comparable<T>> Optional<T> getOptionalValue(Property<T> var1) {
+       Comparable var2 = (Comparable)this.values.get(var1);
+-      return var2 == null ? Optional.empty() : Optional.of(var1.getValueClass().cast(var2));
++      return var2 == null ? Optional.empty() : Optional.of((Comparable)var1.getValueClass().cast(var2));
+    }
+ 
+    public <T extends Comparable<T>, V extends T> S setValue(Property<T> var1, V var2) {
+       Comparable var3 = (Comparable)this.values.get(var1);
+       if (var3 == null) {

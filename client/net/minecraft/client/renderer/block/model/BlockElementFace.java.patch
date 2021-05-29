@@ -1,0 +1,15 @@
+--- net/minecraft/client/renderer/block/model/BlockElementFace.java
++++ net/minecraft/client/renderer/block/model/BlockElementFace.java
+@@ -22,11 +22,11 @@
+       this.tintIndex = var2;
+       this.texture = var3;
+       this.uv = var4;
+    }
+ 
+-   public static class Deserializer implements JsonDeserializer<BlockElementFace> {
++   protected static class Deserializer implements JsonDeserializer<BlockElementFace> {
+       private static final int DEFAULT_TINT_INDEX = -1;
+ 
+       protected Deserializer() {
+       }
+ 

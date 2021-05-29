@@ -1,0 +1,48 @@
+--- net/minecraft/tags/TagContainer.java
++++ net/minecraft/tags/TagContainer.java
+@@ -15,15 +15,15 @@
+ import net.minecraft.world.level.block.Blocks;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class TagContainer {
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+    public static final TagContainer EMPTY = new TagContainer(ImmutableMap.of());
+    private final Map<ResourceKey<? extends Registry<?>>, TagCollection<?>> collections;
+ 
+-   private TagContainer(Map<ResourceKey<? extends Registry<?>>, TagCollection<?>> var1) {
++   TagContainer(Map<ResourceKey<? extends Registry<?>>, TagCollection<?>> var1) {
+       this.collections = var1;
+    }
+ 
+    @Nullable
+    private <T> TagCollection<T> get(ResourceKey<? extends Registry<T>> var1) {
+@@ -109,10 +109,15 @@
+          LOGGER.error("Unknown registry {}", var2);
+       }
+ 
+    }
+ 
++   @FunctionalInterface
++   interface CollectionConsumer {
++      <T> void accept(ResourceKey<? extends Registry<T>> var1, TagCollection<T> var2);
++   }
++
+    public static class Builder {
+       private final com.google.common.collect.ImmutableMap.Builder<ResourceKey<? extends Registry<?>>, TagCollection<?>> result = ImmutableMap.builder();
+ 
+       public Builder() {
+       }
+@@ -124,11 +129,6 @@
+ 
+       public TagContainer build() {
+          return new TagContainer(this.result.build());
+       }
+    }
+-
+-   @FunctionalInterface
+-   interface CollectionConsumer {
+-      <T> void accept(ResourceKey<? extends Registry<T>> var1, TagCollection<T> var2);
+-   }
+ }

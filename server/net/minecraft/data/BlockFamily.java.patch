@@ -1,0 +1,31 @@
+--- net/minecraft/data/BlockFamily.java
++++ net/minecraft/data/BlockFamily.java
+@@ -7,22 +7,19 @@
+ import net.minecraft.world.level.block.Block;
+ import org.apache.commons.lang3.StringUtils;
+ 
+ public class BlockFamily {
+    private final Block baseBlock;
+-   private final Map<BlockFamily.Variant, Block> variants;
+-   private boolean generateModel;
+-   private boolean generateRecipe;
++   final Map<BlockFamily.Variant, Block> variants = Maps.newHashMap();
++   boolean generateModel = true;
++   boolean generateRecipe = true;
+    @Nullable
+-   private String recipeGroupPrefix;
++   String recipeGroupPrefix;
+    @Nullable
+-   private String recipeUnlockedBy;
++   String recipeUnlockedBy;
+ 
+-   private BlockFamily(Block var1) {
+-      this.variants = Maps.newHashMap();
+-      this.generateModel = true;
+-      this.generateRecipe = true;
++   BlockFamily(Block var1) {
+       this.baseBlock = var1;
+    }
+ 
+    public Block getBaseBlock() {
+       return this.baseBlock;

@@ -1,0 +1,57 @@
+--- net/minecraft/client/gui/screens/inventory/SignEditScreen.java
++++ net/minecraft/client/gui/screens/inventory/SignEditScreen.java
+@@ -9,10 +9,11 @@
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import com.mojang.blaze3d.vertex.Tesselator;
+ import com.mojang.blaze3d.vertex.VertexConsumer;
+ import com.mojang.blaze3d.vertex.VertexFormat;
+ import com.mojang.math.Matrix4f;
++import java.util.Objects;
+ import java.util.stream.IntStream;
+ import net.minecraft.client.gui.components.Button;
+ import net.minecraft.client.gui.font.TextFieldHelper;
+ import net.minecraft.client.gui.screens.Screen;
+ import net.minecraft.client.multiplayer.ClientPacketListener;
+@@ -136,11 +137,11 @@
+       var1.pushPose();
+       var1.scale(0.6666667F, -0.6666667F, -0.6666667F);
+       MultiBufferSource.BufferSource var10 = this.minecraft.renderBuffers().bufferSource();
+       Material var11 = Sheets.getSignMaterial(this.woodType);
+       SignRenderer.SignModel var10002 = this.signModel;
+-      var10002.getClass();
++      Objects.requireNonNull(var10002);
+       VertexConsumer var12 = var11.buffer(var10, var10002::renderType);
+       this.signModel.stick.visible = var7;
+       this.signModel.root.render(var1, var12, 15728880, OverlayTexture.NO_OVERLAY);
+       var1.popPose();
+       float var13 = 0.010416667F;
+@@ -183,11 +184,11 @@
+             int var33 = this.minecraft.font.width(var20.substring(0, Math.max(Math.min(var15, var20.length()), 0)));
+             var22 = var33 - this.minecraft.font.width(var20) / 2;
+             if (var8 && var15 < var20.length()) {
+                int var31 = var17 - 1;
+                int var10003 = var22 + 1;
+-               this.minecraft.font.getClass();
++               Objects.requireNonNull(this.minecraft.font);
+                fill(var1, var22, var31, var10003, var17 + 9, -16777216 | var14);
+             }
+ 
+             if (var16 != var15) {
+                var23 = Math.min(var15, var16);
+@@ -201,14 +202,14 @@
+                RenderSystem.disableTexture();
+                RenderSystem.enableColorLogicOp();
+                RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
+                var30.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+                float var32 = (float)var27;
+-               this.minecraft.font.getClass();
++               Objects.requireNonNull(this.minecraft.font);
+                var30.vertex(var18, var32, (float)(var17 + 9), 0.0F).color(0, 0, 255, 255).endVertex();
+                var32 = (float)var28;
+-               this.minecraft.font.getClass();
++               Objects.requireNonNull(this.minecraft.font);
+                var30.vertex(var18, var32, (float)(var17 + 9), 0.0F).color(0, 0, 255, 255).endVertex();
+                var30.vertex(var18, (float)var28, (float)var17, 0.0F).color(0, 0, 255, 255).endVertex();
+                var30.vertex(var18, (float)var27, (float)var17, 0.0F).color(0, 0, 255, 255).endVertex();
+                var30.end();
+                BufferUploader.end(var30);

@@ -1,0 +1,76 @@
+--- net/minecraft/world/item/crafting/ShapedRecipe.java
++++ net/minecraft/world/item/crafting/ShapedRecipe.java
+@@ -23,16 +23,16 @@
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.Level;
+ 
+ public class ShapedRecipe implements CraftingRecipe {
+-   private final int width;
+-   private final int height;
+-   private final NonNullList<Ingredient> recipeItems;
+-   private final ItemStack result;
++   final int width;
++   final int height;
++   final NonNullList<Ingredient> recipeItems;
++   final ItemStack result;
+    private final ResourceLocation id;
+-   private final String group;
++   final String group;
+ 
+    public ShapedRecipe(ResourceLocation var1, String var2, int var3, int var4, NonNullList<Ingredient> var5, ItemStack var6) {
+       this.id = var1;
+       this.group = var2;
+       this.width = var3;
+@@ -114,11 +114,11 @@
+ 
+    public int getHeight() {
+       return this.height;
+    }
+ 
+-   private static NonNullList<Ingredient> dissolvePattern(String[] var0, Map<String, Ingredient> var1, int var2, int var3) {
++   static NonNullList<Ingredient> dissolvePattern(String[] var0, Map<String, Ingredient> var1, int var2, int var3) {
+       NonNullList var4 = NonNullList.withSize(var2 * var3, Ingredient.EMPTY);
+       HashSet var5 = Sets.newHashSet((Iterable)var1.keySet());
+       var5.remove(" ");
+ 
+       for(int var6 = 0; var6 < var0.length; ++var6) {
+@@ -200,11 +200,11 @@
+       }
+ 
+       return var1;
+    }
+ 
+-   private static String[] patternFromJson(JsonArray var0) {
++   static String[] patternFromJson(JsonArray var0) {
+       String[] var1 = new String[var0.size()];
+       if (var1.length > 3) {
+          throw new JsonSyntaxException("Invalid pattern: too many rows, 3 is maximum");
+       } else if (var1.length == 0) {
+          throw new JsonSyntaxException("Invalid pattern: empty pattern not allowed");
+@@ -224,11 +224,11 @@
+ 
+          return var1;
+       }
+    }
+ 
+-   private static Map<String, Ingredient> keyFromJson(JsonObject var0) {
++   static Map<String, Ingredient> keyFromJson(JsonObject var0) {
+       HashMap var1 = Maps.newHashMap();
+       Iterator var2 = var0.entrySet().iterator();
+ 
+       while(var2.hasNext()) {
+          Entry var3 = (Entry)var2.next();
+@@ -238,11 +238,11 @@
+ 
+          if (" ".equals(var3.getKey())) {
+             throw new JsonSyntaxException("Invalid key entry: ' ' is a reserved symbol.");
+          }
+ 
+-         var1.put(var3.getKey(), Ingredient.fromJson((JsonElement)var3.getValue()));
++         var1.put((String)var3.getKey(), Ingredient.fromJson((JsonElement)var3.getValue()));
+       }
+ 
+       var1.put(" ", Ingredient.EMPTY);
+       return var1;
+    }

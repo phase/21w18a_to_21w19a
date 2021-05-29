@@ -1,0 +1,28 @@
+--- net/minecraft/client/gui/screens/worldselection/WorldPreset.java
++++ net/minecraft/client/gui/screens/worldselection/WorldPreset.java
+@@ -91,11 +91,11 @@
+    };
+    protected static final List<WorldPreset> PRESETS;
+    protected static final Map<Optional<WorldPreset>, WorldPreset.PresetEditor> EDITORS;
+    private final Component description;
+ 
+-   private WorldPreset(String var1) {
++   WorldPreset(String var1) {
+       this.description = new TranslatableComponent("generator." + var1);
+    }
+ 
+    private static WorldGenSettings fromBuffetSettings(RegistryAccess var0, WorldGenSettings var1, WorldPreset var2, Biome var3) {
+       FixedBiomeSource var4 = new FixedBiomeSource(var3);
+@@ -118,11 +118,11 @@
+ 
+       return new WorldGenSettings(var1.seed(), var1.generateFeatures(), var1.generateBonusChest(), WorldGenSettings.withOverworld((Registry)var6, (MappedRegistry)var1.dimensions(), new NoiseBasedChunkGenerator(var4, var1.seed(), var5)));
+    }
+ 
+    private static Biome parseBuffetSettings(RegistryAccess var0, WorldGenSettings var1) {
+-      return (Biome)var1.overworld().getBiomeSource().possibleBiomes().stream().findFirst().orElse(var0.registryOrThrow(Registry.BIOME_REGISTRY).getOrThrow(Biomes.PLAINS));
++      return (Biome)var1.overworld().getBiomeSource().possibleBiomes().stream().findFirst().orElse((Biome)var0.registryOrThrow(Registry.BIOME_REGISTRY).getOrThrow(Biomes.PLAINS));
+    }
+ 
+    public static Optional<WorldPreset> of(WorldGenSettings var0) {
+       ChunkGenerator var1 = var0.overworld();
+       if (var1 instanceof FlatLevelSource) {

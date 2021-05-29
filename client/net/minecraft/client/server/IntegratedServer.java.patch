@@ -1,0 +1,29 @@
+--- net/minecraft/client/server/IntegratedServer.java
++++ net/minecraft/client/server/IntegratedServer.java
+@@ -59,11 +59,12 @@
+       this.setUsesAuthentication(true);
+       this.setPvpAllowed(true);
+       this.setFlightAllowed(true);
+       this.initializeKeyPair();
+       this.loadLevel();
+-      this.setMotd(this.getSingleplayerName() + " - " + this.getWorldData().getLevelName());
++      String var10001 = this.getSingleplayerName();
++      this.setMotd(var10001 + " - " + this.getWorldData().getLevelName());
+       return true;
+    }
+ 
+    public void tickServer(BooleanSupplier var1) {
+       boolean var2 = this.paused;
+@@ -162,11 +163,11 @@
+    public boolean publishServer(@Nullable GameType var1, boolean var2, int var3) {
+       try {
+          this.getConnection().startTcpServerListener((InetAddress)null, var3);
+          LOGGER.info("Started serving on {}", var3);
+          this.publishedPort = var3;
+-         this.lanPinger = new LanServerPinger(this.getMotd(), var3 + "");
++         this.lanPinger = new LanServerPinger(this.getMotd(), var3.makeConcatWithConstants<invokedynamic>(var3));
+          this.lanPinger.start();
+          this.publishedGameType = var1;
+          this.getPlayerList().setAllowCheatsForAllPlayers(var2);
+          int var4 = this.getProfilePermissions(this.minecraft.player.getGameProfile());
+          this.minecraft.player.setPermissionLevel(var4);

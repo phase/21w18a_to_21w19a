@@ -1,0 +1,20 @@
+--- net/minecraft/world/level/block/entity/BarrelBlockEntity.java
++++ net/minecraft/world/level/block/entity/BarrelBlockEntity.java
+@@ -110,15 +110,15 @@
+          this.openersCounter.recheckOpeners(this.getLevel(), this.getBlockPos(), this.getBlockState());
+       }
+ 
+    }
+ 
+-   private void updateBlockState(BlockState var1, boolean var2) {
++   void updateBlockState(BlockState var1, boolean var2) {
+       this.level.setBlock(this.getBlockPos(), (BlockState)var1.setValue(BarrelBlock.OPEN, var2), 3);
+    }
+ 
+-   private void playSound(BlockState var1, SoundEvent var2) {
++   void playSound(BlockState var1, SoundEvent var2) {
+       Vec3i var3 = ((Direction)var1.getValue(BarrelBlock.FACING)).getNormal();
+       double var4 = (double)this.worldPosition.getX() + 0.5D + (double)var3.getX() / 2.0D;
+       double var6 = (double)this.worldPosition.getY() + 0.5D + (double)var3.getY() / 2.0D;
+       double var8 = (double)this.worldPosition.getZ() + 0.5D + (double)var3.getZ() / 2.0D;
+       this.level.playSound((Player)null, var4, var6, var8, var2, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);

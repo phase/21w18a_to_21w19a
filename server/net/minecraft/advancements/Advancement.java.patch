@@ -1,0 +1,43 @@
+--- net/minecraft/advancements/Advancement.java
++++ net/minecraft/advancements/Advancement.java
+@@ -82,11 +82,12 @@
+    public AdvancementRewards getRewards() {
+       return this.rewards;
+    }
+ 
+    public String toString() {
+-      return "SimpleAdvancement{id=" + this.getId() + ", parent=" + (this.parent == null ? "null" : this.parent.getId()) + ", display=" + this.display + ", rewards=" + this.rewards + ", criteria=" + this.criteria + ", requirements=" + Arrays.deepToString(this.requirements) + '}';
++      ResourceLocation var10000 = this.getId();
++      return "SimpleAdvancement{id=" + var10000 + ", parent=" + (this.parent == null ? "null" : this.parent.getId()) + ", display=" + this.display + ", rewards=" + this.rewards + ", criteria=" + this.criteria + ", requirements=" + Arrays.deepToString(this.requirements) + "}";
+    }
+ 
+    public Iterable<Advancement> getChildren() {
+       return this.children;
+    }
+@@ -137,11 +138,11 @@
+       private AdvancementRewards rewards;
+       private Map<String, Criterion> criteria;
+       private String[][] requirements;
+       private RequirementsStrategy requirementsStrategy;
+ 
+-      private Builder(@Nullable ResourceLocation var1, @Nullable DisplayInfo var2, AdvancementRewards var3, Map<String, Criterion> var4, String[][] var5) {
++      Builder(@Nullable ResourceLocation var1, @Nullable DisplayInfo var2, AdvancementRewards var3, Map<String, Criterion> var4, String[][] var5) {
+          this.rewards = AdvancementRewards.EMPTY;
+          this.criteria = Maps.newLinkedHashMap();
+          this.requirementsStrategy = RequirementsStrategy.AND;
+          this.parentId = var1;
+          this.display = var2;
+@@ -328,11 +329,12 @@
+          }
+ 
+       }
+ 
+       public String toString() {
+-         return "Task Advancement{parentId=" + this.parentId + ", display=" + this.display + ", rewards=" + this.rewards + ", criteria=" + this.criteria + ", requirements=" + Arrays.deepToString(this.requirements) + '}';
++         ResourceLocation var10000 = this.parentId;
++         return "Task Advancement{parentId=" + var10000 + ", display=" + this.display + ", rewards=" + this.rewards + ", criteria=" + this.criteria + ", requirements=" + Arrays.deepToString(this.requirements) + "}";
+       }
+ 
+       public static Advancement.Builder fromJson(JsonObject var0, DeserializationContext var1) {
+          ResourceLocation var2 = var0.has("parent") ? new ResourceLocation(GsonHelper.getAsString(var0, "parent")) : null;
+          DisplayInfo var3 = var0.has("display") ? DisplayInfo.fromJson(GsonHelper.getAsJsonObject(var0, "display")) : null;

@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/monster/Zombie.java
++++ net/minecraft/world/entity/monster/Zombie.java
+@@ -508,11 +508,11 @@
+       DOOR_BREAKING_PREDICATE = (var0) -> {
+          return var0 == Difficulty.HARD;
+       };
+    }
+ 
+-   class ZombieAttackTurtleEggGoal extends RemoveBlockGoal {
++   private class ZombieAttackTurtleEggGoal extends RemoveBlockGoal {
+       ZombieAttackTurtleEggGoal(PathfinderMob var2, double var3, int var5) {
+          super(Blocks.TURTLE_EGG, var2, var3, var5);
+       }
+ 
+       public void playDestroyProgressSound(LevelAccessor var1, BlockPos var2) {

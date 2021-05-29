@@ -1,0 +1,392 @@
+--- net/minecraft/server/MinecraftServer.java
++++ net/minecraft/server/MinecraftServer.java
+@@ -158,11 +158,11 @@
+ import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTask> implements SnooperPopulator, CommandSource, AutoCloseable {
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+    private static final float AVERAGE_TICK_TIME_SMOOTHING = 0.8F;
+    private static final int TICK_STATS_SPAN = 100;
+    public static final int MS_PER_TICK = 50;
+    private static final int SNOOPER_UPDATE_INTERVAL = 6000;
+    private static final int OVERLOADED_THRESHOLD = 2000;
+@@ -291,11 +291,16 @@
+       this.serverThread = var1;
+       this.executor = Util.backgroundExecutor();
+    }
+ 
+    private void readScoreboard(DimensionDataStorage var1) {
+-      var1.computeIfAbsent(this.getScoreboard()::createData, this.getScoreboard()::createData, "scoreboard");
++      ServerScoreboard var10001 = this.getScoreboard();
++      Objects.requireNonNull(var10001);
++      Function var2 = var10001::createData;
++      ServerScoreboard var10002 = this.getScoreboard();
++      Objects.requireNonNull(var10002);
++      var1.computeIfAbsent(var2, var10002::createData, "scoreboard");
+    }
+ 
+    protected abstract boolean initServer() throws IOException;
+ 
+    public static void convertFromRegionFormatIfNeeded(LevelStorageSource.LevelStorageAccess var0) {
+@@ -537,11 +542,11 @@
+       File var1 = this.storageSource.getLevelPath(LevelResource.MAP_RESOURCE_FILE).toFile();
+       if (var1.isFile()) {
+          String var2 = this.storageSource.getLevelId();
+ 
+          try {
+-            this.setResourcePack("level://" + URLEncoder.encode(var2, StandardCharsets.UTF_8.toString()) + "/" + "resources.zip", "");
++            this.setResourcePack("level://" + URLEncoder.encode(var2, StandardCharsets.UTF_8.toString()) + "/resources.zip", "");
+          } catch (UnsupportedEncodingException var4) {
+             LOGGER.warn((String)"Something went wrong url encoding {}", (Object)var2);
+          }
+       }
+ 
+@@ -583,11 +588,11 @@
+ 
+    public void close() {
+       this.stopServer();
+    }
+ 
+-   protected void stopServer() {
++   public void stopServer() {
+       LOGGER.info("Stopping server");
+       if (this.getConnection() != null) {
+          this.getConnection().stop();
+       }
+ 
+@@ -703,11 +708,14 @@
+          } else {
+             var2 = new CrashReport("Exception in server tick loop", var44);
+          }
+ 
+          this.fillReport(var2.getSystemDetails());
+-         File var3 = new File(new File(this.getServerDirectory(), "crash-reports"), "crash-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + "-server.txt");
++         File var10002 = new File(this.getServerDirectory(), "crash-reports");
++         SimpleDateFormat var10003 = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
++         Date var10004 = new Date();
++         File var3 = new File(var10002, "crash-" + var10003.format(var10004) + "-server.txt");
+          if (var2.saveToFile(var3)) {
+             LOGGER.error((String)"This crash report has been saved to: {}", (Object)var3.getAbsolutePath());
+          } else {
+             LOGGER.error("We were unable to save this crash report to disk.");
+          }
+@@ -815,14 +823,14 @@
+    }
+ 
+    protected void onServerCrash(CrashReport var1) {
+    }
+ 
+-   protected void onServerExit() {
++   public void onServerExit() {
+    }
+ 
+-   protected void tickServer(BooleanSupplier var1) {
++   public void tickServer(BooleanSupplier var1) {
+       long var2 = Util.getNanos();
+       ++this.tickCount;
+       this.tickChildren(var1);
+       if (var2 - this.lastServerStatus >= 5000000000L) {
+          this.lastServerStatus = var2;
+@@ -863,11 +871,11 @@
+       long var9 = Util.getNanos();
+       this.frameTimer.logFrameDuration(var9 - var2);
+       this.profiler.pop();
+    }
+ 
+-   protected void tickChildren(BooleanSupplier var1) {
++   public void tickChildren(BooleanSupplier var1) {
+       this.profiler.push("commandFunctions");
+       this.getFunctions().tick();
+       this.profiler.popPush("levels");
+       Iterator var2 = this.getAllLevels().iterator();
+ 
+@@ -972,11 +980,12 @@
+    }
+ 
+    public void fillReport(CrashReportCategory var1) {
+       if (this.playerList != null) {
+          var1.setDetail("Player Count", () -> {
+-            return this.playerList.getPlayerCount() + " / " + this.playerList.getMaxPlayers() + "; " + this.playerList.getPlayers();
++            int var10000 = this.playerList.getPlayerCount();
++            return var10000 + " / " + this.playerList.getMaxPlayers() + "; " + this.playerList.getPlayers();
+          });
+       }
+ 
+       var1.setDetail("Data Packs", () -> {
+          StringBuilder var1 = new StringBuilder();
+@@ -1074,11 +1083,11 @@
+    private void sendDifficultyUpdate(ServerPlayer var1) {
+       LevelData var2 = var1.getLevel().getLevelData();
+       var1.connection.send(new ClientboundChangeDifficultyPacket(var2.getDifficulty(), var2.isDifficultyLocked()));
+    }
+ 
+-   protected boolean isSpawningMonsters() {
++   public boolean isSpawningMonsters() {
+       return this.worldData.getDifficulty() != Difficulty.PEACEFUL;
+    }
+ 
+    public boolean isDemo() {
+       return this.isDemo;
+@@ -1325,11 +1334,11 @@
+ 
+    public CompletableFuture<Void> reloadResources(Collection<String> var1) {
+       CompletableFuture var2 = CompletableFuture.supplyAsync(() -> {
+          Stream var10000 = var1.stream();
+          PackRepository var10001 = this.packRepository;
+-         var10001.getClass();
++         Objects.requireNonNull(var10001);
+          return (ImmutableList)var10000.map(var10001::getPack).filter(Objects::nonNull).map(Pack::open).collect(ImmutableList.toImmutableList());
+       }, this).thenCompose((var1x) -> {
+          return ServerResources.loadResources(var1x, this.registryHolder, this.isDedicatedServer() ? Commands.CommandSelection.DEDICATED : Commands.CommandSelection.INTEGRATED, this.getFunctionCompilationLevel(), this.executor, this);
+       }).thenAcceptAsync((var2x) -> {
+          this.resources.close();
+@@ -1341,10 +1350,11 @@
+          this.getPlayerList().reloadResources();
+          this.functionManager.replaceLibrary(this.resources.getFunctionLibrary());
+          this.structureManager.onResourceManagerReload(this.resources.getResourceManager());
+       }, this);
+       if (this.isSameThread()) {
++         Objects.requireNonNull(var2);
+          this.managedBlock(var2::isDone);
+       }
+ 
+       return var2;
+    }
+@@ -1535,171 +1545,156 @@
+       this.dumpThreads(var1.resolve("threads.txt"));
+    }
+ 
+    private void dumpMiscStats(Path var1) throws IOException {
+       BufferedWriter var2 = Files.newBufferedWriter(var1);
+-      Throwable var3 = null;
+ 
+       try {
+          var2.write(String.format("pending_tasks: %d\n", this.getPendingTasksCount()));
+          var2.write(String.format("average_tick_time: %f\n", this.getAverageTickTime()));
+          var2.write(String.format("tick_times: %s\n", Arrays.toString(this.tickTimes)));
+          var2.write(String.format("queue: %s\n", Util.backgroundExecutor()));
+-      } catch (Throwable var12) {
+-         var3 = var12;
+-         throw var12;
+-      } finally {
++      } catch (Throwable var6) {
+          if (var2 != null) {
+-            if (var3 != null) {
+-               try {
+-                  var2.close();
+-               } catch (Throwable var11) {
+-                  var3.addSuppressed(var11);
+-               }
+-            } else {
++            try {
+                var2.close();
++            } catch (Throwable var5) {
++               var6.addSuppressed(var5);
+             }
+          }
+ 
++         throw var6;
+       }
+ 
++      if (var2 != null) {
++         var2.close();
++      }
++
+    }
+ 
+    private void dumpCrashCategory(Path var1) throws IOException {
+       CrashReport var2 = new CrashReport("Server dump", new Exception("dummy"));
+       this.fillReport(var2.getSystemDetails());
+       BufferedWriter var3 = Files.newBufferedWriter(var1);
+-      Throwable var4 = null;
+ 
+       try {
+          var3.write(var2.getFriendlyReport());
+-      } catch (Throwable var13) {
+-         var4 = var13;
+-         throw var13;
+-      } finally {
++      } catch (Throwable var7) {
+          if (var3 != null) {
+-            if (var4 != null) {
+-               try {
+-                  var3.close();
+-               } catch (Throwable var12) {
+-                  var4.addSuppressed(var12);
+-               }
+-            } else {
++            try {
+                var3.close();
++            } catch (Throwable var6) {
++               var7.addSuppressed(var6);
+             }
+          }
+ 
++         throw var7;
+       }
+ 
++      if (var3 != null) {
++         var3.close();
++      }
++
+    }
+ 
+    private void dumpGameRules(Path var1) throws IOException {
+       BufferedWriter var2 = Files.newBufferedWriter(var1);
+-      Throwable var3 = null;
+ 
+       try {
+-         final ArrayList var4 = Lists.newArrayList();
+-         final GameRules var5 = this.getGameRules();
++         final ArrayList var3 = Lists.newArrayList();
++         final GameRules var4 = this.getGameRules();
+          GameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
+             public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> var1, GameRules.Type<T> var2) {
+-               var4.add(String.format("%s=%s\n", var1.getId(), var5.getRule(var1)));
++               var3.add(String.format("%s=%s\n", var1.getId(), var4.getRule(var1)));
+             }
+          });
+-         Iterator var6 = var4.iterator();
++         Iterator var5 = var3.iterator();
+ 
+-         while(var6.hasNext()) {
+-            String var7 = (String)var6.next();
+-            var2.write(var7);
++         while(var5.hasNext()) {
++            String var6 = (String)var5.next();
++            var2.write(var6);
+          }
+-      } catch (Throwable var15) {
+-         var3 = var15;
+-         throw var15;
+-      } finally {
++      } catch (Throwable var8) {
+          if (var2 != null) {
+-            if (var3 != null) {
+-               try {
+-                  var2.close();
+-               } catch (Throwable var14) {
+-                  var3.addSuppressed(var14);
+-               }
+-            } else {
++            try {
+                var2.close();
++            } catch (Throwable var7) {
++               var8.addSuppressed(var7);
+             }
+          }
+ 
++         throw var8;
+       }
+ 
++      if (var2 != null) {
++         var2.close();
++      }
++
+    }
+ 
+    private void dumpClasspath(Path var1) throws IOException {
+       BufferedWriter var2 = Files.newBufferedWriter(var1);
+-      Throwable var3 = null;
+ 
+       try {
+-         String var4 = System.getProperty("java.class.path");
+-         String var5 = System.getProperty("path.separator");
+-         Iterator var6 = Splitter.on(var5).split(var4).iterator();
++         String var3 = System.getProperty("java.class.path");
++         String var4 = System.getProperty("path.separator");
++         Iterator var5 = Splitter.on(var4).split(var3).iterator();
+ 
+-         while(var6.hasNext()) {
+-            String var7 = (String)var6.next();
+-            var2.write(var7);
++         while(var5.hasNext()) {
++            String var6 = (String)var5.next();
++            var2.write(var6);
+             var2.write("\n");
+          }
+-      } catch (Throwable var15) {
+-         var3 = var15;
+-         throw var15;
+-      } finally {
++      } catch (Throwable var8) {
+          if (var2 != null) {
+-            if (var3 != null) {
+-               try {
+-                  var2.close();
+-               } catch (Throwable var14) {
+-                  var3.addSuppressed(var14);
+-               }
+-            } else {
++            try {
+                var2.close();
++            } catch (Throwable var7) {
++               var8.addSuppressed(var7);
+             }
+          }
+ 
++         throw var8;
+       }
+ 
++      if (var2 != null) {
++         var2.close();
++      }
++
+    }
+ 
+    private void dumpThreads(Path var1) throws IOException {
+       ThreadMXBean var2 = ManagementFactory.getThreadMXBean();
+       ThreadInfo[] var3 = var2.dumpAllThreads(true, true);
+       Arrays.sort(var3, Comparator.comparing(ThreadInfo::getThreadName));
+       BufferedWriter var4 = Files.newBufferedWriter(var1);
+-      Throwable var5 = null;
+ 
+       try {
+-         ThreadInfo[] var6 = var3;
+-         int var7 = var3.length;
++         ThreadInfo[] var5 = var3;
++         int var6 = var3.length;
+ 
+-         for(int var8 = 0; var8 < var7; ++var8) {
+-            ThreadInfo var9 = var6[var8];
+-            var4.write(var9.toString());
++         for(int var7 = 0; var7 < var6; ++var7) {
++            ThreadInfo var8 = var5[var7];
++            var4.write(var8.toString());
+             var4.write(10);
+          }
+-      } catch (Throwable var17) {
+-         var5 = var17;
+-         throw var17;
+-      } finally {
++      } catch (Throwable var10) {
+          if (var4 != null) {
+-            if (var5 != null) {
+-               try {
+-                  var4.close();
+-               } catch (Throwable var16) {
+-                  var5.addSuppressed(var16);
+-               }
+-            } else {
++            try {
+                var4.close();
++            } catch (Throwable var9) {
++               var10.addSuppressed(var9);
+             }
+          }
+ 
++         throw var10;
+       }
+ 
++      if (var4 != null) {
++         var4.close();
++      }
++
+    }
+ 
+    private void startProfilerTick(@Nullable SingleTickProfiler var1) {
+       if (this.delayProfilerStart) {
+          this.delayProfilerStart = false;

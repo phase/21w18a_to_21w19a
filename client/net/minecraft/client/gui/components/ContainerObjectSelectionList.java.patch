@@ -1,0 +1,15 @@
+--- net/minecraft/client/gui/components/ContainerObjectSelectionList.java
++++ net/minecraft/client/gui/components/ContainerObjectSelectionList.java
+@@ -11,11 +11,11 @@
+    }
+ 
+    public boolean changeFocus(boolean var1) {
+       boolean var2 = super.changeFocus(var1);
+       if (var2) {
+-         this.ensureVisible(this.getFocused());
++         this.ensureVisible((ContainerObjectSelectionList.Entry)this.getFocused());
+       }
+ 
+       return var2;
+    }
+ 

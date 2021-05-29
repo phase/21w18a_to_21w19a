@@ -1,0 +1,418 @@
+--- net/minecraft/client/renderer/RenderStateShard.java
++++ net/minecraft/client/renderer/RenderStateShard.java
+@@ -284,83 +284,140 @@
+ 
+       });
+       DEFAULT_LINE = new RenderStateShard.LineStateShard(OptionalDouble.of(1.0D));
+    }
+ 
+-   public static class LineStateShard extends RenderStateShard {
+-      private final OptionalDouble width;
++   protected static class TransparencyStateShard extends RenderStateShard {
++      public TransparencyStateShard(String var1, Runnable var2, Runnable var3) {
++         super(var1, var2, var3);
++      }
++   }
+ 
+-      public LineStateShard(OptionalDouble var1) {
+-         super("line_width", () -> {
+-            if (!Objects.equals(var1, OptionalDouble.of(1.0D))) {
+-               if (var1.isPresent()) {
+-                  RenderSystem.lineWidth((float)var1.getAsDouble());
+-               } else {
+-                  RenderSystem.lineWidth(Math.max(2.5F, (float)Minecraft.getInstance().getWindow().getWidth() / 1920.0F * 2.5F));
+-               }
+-            }
++   protected static class ShaderStateShard extends RenderStateShard {
++      private final Optional<Supplier<ShaderInstance>> shader;
+ 
++      public ShaderStateShard(Supplier<ShaderInstance> var1) {
++         super("shader", () -> {
++            RenderSystem.setShader(var1);
+          }, () -> {
+-            if (!Objects.equals(var1, OptionalDouble.of(1.0D))) {
+-               RenderSystem.lineWidth(1.0F);
+-            }
++         });
++         this.shader = Optional.of(var1);
++      }
+ 
++      public ShaderStateShard() {
++         super("shader", () -> {
++            RenderSystem.setShader(() -> {
++               return null;
++            });
++         }, () -> {
+          });
+-         this.width = var1;
++         this.shader = Optional.empty();
+       }
+ 
+       public String toString() {
+-         return this.name + '[' + (this.width.isPresent() ? this.width.getAsDouble() : "window_scale") + ']';
++         return this.name + "[" + this.shader + "]";
+       }
+    }
+ 
+-   public static class OutputStateShard extends RenderStateShard {
+-      public OutputStateShard(String var1, Runnable var2, Runnable var3) {
+-         super(var1, var2, var3);
++   protected static class TextureStateShard extends RenderStateShard.EmptyTextureStateShard {
++      private final Optional<ResourceLocation> texture;
++      private final boolean blur;
++      private final boolean mipmap;
++
++      public TextureStateShard(ResourceLocation var1, boolean var2, boolean var3) {
++         super(() -> {
++            RenderSystem.enableTexture();
++            TextureManager var3x = Minecraft.getInstance().getTextureManager();
++            var3x.getTexture(var1).setFilter(var2, var3);
++            RenderSystem.setShaderTexture(0, var1);
++         }, () -> {
++         });
++         this.texture = Optional.of(var1);
++         this.blur = var2;
++         this.mipmap = var3;
+       }
++
++      public String toString() {
++         return this.name + "[" + this.texture + "(blur=" + this.blur + ", mipmap=" + this.mipmap + ")]";
++      }
++
++      protected Optional<ResourceLocation> cutoutTexture() {
++         return this.texture;
++      }
+    }
+ 
+-   public static class LayeringStateShard extends RenderStateShard {
+-      public LayeringStateShard(String var1, Runnable var2, Runnable var3) {
++   protected static class EmptyTextureStateShard extends RenderStateShard {
++      public EmptyTextureStateShard(Runnable var1, Runnable var2) {
++         super("texture", var1, var2);
++      }
++
++      EmptyTextureStateShard() {
++         super("texture", () -> {
++         }, () -> {
++         });
++      }
++
++      protected Optional<ResourceLocation> cutoutTexture() {
++         return Optional.empty();
++      }
++   }
++
++   protected static class TexturingStateShard extends RenderStateShard {
++      public TexturingStateShard(String var1, Runnable var2, Runnable var3) {
+          super(var1, var2, var3);
+       }
+    }
+ 
+-   public static class WriteMaskStateShard extends RenderStateShard {
+-      private final boolean writeColor;
+-      private final boolean writeDepth;
++   protected static class LightmapStateShard extends RenderStateShard.BooleanStateShard {
++      public LightmapStateShard(boolean var1) {
++         super("lightmap", () -> {
++            if (var1) {
++               Minecraft.getInstance().gameRenderer.lightTexture().turnOnLightLayer();
++            }
+ 
+-      public WriteMaskStateShard(boolean var1, boolean var2) {
+-         super("write_mask_state", () -> {
+-            if (!var2) {
+-               RenderSystem.depthMask(var2);
++         }, () -> {
++            if (var1) {
++               Minecraft.getInstance().gameRenderer.lightTexture().turnOffLightLayer();
+             }
+ 
+-            if (!var1) {
+-               RenderSystem.colorMask(var1, var1, var1, var1);
++         }, var1);
++      }
++   }
++
++   protected static class OverlayStateShard extends RenderStateShard.BooleanStateShard {
++      public OverlayStateShard(boolean var1) {
++         super("overlay", () -> {
++            if (var1) {
++               Minecraft.getInstance().gameRenderer.overlayTexture().setupOverlayColor();
+             }
+ 
+          }, () -> {
+-            if (!var2) {
+-               RenderSystem.depthMask(true);
++            if (var1) {
++               Minecraft.getInstance().gameRenderer.overlayTexture().teardownOverlayColor();
+             }
+ 
++         }, var1);
++      }
++   }
++
++   protected static class CullStateShard extends RenderStateShard.BooleanStateShard {
++      public CullStateShard(boolean var1) {
++         super("cull", () -> {
+             if (!var1) {
+-               RenderSystem.colorMask(true, true, true, true);
++               RenderSystem.disableCull();
+             }
+ 
+-         });
+-         this.writeColor = var1;
+-         this.writeDepth = var2;
+-      }
++         }, () -> {
++            if (!var1) {
++               RenderSystem.enableCull();
++            }
+ 
+-      public String toString() {
+-         return this.name + "[writeColor=" + this.writeColor + ", writeDepth=" + this.writeDepth + ']';
++         }, var1);
+       }
+    }
+ 
+-   public static class DepthTestStateShard extends RenderStateShard {
++   protected static class DepthTestStateShard extends RenderStateShard {
+       private final String functionName;
+ 
+       public DepthTestStateShard(String var1, int var2) {
+          super("depth_test", () -> {
+             if (var2 != 519) {
+@@ -377,122 +434,114 @@
+          });
+          this.functionName = var1;
+       }
+ 
+       public String toString() {
+-         return this.name + '[' + this.functionName + ']';
++         return this.name + "[" + this.functionName + "]";
+       }
+    }
+ 
+-   public static class CullStateShard extends RenderStateShard.BooleanStateShard {
+-      public CullStateShard(boolean var1) {
+-         super("cull", () -> {
++   protected static class WriteMaskStateShard extends RenderStateShard {
++      private final boolean writeColor;
++      private final boolean writeDepth;
++
++      public WriteMaskStateShard(boolean var1, boolean var2) {
++         super("write_mask_state", () -> {
++            if (!var2) {
++               RenderSystem.depthMask(var2);
++            }
++
+             if (!var1) {
+-               RenderSystem.disableCull();
++               RenderSystem.colorMask(var1, var1, var1, var1);
+             }
+ 
+          }, () -> {
++            if (!var2) {
++               RenderSystem.depthMask(true);
++            }
++
+             if (!var1) {
+-               RenderSystem.enableCull();
++               RenderSystem.colorMask(true, true, true, true);
+             }
+ 
+-         }, var1);
++         });
++         this.writeColor = var1;
++         this.writeDepth = var2;
+       }
++
++      public String toString() {
++         return this.name + "[writeColor=" + this.writeColor + ", writeDepth=" + this.writeDepth + "]";
++      }
+    }
+ 
+-   public static class OverlayStateShard extends RenderStateShard.BooleanStateShard {
+-      public OverlayStateShard(boolean var1) {
+-         super("overlay", () -> {
+-            if (var1) {
+-               Minecraft.getInstance().gameRenderer.overlayTexture().setupOverlayColor();
+-            }
++   protected static class LayeringStateShard extends RenderStateShard {
++      public LayeringStateShard(String var1, Runnable var2, Runnable var3) {
++         super(var1, var2, var3);
++      }
++   }
+ 
+-         }, () -> {
+-            if (var1) {
+-               Minecraft.getInstance().gameRenderer.overlayTexture().teardownOverlayColor();
+-            }
+-
+-         }, var1);
++   protected static class OutputStateShard extends RenderStateShard {
++      public OutputStateShard(String var1, Runnable var2, Runnable var3) {
++         super(var1, var2, var3);
+       }
+    }
+ 
+-   public static class LightmapStateShard extends RenderStateShard.BooleanStateShard {
+-      public LightmapStateShard(boolean var1) {
+-         super("lightmap", () -> {
+-            if (var1) {
+-               Minecraft.getInstance().gameRenderer.lightTexture().turnOnLightLayer();
++   protected static class LineStateShard extends RenderStateShard {
++      private final OptionalDouble width;
++
++      public LineStateShard(OptionalDouble var1) {
++         super("line_width", () -> {
++            if (!Objects.equals(var1, OptionalDouble.of(1.0D))) {
++               if (var1.isPresent()) {
++                  RenderSystem.lineWidth((float)var1.getAsDouble());
++               } else {
++                  RenderSystem.lineWidth(Math.max(2.5F, (float)Minecraft.getInstance().getWindow().getWidth() / 1920.0F * 2.5F));
++               }
+             }
+ 
+          }, () -> {
+-            if (var1) {
+-               Minecraft.getInstance().gameRenderer.lightTexture().turnOffLightLayer();
++            if (!Objects.equals(var1, OptionalDouble.of(1.0D))) {
++               RenderSystem.lineWidth(1.0F);
+             }
+ 
+-         }, var1);
++         });
++         this.width = var1;
+       }
++
++      public String toString() {
++         String var10000 = this.name;
++         return var10000 + "[" + (this.width.isPresent() ? this.width.getAsDouble() : "window_scale") + "]";
++      }
+    }
+ 
+-   static class BooleanStateShard extends RenderStateShard {
++   private static class BooleanStateShard extends RenderStateShard {
+       private final boolean enabled;
+ 
+       public BooleanStateShard(String var1, Runnable var2, Runnable var3, boolean var4) {
+          super(var1, var2, var3);
+          this.enabled = var4;
+       }
+ 
+       public String toString() {
+-         return this.name + '[' + this.enabled + ']';
++         return this.name + "[" + this.enabled + "]";
+       }
+    }
+ 
+-   public static final class OffsetTexturingStateShard extends RenderStateShard.TexturingStateShard {
++   protected static final class OffsetTexturingStateShard extends RenderStateShard.TexturingStateShard {
+       public OffsetTexturingStateShard(float var1, float var2) {
+          super("offset_texturing", () -> {
+             RenderSystem.setTextureMatrix(Matrix4f.createTranslateMatrix(var1, var2, 0.0F));
+          }, () -> {
+             RenderSystem.resetTextureMatrix();
+          });
+       }
+    }
+ 
+-   public static class TexturingStateShard extends RenderStateShard {
+-      public TexturingStateShard(String var1, Runnable var2, Runnable var3) {
+-         super(var1, var2, var3);
+-      }
+-   }
+-
+-   public static class TextureStateShard extends RenderStateShard.EmptyTextureStateShard {
+-      private final Optional<ResourceLocation> texture;
+-      private final boolean blur;
+-      private final boolean mipmap;
+-
+-      public TextureStateShard(ResourceLocation var1, boolean var2, boolean var3) {
+-         super(() -> {
+-            RenderSystem.enableTexture();
+-            TextureManager var3x = Minecraft.getInstance().getTextureManager();
+-            var3x.getTexture(var1).setFilter(var2, var3);
+-            RenderSystem.setShaderTexture(0, var1);
+-         }, () -> {
+-         });
+-         this.texture = Optional.of(var1);
+-         this.blur = var2;
+-         this.mipmap = var3;
+-      }
+-
+-      public String toString() {
+-         return this.name + '[' + this.texture + "(blur=" + this.blur + ", mipmap=" + this.mipmap + ")]";
+-      }
+-
+-      protected Optional<ResourceLocation> cutoutTexture() {
+-         return this.texture;
+-      }
+-   }
+-
+-   public static class MultiTextureStateShard extends RenderStateShard.EmptyTextureStateShard {
++   protected static class MultiTextureStateShard extends RenderStateShard.EmptyTextureStateShard {
+       private final Optional<ResourceLocation> cutoutTexture;
+ 
+-      private MultiTextureStateShard(ImmutableList<Triple<ResourceLocation, Boolean, Boolean>> var1) {
++      MultiTextureStateShard(ImmutableList<Triple<ResourceLocation, Boolean, Boolean>> var1) {
+          super(() -> {
+             int var1x = 0;
+             UnmodifiableIterator var2 = var1.iterator();
+ 
+             while(var2.hasNext()) {
+@@ -529,54 +578,6 @@
+          public RenderStateShard.MultiTextureStateShard build() {
+             return new RenderStateShard.MultiTextureStateShard(this.builder.build());
+          }
+       }
+    }
+-
+-   public static class EmptyTextureStateShard extends RenderStateShard {
+-      public EmptyTextureStateShard(Runnable var1, Runnable var2) {
+-         super("texture", var1, var2);
+-      }
+-
+-      private EmptyTextureStateShard() {
+-         super("texture", () -> {
+-         }, () -> {
+-         });
+-      }
+-
+-      protected Optional<ResourceLocation> cutoutTexture() {
+-         return Optional.empty();
+-      }
+-   }
+-
+-   public static class ShaderStateShard extends RenderStateShard {
+-      private final Optional<Supplier<ShaderInstance>> shader;
+-
+-      public ShaderStateShard(Supplier<ShaderInstance> var1) {
+-         super("shader", () -> {
+-            RenderSystem.setShader(var1);
+-         }, () -> {
+-         });
+-         this.shader = Optional.of(var1);
+-      }
+-
+-      public ShaderStateShard() {
+-         super("shader", () -> {
+-            RenderSystem.setShader(() -> {
+-               return null;
+-            });
+-         }, () -> {
+-         });
+-         this.shader = Optional.empty();
+-      }
+-
+-      public String toString() {
+-         return this.name + '[' + this.shader + "]";
+-      }
+-   }
+-
+-   public static class TransparencyStateShard extends RenderStateShard {
+-      public TransparencyStateShard(String var1, Runnable var2, Runnable var3) {
+-         super(var1, var2, var3);
+-      }
+-   }
+ }

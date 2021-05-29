@@ -1,0 +1,49 @@
+--- net/minecraft/world/level/storage/PrimaryLevelData.java
++++ net/minecraft/world/level/storage/PrimaryLevelData.java
+@@ -4,13 +4,15 @@
+ import com.google.common.collect.Sets;
+ import com.mojang.datafixers.DataFixer;
+ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.Dynamic;
+ import com.mojang.serialization.Lifecycle;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.UUID;
+ import java.util.stream.Collectors;
++import java.util.stream.Stream;
+ import javax.annotation.Nullable;
+ import net.minecraft.CrashReportCategory;
+ import net.minecraft.SharedConstants;
+ import net.minecraft.Util;
+ import net.minecraft.core.BlockPos;
+@@ -133,24 +135,26 @@
+       return var3;
+    }
+ 
+    private void setTagData(RegistryAccess var1, CompoundTag var2, @Nullable CompoundTag var3) {
+       ListTag var4 = new ListTag();
+-      this.knownServerBrands.stream().map(StringTag::valueOf).forEach(var4::add);
++      Stream var10000 = this.knownServerBrands.stream().map(StringTag::valueOf);
++      Objects.requireNonNull(var4);
++      var10000.forEach(var4::add);
+       var2.put("ServerBrands", var4);
+       var2.putBoolean("WasModded", this.wasModded);
+       CompoundTag var5 = new CompoundTag();
+       var5.putString("Name", SharedConstants.getCurrentVersion().getName());
+       var5.putInt("Id", SharedConstants.getCurrentVersion().getWorldVersion());
+       var5.putBoolean("Snapshot", !SharedConstants.getCurrentVersion().isStable());
+       var2.put("Version", var5);
+       var2.putInt("DataVersion", SharedConstants.getCurrentVersion().getWorldVersion());
+       RegistryWriteOps var6 = RegistryWriteOps.create(NbtOps.INSTANCE, var1);
+-      DataResult var10000 = WorldGenSettings.CODEC.encodeStart(var6, this.worldGenSettings);
++      DataResult var7 = WorldGenSettings.CODEC.encodeStart(var6, this.worldGenSettings);
+       Logger var10002 = LOGGER;
+-      var10002.getClass();
+-      var10000.resultOrPartial(Util.prefix("WorldGenSettings: ", var10002::error)).ifPresent((var1x) -> {
++      Objects.requireNonNull(var10002);
++      var7.resultOrPartial(Util.prefix("WorldGenSettings: ", var10002::error)).ifPresent((var1x) -> {
+          var2.put("WorldGenSettings", var1x);
+       });
+       var2.putInt("GameType", this.settings.gameType().getId());
+       var2.putInt("SpawnX", this.xSpawn);
+       var2.putInt("SpawnY", this.ySpawn);

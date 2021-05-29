@@ -1,0 +1,78 @@
+--- net/minecraft/commands/arguments/MessageArgument.java
++++ net/minecraft/commands/arguments/MessageArgument.java
+@@ -35,39 +35,10 @@
+ 
+    public Collection<String> getExamples() {
+       return EXAMPLES;
+    }
+ 
+-   public static class Part {
+-      private final int start;
+-      private final int end;
+-      private final EntitySelector selector;
+-
+-      public Part(int var1, int var2, EntitySelector var3) {
+-         this.start = var1;
+-         this.end = var2;
+-         this.selector = var3;
+-      }
+-
+-      public int getStart() {
+-         return this.start;
+-      }
+-
+-      public int getEnd() {
+-         return this.end;
+-      }
+-
+-      public EntitySelector getSelector() {
+-         return this.selector;
+-      }
+-
+-      @Nullable
+-      public Component toComponent(CommandSourceStack var1) throws CommandSyntaxException {
+-         return EntitySelector.joinNames(this.selector.findEntities(var1));
+-      }
+-   }
+-
+    public static class Message {
+       private final String text;
+       private final MessageArgument.Part[] parts;
+ 
+       public Message(String var1, MessageArgument.Part[] var2) {
+@@ -154,6 +125,35 @@
+                var3.add(new MessageArgument.Part(var5 - var4, var0.getCursor() - var4, var6));
+             }
+          }
+       }
+    }
++
++   public static class Part {
++      private final int start;
++      private final int end;
++      private final EntitySelector selector;
++
++      public Part(int var1, int var2, EntitySelector var3) {
++         this.start = var1;
++         this.end = var2;
++         this.selector = var3;
++      }
++
++      public int getStart() {
++         return this.start;
++      }
++
++      public int getEnd() {
++         return this.end;
++      }
++
++      public EntitySelector getSelector() {
++         return this.selector;
++      }
++
++      @Nullable
++      public Component toComponent(CommandSourceStack var1) throws CommandSyntaxException {
++         return EntitySelector.joinNames(this.selector.findEntities(var1));
++      }
++   }
+ }

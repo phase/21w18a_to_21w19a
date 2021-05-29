@@ -1,0 +1,15 @@
+--- net/minecraft/client/renderer/entity/PandaRenderer.java
++++ net/minecraft/client/renderer/entity/PandaRenderer.java
+@@ -27,11 +27,11 @@
+       super(var1, new PandaModel(var1.bakeLayer(ModelLayers.PANDA)), 0.9F);
+       this.addLayer(new PandaHoldsItemLayer(this));
+    }
+ 
+    public ResourceLocation getTextureLocation(Panda var1) {
+-      return (ResourceLocation)TEXTURES.getOrDefault(var1.getVariant(), TEXTURES.get(Panda.Gene.NORMAL));
++      return (ResourceLocation)TEXTURES.getOrDefault(var1.getVariant(), (ResourceLocation)TEXTURES.get(Panda.Gene.NORMAL));
+    }
+ 
+    protected void setupRotations(Panda var1, PoseStack var2, float var3, float var4, float var5) {
+       super.setupRotations(var1, var2, var3, var4, var5);
+       float var8;

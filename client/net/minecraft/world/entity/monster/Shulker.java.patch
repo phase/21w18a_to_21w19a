@@ -1,0 +1,161 @@
+--- net/minecraft/world/entity/monster/Shulker.java
++++ net/minecraft/world/entity/monster/Shulker.java
+@@ -235,11 +235,12 @@
+       double var5 = (double)Math.min(var1, var2);
+       return (new AABB(BlockPos.ZERO)).expandTowards((double)var0.getStepX() * var3, (double)var0.getStepY() * var3, (double)var0.getStepZ() * var3).contract((double)(-var0.getStepX()) * (1.0D + var5), (double)(-var0.getStepY()) * (1.0D + var5), (double)(-var0.getStepZ()) * (1.0D + var5));
+    }
+ 
+    public double getMyRidingOffset() {
+-      return 0.1875D - this.getVehicle().getPassengersRidingOffset();
++      EntityType var1 = this.getVehicle().getType();
++      return var1 != EntityType.BOAT && var1 != EntityType.MINECART ? super.getMyRidingOffset() : 0.1875D - this.getVehicle().getPassengersRidingOffset();
+    }
+ 
+    public boolean startRiding(Entity var1, boolean var2) {
+       if (this.level.isClientSide()) {
+          this.clientOldAttachPosition = null;
+@@ -322,11 +323,11 @@
+       }
+ 
+       return null;
+    }
+ 
+-   private boolean canStayAt(BlockPos var1, Direction var2) {
++   boolean canStayAt(BlockPos var1, Direction var2) {
+       if (this.isPositionBlocked(var1)) {
+          return false;
+       } else {
+          Direction var3 = var2.getOpposite();
+          if (!this.level.loadedAndEntityCanStandOnFace(var1.relative(var2), this, var3)) {
+@@ -450,11 +451,11 @@
+ 
+    private int getRawPeekAmount() {
+       return (Byte)this.entityData.get(DATA_PEEK_ID);
+    }
+ 
+-   private void setRawPeekAmount(int var1) {
++   void setRawPeekAmount(int var1) {
+       if (!this.level.isClientSide) {
+          this.getAttribute(Attributes.ARMOR).removeModifier(COVERED_ARMOR_MODIFIER);
+          if (var1 == 0) {
+             this.getAttribute(Attributes.ARMOR).addPermanentModifier(COVERED_ARMOR_MODIFIER);
+             this.playSound(SoundEvents.SHULKER_CLOSE, 1.0F, 1.0F);
+@@ -525,51 +526,11 @@
+       DATA_ATTACH_FACE_ID = SynchedEntityData.defineId(Shulker.class, EntityDataSerializers.DIRECTION);
+       DATA_PEEK_ID = SynchedEntityData.defineId(Shulker.class, EntityDataSerializers.BYTE);
+       DATA_COLOR_ID = SynchedEntityData.defineId(Shulker.class, EntityDataSerializers.BYTE);
+    }
+ 
+-   static class ShulkerDefenseAttackGoal extends NearestAttackableTargetGoal<LivingEntity> {
+-      public ShulkerDefenseAttackGoal(Shulker var1) {
+-         super(var1, LivingEntity.class, 10, true, false, (var0) -> {
+-            return var0 instanceof Enemy;
+-         });
+-      }
+-
+-      public boolean canUse() {
+-         return this.mob.getTeam() == null ? false : super.canUse();
+-      }
+-
+-      protected AABB getTargetSearchArea(double var1) {
+-         Direction var3 = ((Shulker)this.mob).getAttachFace();
+-         if (var3.getAxis() == Direction.Axis.X) {
+-            return this.mob.getBoundingBox().inflate(4.0D, var1, var1);
+-         } else {
+-            return var3.getAxis() == Direction.Axis.Z ? this.mob.getBoundingBox().inflate(var1, var1, 4.0D) : this.mob.getBoundingBox().inflate(var1, 4.0D, var1);
+-         }
+-      }
+-   }
+-
+-   class ShulkerNearestAttackGoal extends NearestAttackableTargetGoal<Player> {
+-      public ShulkerNearestAttackGoal(Shulker var2) {
+-         super(var2, Player.class, true);
+-      }
+-
+-      public boolean canUse() {
+-         return Shulker.this.level.getDifficulty() == Difficulty.PEACEFUL ? false : super.canUse();
+-      }
+-
+-      protected AABB getTargetSearchArea(double var1) {
+-         Direction var3 = ((Shulker)this.mob).getAttachFace();
+-         if (var3.getAxis() == Direction.Axis.X) {
+-            return this.mob.getBoundingBox().inflate(4.0D, var1, var1);
+-         } else {
+-            return var3.getAxis() == Direction.Axis.Z ? this.mob.getBoundingBox().inflate(var1, var1, 4.0D) : this.mob.getBoundingBox().inflate(var1, 4.0D, var1);
+-         }
+-      }
+-   }
+-
+-   class ShulkerAttackGoal extends Goal {
++   private class ShulkerAttackGoal extends Goal {
+       private int attackTime;
+ 
+       public ShulkerAttackGoal() {
+          this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+       }
+@@ -614,11 +575,11 @@
+    }
+ 
+    class ShulkerPeekGoal extends Goal {
+       private int peekTime;
+ 
+-      private ShulkerPeekGoal() {
++      ShulkerPeekGoal() {
+       }
+ 
+       public boolean canUse() {
+          return Shulker.this.getTarget() == null && Shulker.this.random.nextInt(40) == 0 && Shulker.this.canStayAt(Shulker.this.blockPosition(), Shulker.this.getAttachFace());
+       }
+@@ -642,11 +603,51 @@
+       public void tick() {
+          --this.peekTime;
+       }
+    }
+ 
+-   static class ShulkerBodyRotationControl extends BodyRotationControl {
++   class ShulkerNearestAttackGoal extends NearestAttackableTargetGoal<Player> {
++      public ShulkerNearestAttackGoal(Shulker var2) {
++         super(var2, Player.class, true);
++      }
++
++      public boolean canUse() {
++         return Shulker.this.level.getDifficulty() == Difficulty.PEACEFUL ? false : super.canUse();
++      }
++
++      protected AABB getTargetSearchArea(double var1) {
++         Direction var3 = ((Shulker)this.mob).getAttachFace();
++         if (var3.getAxis() == Direction.Axis.X) {
++            return this.mob.getBoundingBox().inflate(4.0D, var1, var1);
++         } else {
++            return var3.getAxis() == Direction.Axis.Z ? this.mob.getBoundingBox().inflate(var1, var1, 4.0D) : this.mob.getBoundingBox().inflate(var1, 4.0D, var1);
++         }
++      }
++   }
++
++   static class ShulkerDefenseAttackGoal extends NearestAttackableTargetGoal<LivingEntity> {
++      public ShulkerDefenseAttackGoal(Shulker var1) {
++         super(var1, LivingEntity.class, 10, true, false, (var0) -> {
++            return var0 instanceof Enemy;
++         });
++      }
++
++      public boolean canUse() {
++         return this.mob.getTeam() == null ? false : super.canUse();
++      }
++
++      protected AABB getTargetSearchArea(double var1) {
++         Direction var3 = ((Shulker)this.mob).getAttachFace();
++         if (var3.getAxis() == Direction.Axis.X) {
++            return this.mob.getBoundingBox().inflate(4.0D, var1, var1);
++         } else {
++            return var3.getAxis() == Direction.Axis.Z ? this.mob.getBoundingBox().inflate(var1, var1, 4.0D) : this.mob.getBoundingBox().inflate(var1, 4.0D, var1);
++         }
++      }
++   }
++
++   private static class ShulkerBodyRotationControl extends BodyRotationControl {
+       public ShulkerBodyRotationControl(Mob var1) {
+          super(var1);
+       }
+ 
+       public void clientTick() {

@@ -1,0 +1,35 @@
+--- net/minecraft/tags/BlockTags.java
++++ net/minecraft/tags/BlockTags.java
+@@ -111,10 +111,17 @@
+    public static final Tag.Named<Block> CAVE_VINES;
+    public static final Tag.Named<Block> MOSS_REPLACEABLE;
+    public static final Tag.Named<Block> LUSH_GROUND_REPLACEABLE;
+    public static final Tag.Named<Block> SMALL_DRIPLEAF_PLACEABLE;
+    public static final Tag.Named<Block> SNOW;
++   public static final Tag.Named<Block> MINEABLE_WITH_AXE;
++   public static final Tag.Named<Block> MINEABLE_WITH_HOE;
++   public static final Tag.Named<Block> MINEABLE_WITH_PICKAXE;
++   public static final Tag.Named<Block> MINEABLE_WITH_SHOVEL;
++   public static final Tag.Named<Block> NEEDS_DIAMOND_TOOL;
++   public static final Tag.Named<Block> NEEDS_IRON_TOOL;
++   public static final Tag.Named<Block> NEEDS_STONE_TOOL;
+ 
+    private BlockTags() {
+    }
+ 
+    private static Tag.Named<Block> bind(String var0) {
+@@ -233,7 +240,14 @@
+       CAVE_VINES = bind("cave_vines");
+       MOSS_REPLACEABLE = bind("moss_replaceable");
+       LUSH_GROUND_REPLACEABLE = bind("lush_ground_replaceable");
+       SMALL_DRIPLEAF_PLACEABLE = bind("small_dripleaf_placeable");
+       SNOW = bind("snow");
++      MINEABLE_WITH_AXE = bind("mineable/axe");
++      MINEABLE_WITH_HOE = bind("mineable/hoe");
++      MINEABLE_WITH_PICKAXE = bind("mineable/pickaxe");
++      MINEABLE_WITH_SHOVEL = bind("mineable/shovel");
++      NEEDS_DIAMOND_TOOL = bind("needs_diamond_tool");
++      NEEDS_IRON_TOOL = bind("needs_iron_tool");
++      NEEDS_STONE_TOOL = bind("needs_stone_tool");
+    }
+ }

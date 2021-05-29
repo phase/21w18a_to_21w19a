@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/ai/behavior/StopAttackingIfTargetInvalid.java
++++ net/minecraft/world/entity/ai/behavior/StopAttackingIfTargetInvalid.java
+@@ -40,11 +40,11 @@
+       });
+    }
+ 
+    protected void start(ServerLevel var1, E var2, long var3) {
+       LivingEntity var5 = this.getAttackTarget(var2);
+-      if (!var5.canBeTargeted()) {
++      if (!var5.canBeSeenAsEnemy()) {
+          this.clearAttackTarget(var2);
+       } else if (isTiredOfTryingToReachTarget(var2)) {
+          this.clearAttackTarget(var2);
+       } else if (this.isCurrentTargetDeadOrRemoved(var2)) {
+          this.clearAttackTarget(var2);

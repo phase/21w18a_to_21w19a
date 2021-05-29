@@ -1,0 +1,48 @@
+--- net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java
++++ net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java
+@@ -113,44 +113,11 @@
+          List var6 = var1.getEntities((Entity)null, var5);
+          if (!var6.isEmpty()) {
+             for(int var7 = 0; var7 < var6.size(); ++var7) {
+                Entity var8 = (Entity)var6.get(var7);
+                if (var8.getPistonPushReaction() != PushReaction.IGNORE) {
+-                  double var9 = 0.0D;
+-                  double var11 = 0.0D;
+-                  double var13 = 0.0D;
+-                  AABB var15 = var8.getBoundingBox();
+-                  switch(var4.getAxis()) {
+-                  case X:
+-                     if (var4.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+-                        var9 = var5.maxX - var15.minX;
+-                     } else {
+-                        var9 = var15.maxX - var5.minX;
+-                     }
+-
+-                     var9 += 0.01D;
+-                     break;
+-                  case Y:
+-                     if (var4.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+-                        var11 = var5.maxY - var15.minY;
+-                     } else {
+-                        var11 = var15.maxY - var5.minY;
+-                     }
+-
+-                     var11 += 0.01D;
+-                     break;
+-                  case Z:
+-                     if (var4.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+-                        var13 = var5.maxZ - var15.minZ;
+-                     } else {
+-                        var13 = var15.maxZ - var5.minZ;
+-                     }
+-
+-                     var13 += 0.01D;
+-                  }
+-
+-                  var8.move(MoverType.SHULKER_BOX, new Vec3(var9 * (double)var4.getStepX(), var11 * (double)var4.getStepY(), var13 * (double)var4.getStepZ()));
++                  var8.move(MoverType.SHULKER_BOX, new Vec3((var5.getXsize() + 0.01D) * (double)var4.getStepX(), (var5.getYsize() + 0.01D) * (double)var4.getStepY(), (var5.getZsize() + 0.01D) * (double)var4.getStepZ()));
+                }
+             }
+ 
+          }
+       }

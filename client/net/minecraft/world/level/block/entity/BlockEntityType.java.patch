@@ -1,0 +1,26 @@
+--- net/minecraft/world/level/block/entity/BlockEntityType.java
++++ net/minecraft/world/level/block/entity/BlockEntityType.java
+@@ -129,11 +129,11 @@
+       SCULK_SENSOR = register("sculk_sensor", BlockEntityType.Builder.of(SculkSensorBlockEntity::new, Blocks.SCULK_SENSOR));
+    }
+ 
+    public static final class Builder<T extends BlockEntity> {
+       private final BlockEntityType.BlockEntitySupplier<? extends T> factory;
+-      private final Set<Block> validBlocks;
++      final Set<Block> validBlocks;
+ 
+       private Builder(BlockEntityType.BlockEntitySupplier<? extends T> var1, Set<Block> var2) {
+          this.factory = var1;
+          this.validBlocks = var2;
+       }
+@@ -146,9 +146,9 @@
+          return new BlockEntityType(this.factory, this.validBlocks, var1);
+       }
+    }
+ 
+    @FunctionalInterface
+-   interface BlockEntitySupplier<T extends BlockEntity> {
++   private interface BlockEntitySupplier<T extends BlockEntity> {
+       T create(BlockPos var1, BlockState var2);
+    }
+ }

@@ -1,0 +1,14 @@
+--- net/minecraft/world/item/HoneycombItem.java
++++ net/minecraft/world/item/HoneycombItem.java
+@@ -38,10 +38,10 @@
+          return InteractionResult.sidedSuccess(var2.isClientSide);
+       }).orElse(InteractionResult.PASS);
+    }
+ 
+    public static Optional<BlockState> getWaxed(BlockState var0) {
+-      return Optional.ofNullable(((BiMap)WAXABLES.get()).get(var0.getBlock())).map((var1) -> {
++      return Optional.ofNullable((Block)((BiMap)WAXABLES.get()).get(var0.getBlock())).map((var1) -> {
+          return var1.withPropertiesOf(var0);
+       });
+    }
+ }

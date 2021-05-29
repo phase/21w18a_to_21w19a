@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/newbiome/layer/ZoomLayer.java
++++ net/minecraft/world/level/newbiome/layer/ZoomLayer.java
+@@ -13,11 +13,11 @@
+    };
+ 
+    private static final int ZOOM_BITS = 1;
+    private static final int ZOOM_MASK = 1;
+ 
+-   private ZoomLayer() {
++   ZoomLayer() {
+    }
+ 
+    public int getParentX(int var1) {
+       return var1 >> 1;
+    }

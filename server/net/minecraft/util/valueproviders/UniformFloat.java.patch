@@ -1,0 +1,12 @@
+--- net/minecraft/util/valueproviders/UniformFloat.java
++++ net/minecraft/util/valueproviders/UniformFloat.java
+@@ -49,8 +49,8 @@
+    public FloatProviderType<?> getType() {
+       return FloatProviderType.UNIFORM;
+    }
+ 
+    public String toString() {
+-      return "[" + this.minInclusive + '-' + this.maxExclusive + ']';
++      return "[" + this.minInclusive + "-" + this.maxExclusive + "]";
+    }
+ }

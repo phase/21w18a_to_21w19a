@@ -1,0 +1,75 @@
+--- net/minecraft/client/gui/components/CycleButton.java
++++ net/minecraft/client/gui/components/CycleButton.java
+@@ -11,11 +11,11 @@
+ import net.minecraft.network.chat.MutableComponent;
+ import net.minecraft.util.FormattedCharSequence;
+ import net.minecraft.util.Mth;
+ 
+ public class CycleButton<T> extends AbstractButton implements TooltipAccessor {
+-   private static final BooleanSupplier DEFAULT_ALT_LIST_SELECTOR = Screen::hasAltDown;
++   static final BooleanSupplier DEFAULT_ALT_LIST_SELECTOR = Screen::hasAltDown;
+    private static final List<Boolean> BOOLEAN_OPTIONS;
+    private final Component name;
+    private int index;
+    private T value;
+    private final CycleButton.ValueListSupplier<T> values;
+@@ -23,11 +23,11 @@
+    private final Function<CycleButton<T>, MutableComponent> narrationProvider;
+    private final CycleButton.OnValueChange<T> onValueChange;
+    private final CycleButton.TooltipSupplier<T> tooltipSupplier;
+    private final boolean displayOnlyValue;
+ 
+-   private CycleButton(int var1, int var2, int var3, int var4, Component var5, Component var6, int var7, T var8, CycleButton.ValueListSupplier<T> var9, Function<T, Component> var10, Function<CycleButton<T>, MutableComponent> var11, CycleButton.OnValueChange<T> var12, CycleButton.TooltipSupplier<T> var13, boolean var14) {
++   CycleButton(int var1, int var2, int var3, int var4, Component var5, Component var6, int var7, T var8, CycleButton.ValueListSupplier<T> var9, Function<T, Component> var10, Function<CycleButton<T>, MutableComponent> var11, CycleButton.OnValueChange<T> var12, CycleButton.TooltipSupplier<T> var13, boolean var14) {
+       super(var1, var2, var3, var4, var5);
+       this.name = var6;
+       this.index = var7;
+       this.value = var8;
+       this.values = var9;
+@@ -123,11 +123,11 @@
+ 
+    static {
+       BOOLEAN_OPTIONS = ImmutableList.of(Boolean.TRUE, Boolean.FALSE);
+    }
+ 
+-   interface ValueListSupplier<T> {
++   private interface ValueListSupplier<T> {
+       List<T> getSelectedList();
+ 
+       List<T> getDefaultList();
+ 
+       static <T> CycleButton.ValueListSupplier<T> create(List<T> var0) {
+@@ -156,10 +156,18 @@
+             }
+          };
+       }
+    }
+ 
++   public interface OnValueChange<T> {
++      void onValueChange(CycleButton var1, T var2);
++   }
++
++   @FunctionalInterface
++   public interface TooltipSupplier<T> extends Function<T, List<FormattedCharSequence>> {
++   }
++
+    public static class Builder<T> {
+       private int initialIndex;
+       @Nullable
+       private T initialValue;
+       private final Function<T, Component> valueStringifier;
+@@ -234,14 +242,6 @@
+             Object var10 = this.displayOnlyValue ? var9 : CommonComponents.optionNameValue(var5, var9);
+             return new CycleButton(var1, var2, var3, var4, (Component)var10, var5, this.initialIndex, var8, this.values, this.valueStringifier, this.narrationProvider, var6, this.tooltipSupplier, this.displayOnlyValue);
+          }
+       }
+    }
+-
+-   @FunctionalInterface
+-   public interface TooltipSupplier<T> extends Function<T, List<FormattedCharSequence>> {
+-   }
+-
+-   public interface OnValueChange<T> {
+-      void onValueChange(CycleButton var1, T var2);
+-   }
+ }

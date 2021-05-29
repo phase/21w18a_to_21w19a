@@ -1,0 +1,50 @@
+--- net/minecraft/gametest/framework/GameTestBatchRunner.java
++++ net/minecraft/gametest/framework/GameTestBatchRunner.java
+@@ -6,10 +6,11 @@
+ import java.util.Collection;
+ import java.util.HashMap;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.world.level.block.Rotation;
+ import net.minecraft.world.level.block.entity.StructureBlockEntity;
+ import net.minecraft.world.phys.AABB;
+@@ -17,11 +18,11 @@
+ import org.apache.logging.log4j.Logger;
+ 
+ public class GameTestBatchRunner {
+    private static final Logger LOGGER = LogManager.getLogger();
+    private final BlockPos firstTestNorthWestCorner;
+-   private final ServerLevel level;
++   final ServerLevel level;
+    private final GameTestTicker testTicker;
+    private final int testsPerRow;
+    private final List<GameTestInfo> allTestInfos;
+    private final List<Pair<GameTestBatch, Collection<GameTestInfo>>> batches;
+    private final BlockPos.MutableBlockPos nextTestNorthWestCorner;
+@@ -49,20 +50,21 @@
+ 
+    public void start() {
+       this.runBatch(0);
+    }
+ 
+-   private void runBatch(final int var1) {
++   void runBatch(final int var1) {
+       if (var1 < this.batches.size()) {
+          Pair var2 = (Pair)this.batches.get(var1);
+          final GameTestBatch var3 = (GameTestBatch)var2.getFirst();
+          Collection var4 = (Collection)var2.getSecond();
+          Map var5 = this.createStructuresForBatch(var4);
+          String var6 = var3.getName();
+          LOGGER.info((String)"Running test batch '{}' ({} tests)...", (Object)var6, (Object)var4.size());
+          var3.runBeforeBatchFunction(this.level);
+          final MultipleTestTracker var7 = new MultipleTestTracker();
++         Objects.requireNonNull(var7);
+          var4.forEach(var7::addTestToTrack);
+          var7.addListener(new GameTestListener() {
+             private void testCompleted() {
+                if (var7.isDone()) {
+                   var3.runAfterBatchFunction(GameTestBatchRunner.this.level);

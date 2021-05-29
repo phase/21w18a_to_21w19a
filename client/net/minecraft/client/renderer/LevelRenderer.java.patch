@@ -1,0 +1,100 @@
+--- net/minecraft/client/renderer/LevelRenderer.java
++++ net/minecraft/client/renderer/LevelRenderer.java
+@@ -60,10 +60,11 @@
+ import net.minecraft.client.player.LocalPlayer;
+ import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+ import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
+ import net.minecraft.client.renderer.culling.Frustum;
+ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
++import net.minecraft.client.renderer.entity.layers.SheepFurLayer;
+ import net.minecraft.client.renderer.texture.TextureAtlas;
+ import net.minecraft.client.renderer.texture.TextureManager;
+ import net.minecraft.client.resources.model.ModelBakery;
+ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+ import net.minecraft.client.resources.sounds.SoundInstance;
+@@ -343,11 +344,11 @@
+                         var41 = Mth.sqrt(var37 * var37 + var39 * var39) / (float)var16;
+                         float var48 = ((1.0F - var41 * var41) * 0.3F + 0.5F) * var9;
+                         var19.set(var21, var31, var20);
+                         int var43 = getLightColor(var10, var19);
+                         int var44 = var43 >> 16 & '\uffff';
+-                        int var45 = (var43 & '\uffff') * 3;
++                        int var45 = var43 & '\uffff';
+                         int var46 = (var44 * 3 + 240) / 4;
+                         int var47 = (var45 * 3 + 240) / 4;
+                         var15.vertex((double)var21 - var3 - var23 + 0.5D, (double)var30 - var5, (double)var20 - var7 - var25 + 0.5D).uv(0.0F + var35, (float)var29 * 0.25F + var49 + var50).color(1.0F, 1.0F, 1.0F, var48).uv2(var47, var46).endVertex();
+                         var15.vertex((double)var21 - var3 + var23 + 0.5D, (double)var30 - var5, (double)var20 - var7 + var25 + 0.5D).uv(1.0F + var35, (float)var29 * 0.25F + var49 + var50).color(1.0F, 1.0F, 1.0F, var48).uv2(var47, var46).endVertex();
+                         var15.vertex((double)var21 - var3 + var23 + 0.5D, (double)var29 - var5, (double)var20 - var7 + var25 + 0.5D).uv(1.0F + var35, (float)var30 * 0.25F + var49 + var50).color(1.0F, 1.0F, 1.0F, var48).uv2(var47, var46).endVertex();
+@@ -751,11 +752,12 @@
+ 
+       return var1;
+    }
+ 
+    public String getEntityStatistics() {
+-      return "E: " + this.renderedEntities + "/" + this.level.getEntityCount() + ", B: " + this.culledEntities;
++      int var10000 = this.renderedEntities;
++      return "E: " + var10000 + "/" + this.level.getEntityCount() + ", B: " + this.culledEntities;
+    }
+ 
+    private void setupRender(Camera var1, Frustum var2, boolean var3, int var4, boolean var5) {
+       Vec3 var6 = var1.getPosition();
+       if (this.minecraft.options.renderDistance != this.lastViewDistance) {
+@@ -1073,10 +1075,11 @@
+                   if (!var39.hasNext()) {
+                      this.checkPoseStack(var1);
+                      var38.endBatch(RenderType.entitySolid(TextureAtlas.LOCATION_BLOCKS));
+                      var38.endBatch(RenderType.entityCutout(TextureAtlas.LOCATION_BLOCKS));
+                      var38.endBatch(RenderType.entityCutoutNoCull(TextureAtlas.LOCATION_BLOCKS));
++                     var38.endBatch(RenderType.entityCutoutNoCull(SheepFurLayer.SHEEP_FUR_LOCATION));
+                      var38.endBatch(RenderType.entitySmoothCutout(TextureAtlas.LOCATION_BLOCKS));
+                      var10.popPush("blockentities");
+                      ObjectListIterator var53 = this.renderChunks.iterator();
+ 
+                      while(true) {
+@@ -2856,20 +2859,20 @@
+       public TransparencyShaderException(String var1, Throwable var2) {
+          super(var1, var2);
+       }
+    }
+ 
+-   static class RenderInfoMap {
++   private static class RenderInfoMap {
+       private final LevelRenderer.RenderChunkInfo[] infos;
+       private final LevelRenderer.RenderChunkInfo[] blank;
+ 
+-      private RenderInfoMap(int var1) {
++      RenderInfoMap(int var1) {
+          this.infos = new LevelRenderer.RenderChunkInfo[var1];
+          this.blank = new LevelRenderer.RenderChunkInfo[var1];
+       }
+ 
+-      private void clear() {
++      void clear() {
+          System.arraycopy(this.blank, 0, this.infos, 0, this.infos.length);
+       }
+ 
+       public void put(ChunkRenderDispatcher.RenderChunk var1, LevelRenderer.RenderChunkInfo var2) {
+          this.infos[var1.index] = var2;
+@@ -2878,17 +2881,17 @@
+       public LevelRenderer.RenderChunkInfo get(ChunkRenderDispatcher.RenderChunk var1) {
+          return this.infos[var1.index];
+       }
+    }
+ 
+-   static class RenderChunkInfo {
+-      private final ChunkRenderDispatcher.RenderChunk chunk;
++   private static class RenderChunkInfo {
++      final ChunkRenderDispatcher.RenderChunk chunk;
+       private byte sourceDirections;
+-      private byte directions;
+-      private final int step;
++      byte directions;
++      final int step;
+ 
+-      private RenderChunkInfo(ChunkRenderDispatcher.RenderChunk var1, @Nullable Direction var2, int var3) {
++      RenderChunkInfo(ChunkRenderDispatcher.RenderChunk var1, @Nullable Direction var2, int var3) {
+          this.chunk = var1;
+          if (var2 != null) {
+             this.addSourceDirection(var2);
+          }
+ 

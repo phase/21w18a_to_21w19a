@@ -1,0 +1,94 @@
+--- com/mojang/realmsclient/gui/screens/RealmsDownloadLatestWorldScreen.java
++++ com/mojang/realmsclient/gui/screens/RealmsDownloadLatestWorldScreen.java
+@@ -226,57 +226,59 @@
+             if (!DOWNLOAD_LOCK.tryLock(1L, TimeUnit.SECONDS)) {
+                this.status = new TranslatableComponent("mco.download.failed");
+                return;
+             }
+ 
+-            if (this.cancelled) {
+-               this.downloadCancelled();
+-               return;
+-            }
++            if (!this.cancelled) {
++               this.status = new TranslatableComponent("mco.download.downloading", new Object[]{this.worldName});
++               FileDownload var1 = new FileDownload();
++               var1.contentLength(this.worldDownload.downloadLink);
++               var1.download(this.worldDownload, this.worldName, this.downloadStatus, this.minecraft.getLevelSource());
+ 
+-            this.status = new TranslatableComponent("mco.download.downloading", new Object[]{this.worldName});
+-            FileDownload var1 = new FileDownload();
+-            var1.contentLength(this.worldDownload.downloadLink);
+-            var1.download(this.worldDownload, this.worldName, this.downloadStatus, this.minecraft.getLevelSource());
++               while(!var1.isFinished()) {
++                  if (var1.isError()) {
++                     var1.cancel();
++                     this.errorMessage = new TranslatableComponent("mco.download.failed");
++                     this.cancelButton.setMessage(CommonComponents.GUI_DONE);
++                     return;
++                  }
+ 
+-            while(!var1.isFinished()) {
+-               if (var1.isError()) {
+-                  var1.cancel();
+-                  this.errorMessage = new TranslatableComponent("mco.download.failed");
+-                  this.cancelButton.setMessage(CommonComponents.GUI_DONE);
+-                  return;
+-               }
++                  if (var1.isExtracting()) {
++                     if (!this.extracting) {
++                        this.status = new TranslatableComponent("mco.download.extracting");
++                     }
+ 
+-               if (var1.isExtracting()) {
+-                  if (!this.extracting) {
+-                     this.status = new TranslatableComponent("mco.download.extracting");
++                     this.extracting = true;
+                   }
+ 
+-                  this.extracting = true;
+-               }
++                  if (this.cancelled) {
++                     var1.cancel();
++                     this.downloadCancelled();
++                     return;
++                  }
+ 
+-               if (this.cancelled) {
+-                  var1.cancel();
+-                  this.downloadCancelled();
+-                  return;
++                  try {
++                     Thread.sleep(500L);
++                  } catch (InterruptedException var8) {
++                     LOGGER.error("Failed to check Realms backup download status");
++                  }
+                }
+ 
+-               try {
+-                  Thread.sleep(500L);
+-               } catch (InterruptedException var8) {
+-                  LOGGER.error("Failed to check Realms backup download status");
+-               }
++               this.finished = true;
++               this.status = new TranslatableComponent("mco.download.done");
++               this.cancelButton.setMessage(CommonComponents.GUI_DONE);
++               return;
+             }
+ 
+-            this.finished = true;
+-            this.status = new TranslatableComponent("mco.download.done");
+-            this.cancelButton.setMessage(CommonComponents.GUI_DONE);
++            this.downloadCancelled();
+          } catch (InterruptedException var9) {
+             LOGGER.error("Could not acquire upload lock");
++            return;
+          } catch (Exception var10) {
+             this.errorMessage = new TranslatableComponent("mco.download.failed");
+             var10.printStackTrace();
++            return;
+          } finally {
+             if (!DOWNLOAD_LOCK.isHeldByCurrentThread()) {
+                return;
+             }
+ 

@@ -1,0 +1,12 @@
+--- net/minecraft/world/level/levelgen/heightproviders/TrapezoidHeight.java
++++ net/minecraft/world/level/levelgen/heightproviders/TrapezoidHeight.java
+@@ -59,8 +59,8 @@
+    public HeightProviderType<?> getType() {
+       return HeightProviderType.TRAPEZOID;
+    }
+ 
+    public String toString() {
+-      return this.plateau == 0 ? "triangle (" + this.minInclusive + "-" + this.maxInclusive + ")" : "trapezoid(" + this.plateau + ") in [" + this.minInclusive + '-' + this.maxInclusive + ']';
++      return this.plateau == 0 ? "triangle (" + this.minInclusive + "-" + this.maxInclusive + ")" : "trapezoid(" + this.plateau + ") in [" + this.minInclusive + "-" + this.maxInclusive + "]";
+    }
+ }

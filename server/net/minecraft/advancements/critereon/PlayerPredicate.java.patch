@@ -1,0 +1,156 @@
+--- net/minecraft/advancements/critereon/PlayerPredicate.java
++++ net/minecraft/advancements/critereon/PlayerPredicate.java
+@@ -11,10 +11,11 @@
+ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
+ import it.unimi.dsi.fastutil.objects.ObjectIterator;
+ import java.util.HashMap;
+ import java.util.Iterator;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Map.Entry;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
+ import net.minecraft.advancements.Advancement;
+ import net.minecraft.advancements.AdvancementProgress;
+@@ -48,17 +49,17 @@
+       } else {
+          Object2BooleanOpenHashMap var1 = new Object2BooleanOpenHashMap();
+          JsonObject var2 = GsonHelper.convertToJsonObject(var0, "criterion data");
+          var2.entrySet().forEach((var1x) -> {
+             boolean var2 = GsonHelper.convertToBoolean((JsonElement)var1x.getValue(), "criterion test");
+-            var1.put(var1x.getKey(), var2);
++            var1.put((String)var1x.getKey(), var2);
+          });
+          return new PlayerPredicate.AdvancementCriterionsPredicate(var1);
+       }
+    }
+ 
+-   private PlayerPredicate(MinMaxBounds.Ints var1, @Nullable GameType var2, Map<Stat<?>, MinMaxBounds.Ints> var3, Object2BooleanMap<ResourceLocation> var4, Map<ResourceLocation, PlayerPredicate.AdvancementPredicate> var5) {
++   PlayerPredicate(MinMaxBounds.Ints var1, @Nullable GameType var2, Map<Stat<?>, MinMaxBounds.Ints> var3, Object2BooleanMap<ResourceLocation> var4, Map<ResourceLocation, PlayerPredicate.AdvancementPredicate> var5) {
+       this.level = var1;
+       this.gameType = var2;
+       this.stats = var3;
+       this.recipes = var4;
+       this.advancements = var5;
+@@ -226,10 +227,63 @@
+ 
+          return var1;
+       }
+    }
+ 
++   private static class AdvancementDonePredicate implements PlayerPredicate.AdvancementPredicate {
++      private final boolean state;
++
++      public AdvancementDonePredicate(boolean var1) {
++         this.state = var1;
++      }
++
++      public JsonElement toJson() {
++         return new JsonPrimitive(this.state);
++      }
++
++      public boolean test(AdvancementProgress var1) {
++         return var1.isDone() == this.state;
++      }
++   }
++
++   private static class AdvancementCriterionsPredicate implements PlayerPredicate.AdvancementPredicate {
++      private final Object2BooleanMap<String> criterions;
++
++      public AdvancementCriterionsPredicate(Object2BooleanMap<String> var1) {
++         this.criterions = var1;
++      }
++
++      public JsonElement toJson() {
++         JsonObject var1 = new JsonObject();
++         Object2BooleanMap var10000 = this.criterions;
++         Objects.requireNonNull(var1);
++         var10000.forEach(var1::addProperty);
++         return var1;
++      }
++
++      public boolean test(AdvancementProgress var1) {
++         ObjectIterator var2 = this.criterions.object2BooleanEntrySet().iterator();
++
++         Object2BooleanMap.Entry var3;
++         CriterionProgress var4;
++         do {
++            if (!var2.hasNext()) {
++               return true;
++            }
++
++            var3 = (Object2BooleanMap.Entry)var2.next();
++            var4 = var1.getCriterion((String)var3.getKey());
++         } while(var4 != null && var4.isDone() == var3.getBooleanValue());
++
++         return false;
++      }
++   }
++
++   private interface AdvancementPredicate extends Predicate<AdvancementProgress> {
++      JsonElement toJson();
++   }
++
+    public static class Builder {
+       private MinMaxBounds.Ints level;
+       @Nullable
+       private GameType gameType;
+       private final Map<Stat<?>, MinMaxBounds.Ints> stats;
+@@ -279,57 +333,6 @@
+ 
+       public PlayerPredicate build() {
+          return new PlayerPredicate(this.level, this.gameType, this.stats, this.recipes, this.advancements);
+       }
+    }
+-
+-   static class AdvancementCriterionsPredicate implements PlayerPredicate.AdvancementPredicate {
+-      private final Object2BooleanMap<String> criterions;
+-
+-      public AdvancementCriterionsPredicate(Object2BooleanMap<String> var1) {
+-         this.criterions = var1;
+-      }
+-
+-      public JsonElement toJson() {
+-         JsonObject var1 = new JsonObject();
+-         this.criterions.forEach(var1::addProperty);
+-         return var1;
+-      }
+-
+-      public boolean test(AdvancementProgress var1) {
+-         ObjectIterator var2 = this.criterions.object2BooleanEntrySet().iterator();
+-
+-         Object2BooleanMap.Entry var3;
+-         CriterionProgress var4;
+-         do {
+-            if (!var2.hasNext()) {
+-               return true;
+-            }
+-
+-            var3 = (Object2BooleanMap.Entry)var2.next();
+-            var4 = var1.getCriterion((String)var3.getKey());
+-         } while(var4 != null && var4.isDone() == var3.getBooleanValue());
+-
+-         return false;
+-      }
+-   }
+-
+-   static class AdvancementDonePredicate implements PlayerPredicate.AdvancementPredicate {
+-      private final boolean state;
+-
+-      public AdvancementDonePredicate(boolean var1) {
+-         this.state = var1;
+-      }
+-
+-      public JsonElement toJson() {
+-         return new JsonPrimitive(this.state);
+-      }
+-
+-      public boolean test(AdvancementProgress var1) {
+-         return var1.isDone() == this.state;
+-      }
+-   }
+-
+-   interface AdvancementPredicate extends Predicate<AdvancementProgress> {
+-      JsonElement toJson();
+-   }
+ }

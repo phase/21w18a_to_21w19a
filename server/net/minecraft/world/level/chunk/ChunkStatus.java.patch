@@ -1,0 +1,38 @@
+--- net/minecraft/world/level/chunk/ChunkStatus.java
++++ net/minecraft/world/level/chunk/ChunkStatus.java
+@@ -264,11 +264,19 @@
+ 
+       private ChunkType() {
+       }
+    }
+ 
+-   interface SimpleGenerationTask extends ChunkStatus.GenerationTask {
++   interface GenerationTask {
++      CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> doWork(ChunkStatus var1, Executor var2, ServerLevel var3, ChunkGenerator var4, StructureManager var5, ThreadedLevelLightEngine var6, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> var7, List<ChunkAccess> var8, ChunkAccess var9);
++   }
++
++   interface LoadingTask {
++      CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> doWork(ChunkStatus var1, ServerLevel var2, StructureManager var3, ThreadedLevelLightEngine var4, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> var5, ChunkAccess var6);
++   }
++
++   private interface SimpleGenerationTask extends ChunkStatus.GenerationTask {
+       default CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> doWork(ChunkStatus var1, Executor var2, ServerLevel var3, ChunkGenerator var4, StructureManager var5, ThreadedLevelLightEngine var6, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> var7, List<ChunkAccess> var8, ChunkAccess var9) {
+          if (!var9.getStatus().isOrAfter(var1)) {
+             this.doWork(var3, var4, var8, var9);
+             if (var9 instanceof ProtoChunk) {
+                ((ProtoChunk)var9).setStatus(var1);
+@@ -278,14 +286,6 @@
+          return CompletableFuture.completedFuture(Either.left(var9));
+       }
+ 
+       void doWork(ServerLevel var1, ChunkGenerator var2, List<ChunkAccess> var3, ChunkAccess var4);
+    }
+-
+-   interface LoadingTask {
+-      CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> doWork(ChunkStatus var1, ServerLevel var2, StructureManager var3, ThreadedLevelLightEngine var4, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> var5, ChunkAccess var6);
+-   }
+-
+-   interface GenerationTask {
+-      CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> doWork(ChunkStatus var1, Executor var2, ServerLevel var3, ChunkGenerator var4, StructureManager var5, ThreadedLevelLightEngine var6, Function<ChunkAccess, CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>> var7, List<ChunkAccess> var8, ChunkAccess var9);
+-   }
+ }

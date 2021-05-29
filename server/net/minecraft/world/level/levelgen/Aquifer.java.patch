@@ -1,0 +1,19 @@
+--- net/minecraft/world/level/levelgen/Aquifer.java
++++ net/minecraft/world/level/levelgen/Aquifer.java
+@@ -268,13 +268,13 @@
+ 
+             return new Aquifer.NoiseBasedAquifer.AquiferStatus(Math.min(56, var12), var10 ? Blocks.LAVA.defaultBlockState() : Blocks.WATER.defaultBlockState());
+          }
+       }
+ 
+-      static final class AquiferStatus {
+-         private final int fluidLevel;
+-         private final BlockState fluidType;
++      private static final class AquiferStatus {
++         final int fluidLevel;
++         final BlockState fluidType;
+ 
+          public AquiferStatus(int var1, BlockState var2) {
+             this.fluidLevel = var1;
+             this.fluidType = var2;
+          }

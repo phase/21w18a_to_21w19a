@@ -1,0 +1,76 @@
+--- net/minecraft/world/level/storage/loot/functions/EnchantRandomlyFunction.java
++++ net/minecraft/world/level/storage/loot/functions/EnchantRandomlyFunction.java
+@@ -31,13 +31,13 @@
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class EnchantRandomlyFunction extends LootItemConditionalFunction {
+    private static final Logger LOGGER = LogManager.getLogger();
+-   private final List<Enchantment> enchantments;
++   final List<Enchantment> enchantments;
+ 
+-   private EnchantRandomlyFunction(LootItemCondition[] var1, Collection<Enchantment> var2) {
++   EnchantRandomlyFunction(LootItemCondition[] var1, Collection<Enchantment> var2) {
+       super(var1);
+       this.enchantments = ImmutableList.copyOf(var2);
+    }
+ 
+    public LootItemFunctionType getType() {
+@@ -85,10 +85,30 @@
+       return simpleBuilder((var0) -> {
+          return new EnchantRandomlyFunction(var0, ImmutableList.of());
+       });
+    }
+ 
++   public static class Builder extends LootItemConditionalFunction.Builder<EnchantRandomlyFunction.Builder> {
++      private final Set<Enchantment> enchantments = Sets.newHashSet();
++
++      public Builder() {
++      }
++
++      protected EnchantRandomlyFunction.Builder getThis() {
++         return this;
++      }
++
++      public EnchantRandomlyFunction.Builder withEnchantment(Enchantment var1) {
++         this.enchantments.add(var1);
++         return this;
++      }
++
++      public LootItemFunction build() {
++         return new EnchantRandomlyFunction(this.getConditions(), this.enchantments);
++      }
++   }
++
+    public static class Serializer extends LootItemConditionalFunction.Serializer<EnchantRandomlyFunction> {
+       public Serializer() {
+       }
+ 
+       public void serialize(JsonObject var1, EnchantRandomlyFunction var2, JsonSerializationContext var3) {
+@@ -129,26 +149,6 @@
+          }
+ 
+          return new EnchantRandomlyFunction(var3, var4);
+       }
+    }
+-
+-   public static class Builder extends LootItemConditionalFunction.Builder<EnchantRandomlyFunction.Builder> {
+-      private final Set<Enchantment> enchantments = Sets.newHashSet();
+-
+-      public Builder() {
+-      }
+-
+-      protected EnchantRandomlyFunction.Builder getThis() {
+-         return this;
+-      }
+-
+-      public EnchantRandomlyFunction.Builder withEnchantment(Enchantment var1) {
+-         this.enchantments.add(var1);
+-         return this;
+-      }
+-
+-      public LootItemFunction build() {
+-         return new EnchantRandomlyFunction(this.getConditions(), this.enchantments);
+-      }
+-   }
+ }

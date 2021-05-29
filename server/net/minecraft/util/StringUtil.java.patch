@@ -1,0 +1,19 @@
+--- net/minecraft/util/StringUtil.java
++++ net/minecraft/util/StringUtil.java
+@@ -29,12 +29,15 @@
+    }
+ 
+    public static String truncateStringIfNecessary(String var0, int var1, boolean var2) {
+       if (var0.length() <= var1) {
+          return var0;
++      } else if (var2 && var1 > 3) {
++         String var10000 = var0.substring(0, var1 - 3);
++         return var10000 + "...";
+       } else {
+-         return var2 && var1 > 3 ? var0.substring(0, var1 - 3) + "..." : var0.substring(0, var1);
++         return var0.substring(0, var1);
+       }
+    }
+ 
+    public static int lineCount(String var0) {
+       if (var0.isEmpty()) {

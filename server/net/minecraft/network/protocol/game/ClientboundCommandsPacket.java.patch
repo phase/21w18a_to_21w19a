@@ -1,0 +1,39 @@
+--- net/minecraft/network/protocol/game/ClientboundCommandsPacket.java
++++ net/minecraft/network/protocol/game/ClientboundCommandsPacket.java
+@@ -99,11 +99,11 @@
+       var1.size(var0.size());
+       ObjectIterator var2 = Object2IntMaps.fastIterable(var0).iterator();
+ 
+       while(var2.hasNext()) {
+          Object2IntMap.Entry var3 = (Object2IntMap.Entry)var2.next();
+-         var1.set(var3.getIntValue(), var3.getKey());
++         var1.set(var3.getIntValue(), (CommandNode)var3.getKey());
+       }
+ 
+       return var1;
+    }
+ 
+@@ -193,20 +193,20 @@
+ 
+    public RootCommandNode<SharedSuggestionProvider> getRoot() {
+       return this.root;
+    }
+ 
+-   static class Entry {
++   private static class Entry {
+       @Nullable
+       private final ArgumentBuilder<SharedSuggestionProvider, ?> builder;
+       private final byte flags;
+       private final int redirect;
+       private final int[] children;
+       @Nullable
+-      private CommandNode<SharedSuggestionProvider> node;
++      CommandNode<SharedSuggestionProvider> node;
+ 
+-      private Entry(@Nullable ArgumentBuilder<SharedSuggestionProvider, ?> var1, byte var2, int var3, int[] var4) {
++      Entry(@Nullable ArgumentBuilder<SharedSuggestionProvider, ?> var1, byte var2, int var3, int[] var4) {
+          this.builder = var1;
+          this.flags = var2;
+          this.redirect = var3;
+          this.children = var4;
+       }

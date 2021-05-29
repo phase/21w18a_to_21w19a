@@ -1,0 +1,120 @@
+--- net/minecraft/tags/TagLoader.java
++++ net/minecraft/tags/TagLoader.java
+@@ -62,67 +62,57 @@
+             while(var7.hasNext()) {
+                Resource var8 = (Resource)var7.next();
+ 
+                try {
+                   InputStream var9 = var8.getInputStream();
+-                  Throwable var10 = null;
+ 
+                   try {
+-                     BufferedReader var11 = new BufferedReader(new InputStreamReader(var9, StandardCharsets.UTF_8));
+-                     Throwable var12 = null;
++                     BufferedReader var10 = new BufferedReader(new InputStreamReader(var9, StandardCharsets.UTF_8));
+ 
+                      try {
+-                        JsonObject var13 = (JsonObject)GsonHelper.fromJson(GSON, (Reader)var11, (Class)JsonObject.class);
+-                        if (var13 == null) {
++                        JsonObject var11 = (JsonObject)GsonHelper.fromJson(GSON, (Reader)var10, (Class)JsonObject.class);
++                        if (var11 == null) {
+                            LOGGER.error((String)"Couldn't load tag list {} from {} in data pack {} as it is empty or null", (Object)var6, var4, var8.getSourceName());
+                         } else {
+                            ((Tag.Builder)var2.computeIfAbsent(var6, (var0) -> {
+                               return Tag.Builder.tag();
+-                           })).addFromJson(var13, var8.getSourceName());
++                           })).addFromJson(var11, var8.getSourceName());
+                         }
+-                     } catch (Throwable var53) {
+-                        var12 = var53;
+-                        throw var53;
+-                     } finally {
+-                        if (var11 != null) {
+-                           if (var12 != null) {
+-                              try {
+-                                 var11.close();
+-                              } catch (Throwable var52) {
+-                                 var12.addSuppressed(var52);
+-                              }
+-                           } else {
+-                              var11.close();
+-                           }
++                     } catch (Throwable var23) {
++                        try {
++                           var10.close();
++                        } catch (Throwable var22) {
++                           var23.addSuppressed(var22);
+                         }
+ 
++                        throw var23;
+                      }
+-                  } catch (Throwable var55) {
+-                     var10 = var55;
+-                     throw var55;
+-                  } finally {
++
++                     var10.close();
++                  } catch (Throwable var24) {
+                      if (var9 != null) {
+-                        if (var10 != null) {
+-                           try {
+-                              var9.close();
+-                           } catch (Throwable var51) {
+-                              var10.addSuppressed(var51);
+-                           }
+-                        } else {
++                        try {
+                            var9.close();
++                        } catch (Throwable var21) {
++                           var24.addSuppressed(var21);
+                         }
+                      }
+ 
++                     throw var24;
+                   }
+-               } catch (RuntimeException | IOException var57) {
+-                  LOGGER.error((String)"Couldn't read tag list {} from {} in data pack {}", (Object)var6, var4, var8.getSourceName(), var57);
++
++                  if (var9 != null) {
++                     var9.close();
++                  }
++               } catch (RuntimeException | IOException var25) {
++                  LOGGER.error((String)"Couldn't read tag list {} from {} in data pack {}", (Object)var6, var4, var8.getSourceName(), var25);
+                } finally {
+                   IOUtils.closeQuietly((Closeable)var8);
+                }
+             }
+-         } catch (IOException var59) {
+-            LOGGER.error((String)"Couldn't read tag list {} from {}", (Object)var6, var4, var59);
++         } catch (IOException var27) {
++            LOGGER.error((String)"Couldn't read tag list {} from {}", (Object)var6, var4, var27);
+          }
+       }
+ 
+       return var2;
+    }
+@@ -154,10 +144,11 @@
+ 
+    }
+ 
+    public TagCollection<T> build(Map<ResourceLocation, Tag.Builder> var1) {
+       HashMap var2 = Maps.newHashMap();
++      Objects.requireNonNull(var2);
+       Function var3 = var2::get;
+       Function var4 = (var1x) -> {
+          return ((Optional)this.idToValue.apply(var1x)).orElse((Object)null);
+       };
+       HashMultimap var5 = HashMultimap.create();
+@@ -175,11 +166,11 @@
+       var1.keySet().forEach((var6x) -> {
+          visitDependenciesAndElement(var1, var5, var6, var6x, (var3x, var4x) -> {
+             var4x.build(var3, var4).ifLeft((var1) -> {
+                LOGGER.error((String)"Couldn't load tag {} as it is missing following references: {}", (Object)var3x, (Object)var1.stream().map(Objects::toString).collect(Collectors.joining(",")));
+             }).ifRight((var2x) -> {
+-               Tag var10000 = (Tag)var2.put(var3x, var2x);
++               var2.put(var3x, var2x);
+             });
+          });
+       });
+       return TagCollection.of(var2);
+    }

@@ -1,0 +1,16 @@
+--- net/minecraft/world/entity/ai/memory/ExpirableValue.java
++++ net/minecraft/world/entity/ai/memory/ExpirableValue.java
+@@ -40,11 +40,12 @@
+    public boolean hasExpired() {
+       return this.timeToLive <= 0L;
+    }
+ 
+    public String toString() {
+-      return this.value + (this.canExpire() ? " (ttl: " + this.timeToLive + ")" : "");
++      Object var10000 = this.value;
++      return var10000 + (this.canExpire() ? " (ttl: " + this.timeToLive + ")" : "");
+    }
+ 
+    @VisibleForDebug
+    public boolean canExpire() {
+       return this.timeToLive != Long.MAX_VALUE;

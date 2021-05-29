@@ -1,0 +1,19 @@
+--- net/minecraft/world/item/crafting/UpgradeRecipe.java
++++ net/minecraft/world/item/crafting/UpgradeRecipe.java
+@@ -10,13 +10,13 @@
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.block.Blocks;
+ 
+ public class UpgradeRecipe implements Recipe<Container> {
+-   private final Ingredient base;
+-   private final Ingredient addition;
+-   private final ItemStack result;
++   final Ingredient base;
++   final Ingredient addition;
++   final ItemStack result;
+    private final ResourceLocation id;
+ 
+    public UpgradeRecipe(ResourceLocation var1, Ingredient var2, Ingredient var3, ItemStack var4) {
+       this.id = var1;
+       this.base = var2;

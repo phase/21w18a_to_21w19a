@@ -1,0 +1,75 @@
+--- net/minecraft/world/item/AxeItem.java
++++ net/minecraft/world/item/AxeItem.java
+@@ -1,49 +1,41 @@
+ package net.minecraft.world.item;
+ 
+ import com.google.common.collect.BiMap;
+ import com.google.common.collect.ImmutableMap;
+-import com.google.common.collect.Sets;
+ import java.util.Map;
+ import java.util.Optional;
+-import java.util.Set;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.Direction;
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.sounds.SoundSource;
++import net.minecraft.tags.BlockTags;
+ import net.minecraft.world.InteractionResult;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.item.context.UseOnContext;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.RotatedPillarBlock;
+ import net.minecraft.world.level.block.WeatheringCopper;
+ import net.minecraft.world.level.block.state.BlockState;
+-import net.minecraft.world.level.material.Material;
+ 
+ public class AxeItem extends DiggerItem {
+-   private static final Set<Material> DIGGABLE_MATERIALS;
+-   private static final Set<Block> OTHER_DIGGABLE_BLOCKS;
+    protected static final Map<Block, Block> STRIPPABLES;
+ 
+    protected AxeItem(Tier var1, float var2, float var3, Item.Properties var4) {
+-      super(var2, var3, var1, OTHER_DIGGABLE_BLOCKS, var4);
++      super(var2, var3, var1, BlockTags.MINEABLE_WITH_AXE, var4);
+    }
+ 
+-   public float getDestroySpeed(ItemStack var1, BlockState var2) {
+-      Material var3 = var2.getMaterial();
+-      return DIGGABLE_MATERIALS.contains(var3) ? this.speed : super.getDestroySpeed(var1, var2);
+-   }
+-
+    public InteractionResult useOn(UseOnContext var1) {
+       Level var2 = var1.getLevel();
+       BlockPos var3 = var1.getClickedPos();
+       Player var4 = var1.getPlayer();
+       BlockState var5 = var2.getBlockState(var3);
+       Optional var6 = this.getStripped(var5);
+       Optional var7 = WeatheringCopper.getPrevious(var5);
+-      Optional var8 = Optional.ofNullable(((BiMap)HoneycombItem.WAX_OFF_BY_BLOCK.get()).get(var5.getBlock())).map((var1x) -> {
++      Optional var8 = Optional.ofNullable((Block)((BiMap)HoneycombItem.WAX_OFF_BY_BLOCK.get()).get(var5.getBlock())).map((var1x) -> {
+          return var1x.withPropertiesOf(var5);
+       });
+       Optional var9 = Optional.empty();
+       if (var6.isPresent()) {
+          var2.playSound(var4, var3, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
+@@ -71,16 +63,14 @@
+          return InteractionResult.PASS;
+       }
+    }
+ 
+    private Optional<BlockState> getStripped(BlockState var1) {
+-      return Optional.ofNullable(STRIPPABLES.get(var1.getBlock())).map((var1x) -> {
+-         return (BlockState)var1x.defaultBlockState().setValue(RotatedPillarBlock.AXIS, var1.getValue(RotatedPillarBlock.AXIS));
++      return Optional.ofNullable((Block)STRIPPABLES.get(var1.getBlock())).map((var1x) -> {
++         return (BlockState)var1x.defaultBlockState().setValue(RotatedPillarBlock.AXIS, (Direction.Axis)var1.getValue(RotatedPillarBlock.AXIS));
+       });
+    }
+ 
+    static {
+-      DIGGABLE_MATERIALS = Sets.newHashSet((Object[])(Material.WOOD, Material.NETHER_WOOD, Material.PLANT, Material.REPLACEABLE_PLANT, Material.BAMBOO, Material.VEGETABLE));
+-      OTHER_DIGGABLE_BLOCKS = Sets.newHashSet((Object[])(Blocks.LADDER, Blocks.SCAFFOLDING, Blocks.OAK_BUTTON, Blocks.SPRUCE_BUTTON, Blocks.BIRCH_BUTTON, Blocks.JUNGLE_BUTTON, Blocks.DARK_OAK_BUTTON, Blocks.ACACIA_BUTTON, Blocks.CRIMSON_BUTTON, Blocks.WARPED_BUTTON));
+       STRIPPABLES = (new ImmutableMap.Builder()).put(Blocks.OAK_WOOD, Blocks.STRIPPED_OAK_WOOD).put(Blocks.OAK_LOG, Blocks.STRIPPED_OAK_LOG).put(Blocks.DARK_OAK_WOOD, Blocks.STRIPPED_DARK_OAK_WOOD).put(Blocks.DARK_OAK_LOG, Blocks.STRIPPED_DARK_OAK_LOG).put(Blocks.ACACIA_WOOD, Blocks.STRIPPED_ACACIA_WOOD).put(Blocks.ACACIA_LOG, Blocks.STRIPPED_ACACIA_LOG).put(Blocks.BIRCH_WOOD, Blocks.STRIPPED_BIRCH_WOOD).put(Blocks.BIRCH_LOG, Blocks.STRIPPED_BIRCH_LOG).put(Blocks.JUNGLE_WOOD, Blocks.STRIPPED_JUNGLE_WOOD).put(Blocks.JUNGLE_LOG, Blocks.STRIPPED_JUNGLE_LOG).put(Blocks.SPRUCE_WOOD, Blocks.STRIPPED_SPRUCE_WOOD).put(Blocks.SPRUCE_LOG, Blocks.STRIPPED_SPRUCE_LOG).put(Blocks.WARPED_STEM, Blocks.STRIPPED_WARPED_STEM).put(Blocks.WARPED_HYPHAE, Blocks.STRIPPED_WARPED_HYPHAE).put(Blocks.CRIMSON_STEM, Blocks.STRIPPED_CRIMSON_STEM).put(Blocks.CRIMSON_HYPHAE, Blocks.STRIPPED_CRIMSON_HYPHAE).build();
+    }
+ }

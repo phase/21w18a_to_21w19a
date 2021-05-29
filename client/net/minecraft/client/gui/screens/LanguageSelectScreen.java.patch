@@ -1,0 +1,54 @@
+--- net/minecraft/client/gui/screens/LanguageSelectScreen.java
++++ net/minecraft/client/gui/screens/LanguageSelectScreen.java
+@@ -18,11 +18,11 @@
+ import net.minecraft.network.chat.TranslatableComponent;
+ 
+ public class LanguageSelectScreen extends OptionsSubScreen {
+    private static final Component WARNING_LABEL;
+    private LanguageSelectScreen.LanguageSelectionList packSelectionList;
+-   private final LanguageManager languageManager;
++   final LanguageManager languageManager;
+ 
+    public LanguageSelectScreen(Screen var1, Options var2, LanguageManager var3) {
+       super(var1, var2, new TranslatableComponent("options.language"));
+       this.languageManager = var3;
+    }
+@@ -54,11 +54,11 @@
+ 
+    static {
+       WARNING_LABEL = (new TextComponent("(")).append(new TranslatableComponent("options.languageWarning")).append(")").withStyle(ChatFormatting.GRAY);
+    }
+ 
+-   class LanguageSelectionList extends ObjectSelectionList<LanguageSelectScreen.LanguageSelectionList.Entry> {
++   private class LanguageSelectionList extends ObjectSelectionList<LanguageSelectScreen.LanguageSelectionList.Entry> {
+       public LanguageSelectionList(Minecraft var2) {
+          super(var2, LanguageSelectScreen.this.width, LanguageSelectScreen.this.height, 32, LanguageSelectScreen.this.height - 65 + 4, 18);
+          Iterator var3 = LanguageSelectScreen.this.languageManager.getLanguages().iterator();
+ 
+          while(var3.hasNext()) {
+@@ -69,11 +69,11 @@
+                this.setSelected(var5);
+             }
+          }
+ 
+          if (this.getSelected() != null) {
+-            this.centerScrollOn(this.getSelected());
++            this.centerScrollOn((LanguageSelectScreen.LanguageSelectionList.Entry)this.getSelected());
+          }
+ 
+       }
+ 
+       protected int getScrollbarPosition() {
+@@ -99,11 +99,11 @@
+       protected boolean isFocused() {
+          return LanguageSelectScreen.this.getFocused() == this;
+       }
+ 
+       public class Entry extends ObjectSelectionList.Entry<LanguageSelectScreen.LanguageSelectionList.Entry> {
+-         private final LanguageInfo language;
++         final LanguageInfo language;
+ 
+          public Entry(LanguageInfo var2) {
+             this.language = var2;
+          }
+ 

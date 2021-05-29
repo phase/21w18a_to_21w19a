@@ -1,0 +1,35 @@
+--- net/minecraft/world/inventory/StonecutterMenu.java
++++ net/minecraft/world/inventory/StonecutterMenu.java
+@@ -26,16 +26,16 @@
+    private final ContainerLevelAccess access;
+    private final DataSlot selectedRecipeIndex;
+    private final Level level;
+    private List<StonecutterRecipe> recipes;
+    private ItemStack input;
+-   private long lastSoundTime;
++   long lastSoundTime;
+    final Slot inputSlot;
+    final Slot resultSlot;
+-   private Runnable slotUpdateListener;
++   Runnable slotUpdateListener;
+    public final Container container;
+-   private final ResultContainer resultContainer;
++   final ResultContainer resultContainer;
+ 
+    public StonecutterMenu(int var1, Inventory var2) {
+       this(var1, var2, ContainerLevelAccess.NULL);
+    }
+ 
+@@ -146,11 +146,11 @@
+          this.recipes = this.level.getRecipeManager().getRecipesFor(RecipeType.STONECUTTING, var1, this.level);
+       }
+ 
+    }
+ 
+-   private void setupResultSlot() {
++   void setupResultSlot() {
+       if (!this.recipes.isEmpty() && this.isValidRecipeIndex(this.selectedRecipeIndex.get())) {
+          StonecutterRecipe var1 = (StonecutterRecipe)this.recipes.get(this.selectedRecipeIndex.get());
+          this.resultContainer.setRecipeUsed(var1);
+          this.resultSlot.set(var1.assemble(this.container));
+       } else {

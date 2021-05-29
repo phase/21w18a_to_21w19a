@@ -1,0 +1,481 @@
+--- net/minecraft/data/models/BlockModelGenerators.java
++++ net/minecraft/data/models/BlockModelGenerators.java
+@@ -27,10 +27,11 @@
+ import net.minecraft.data.models.blockstates.MultiPartGenerator;
+ import net.minecraft.data.models.blockstates.MultiVariantGenerator;
+ import net.minecraft.data.models.blockstates.PropertyDispatch;
+ import net.minecraft.data.models.blockstates.Variant;
+ import net.minecraft.data.models.blockstates.VariantProperties;
++import net.minecraft.data.models.blockstates.VariantProperty;
+ import net.minecraft.data.models.model.DelegatedModel;
+ import net.minecraft.data.models.model.ModelLocationUtils;
+ import net.minecraft.data.models.model.ModelTemplate;
+ import net.minecraft.data.models.model.ModelTemplates;
+ import net.minecraft.data.models.model.TextureMapping;
+@@ -62,17 +63,17 @@
+ import net.minecraft.world.level.block.state.properties.StairsShape;
+ import net.minecraft.world.level.block.state.properties.Tilt;
+ import net.minecraft.world.level.block.state.properties.WallSide;
+ 
+ public class BlockModelGenerators {
+-   private final Consumer<BlockStateGenerator> blockStateOutput;
+-   private final BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput;
++   final Consumer<BlockStateGenerator> blockStateOutput;
++   final BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput;
+    private final Consumer<Item> skippedAutoModelsOutput;
+-   private final List<Block> nonOrientableTrapdoor;
+-   private final Map<Block, BlockModelGenerators.BlockStateGeneratorSupplier> fullBlockModelCustomGenerators;
+-   private final Map<Block, TexturedModel> texturedModels;
+-   private static final Map<BlockFamily.Variant, BiConsumer<BlockModelGenerators.BlockFamilyProvider, Block>> SHAPE_CONSUMERS;
++   final List<Block> nonOrientableTrapdoor;
++   final Map<Block, BlockModelGenerators.BlockStateGeneratorSupplier> fullBlockModelCustomGenerators;
++   final Map<Block, TexturedModel> texturedModels;
++   static final Map<BlockFamily.Variant, BiConsumer<BlockModelGenerators.BlockFamilyProvider, Block>> SHAPE_CONSUMERS;
+    public static final Map<BooleanProperty, Function<ResourceLocation, Variant>> MULTIFACE_GENERATOR;
+ 
+    private static BlockStateGenerator createMirroredCubeGenerator(Block var0, ResourceLocation var1, TextureMapping var2, BiConsumer<ResourceLocation, Supplier<JsonElement>> var3) {
+       ResourceLocation var4 = ModelTemplates.CUBE_MIRRORED_ALL.create(var0, var2, var3);
+       return createRotatedVariant(var0, var1, var4);
+@@ -102,23 +103,23 @@
+       this.blockStateOutput = var1;
+       this.modelOutput = var2;
+       this.skippedAutoModelsOutput = var3;
+    }
+ 
+-   private void skipAutoItemBlock(Block var1) {
++   void skipAutoItemBlock(Block var1) {
+       this.skippedAutoModelsOutput.accept(var1.asItem());
+    }
+ 
+-   private void delegateItemModel(Block var1, ResourceLocation var2) {
++   void delegateItemModel(Block var1, ResourceLocation var2) {
+       this.modelOutput.accept(ModelLocationUtils.getModelLocation(var1.asItem()), new DelegatedModel(var2));
+    }
+ 
+    private void delegateItemModel(Item var1, ResourceLocation var2) {
+       this.modelOutput.accept(ModelLocationUtils.getModelLocation(var1), new DelegatedModel(var2));
+    }
+ 
+-   private void createSimpleFlatItemModel(Item var1) {
++   void createSimpleFlatItemModel(Item var1) {
+       ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(var1), TextureMapping.layer0(var1), this.modelOutput);
+    }
+ 
+    private void createSimpleFlatItemModel(Block var1) {
+       Item var2 = var1.asItem();
+@@ -174,11 +175,11 @@
+    private void createRotatedVariantBlock(Block var1) {
+       ResourceLocation var2 = TexturedModel.CUBE.create(var1, this.modelOutput);
+       this.blockStateOutput.accept(createRotatedVariant(var1, var2));
+    }
+ 
+-   private static BlockStateGenerator createButton(Block var0, ResourceLocation var1, ResourceLocation var2) {
++   static BlockStateGenerator createButton(Block var0, ResourceLocation var1, ResourceLocation var2) {
+       return MultiVariantGenerator.multiVariant(var0).with(PropertyDispatch.property(BlockStateProperties.POWERED).select(false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(true, (Variant)Variant.variant().with(VariantProperties.MODEL, var2))).with(PropertyDispatch.properties(BlockStateProperties.ATTACH_FACE, BlockStateProperties.HORIZONTAL_FACING).select(AttachFace.FLOOR, Direction.EAST, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(AttachFace.FLOOR, Direction.WEST, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(AttachFace.FLOOR, Direction.SOUTH, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(AttachFace.FLOOR, Direction.NORTH, (Variant)Variant.variant()).select(AttachFace.WALL, Direction.EAST, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(AttachFace.WALL, Direction.WEST, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(AttachFace.WALL, Direction.SOUTH, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(AttachFace.WALL, Direction.NORTH, (Variant)Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(AttachFace.CEILING, Direction.EAST, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180)).select(AttachFace.CEILING, Direction.WEST, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180)).select(AttachFace.CEILING, Direction.SOUTH, (Variant)Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R180)).select(AttachFace.CEILING, Direction.NORTH, (Variant)Variant.variant().with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180)));
+    }
+ 
+    private static PropertyDispatch.C4<Direction, DoubleBlockHalf, DoorHingeSide, Boolean> configureDoorHalf(PropertyDispatch.C4<Direction, DoubleBlockHalf, DoorHingeSide, Boolean> var0, DoubleBlockHalf var1, ResourceLocation var2, ResourceLocation var3) {
+       return var0.select(Direction.EAST, var1, DoorHingeSide.LEFT, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(Direction.SOUTH, var1, DoorHingeSide.LEFT, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.WEST, var1, DoorHingeSide.LEFT, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.NORTH, var1, DoorHingeSide.LEFT, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.EAST, var1, DoorHingeSide.RIGHT, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)).select(Direction.SOUTH, var1, DoorHingeSide.RIGHT, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.WEST, var1, DoorHingeSide.RIGHT, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.NORTH, var1, DoorHingeSide.RIGHT, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.EAST, var1, DoorHingeSide.LEFT, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.SOUTH, var1, DoorHingeSide.LEFT, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.WEST, var1, DoorHingeSide.LEFT, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.NORTH, var1, DoorHingeSide.LEFT, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)).select(Direction.EAST, var1, DoorHingeSide.RIGHT, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.SOUTH, var1, DoorHingeSide.RIGHT, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(Direction.WEST, var1, DoorHingeSide.RIGHT, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.NORTH, var1, DoorHingeSide.RIGHT, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180));
+@@ -186,23 +187,23 @@
+ 
+    private static BlockStateGenerator createDoor(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3, ResourceLocation var4) {
+       return MultiVariantGenerator.multiVariant(var0).with(configureDoorHalf(configureDoorHalf(PropertyDispatch.properties(BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.DOUBLE_BLOCK_HALF, BlockStateProperties.DOOR_HINGE, BlockStateProperties.OPEN), DoubleBlockHalf.LOWER, var1, var2), DoubleBlockHalf.UPPER, var3, var4));
+    }
+ 
+-   private static BlockStateGenerator createFence(Block var0, ResourceLocation var1, ResourceLocation var2) {
++   static BlockStateGenerator createFence(Block var0, ResourceLocation var1, ResourceLocation var2) {
+       return MultiPartGenerator.multiPart(var0).with(Variant.variant().with(VariantProperties.MODEL, var1)).with(Condition.condition().term(BlockStateProperties.NORTH, true), (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.EAST, true), (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.SOUTH, true), (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.WEST, true), (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true));
+    }
+ 
+-   private static BlockStateGenerator createWall(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3) {
++   static BlockStateGenerator createWall(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3) {
+       return MultiPartGenerator.multiPart(var0).with(Condition.condition().term(BlockStateProperties.UP, true), (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).with(Condition.condition().term(BlockStateProperties.NORTH_WALL, WallSide.LOW), (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.EAST_WALL, WallSide.LOW), (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.SOUTH_WALL, WallSide.LOW), (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.WEST_WALL, WallSide.LOW), (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.NORTH_WALL, WallSide.TALL), (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.EAST_WALL, WallSide.TALL), (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.SOUTH_WALL, WallSide.TALL), (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).with(Condition.condition().term(BlockStateProperties.WEST_WALL, WallSide.TALL), (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true));
+    }
+ 
+-   private static BlockStateGenerator createFenceGate(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3, ResourceLocation var4) {
++   static BlockStateGenerator createFenceGate(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3, ResourceLocation var4) {
+       return MultiVariantGenerator.multiVariant(var0, Variant.variant().with(VariantProperties.UV_LOCK, true)).with(createHorizontalFacingDispatchAlt()).with(PropertyDispatch.properties(BlockStateProperties.IN_WALL, BlockStateProperties.OPEN).select(false, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(true, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var4)).select(false, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(true, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)));
+    }
+ 
+-   private static BlockStateGenerator createStairs(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3) {
++   static BlockStateGenerator createStairs(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3) {
+       return MultiVariantGenerator.multiVariant(var0).with(PropertyDispatch.properties(BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.HALF, BlockStateProperties.STAIRS_SHAPE).select(Direction.EAST, Half.BOTTOM, StairsShape.STRAIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(Direction.WEST, Half.BOTTOM, StairsShape.STRAIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.BOTTOM, StairsShape.STRAIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.NORTH, Half.BOTTOM, StairsShape.STRAIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.BOTTOM, StairsShape.OUTER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)).select(Direction.WEST, Half.BOTTOM, StairsShape.OUTER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.BOTTOM, StairsShape.OUTER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.NORTH, Half.BOTTOM, StairsShape.OUTER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.BOTTOM, StairsShape.OUTER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.WEST, Half.BOTTOM, StairsShape.OUTER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.BOTTOM, StairsShape.OUTER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)).select(Direction.NORTH, Half.BOTTOM, StairsShape.OUTER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.BOTTOM, StairsShape.INNER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(Direction.WEST, Half.BOTTOM, StairsShape.INNER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.BOTTOM, StairsShape.INNER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.NORTH, Half.BOTTOM, StairsShape.INNER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.BOTTOM, StairsShape.INNER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.WEST, Half.BOTTOM, StairsShape.INNER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.BOTTOM, StairsShape.INNER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(Direction.NORTH, Half.BOTTOM, StairsShape.INNER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.TOP, StairsShape.STRAIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.WEST, Half.TOP, StairsShape.STRAIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.TOP, StairsShape.STRAIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.NORTH, Half.TOP, StairsShape.STRAIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.TOP, StairsShape.OUTER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.WEST, Half.TOP, StairsShape.OUTER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.TOP, StairsShape.OUTER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.NORTH, Half.TOP, StairsShape.OUTER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.TOP, StairsShape.OUTER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.WEST, Half.TOP, StairsShape.OUTER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.TOP, StairsShape.OUTER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.NORTH, Half.TOP, StairsShape.OUTER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.TOP, StairsShape.INNER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.WEST, Half.TOP, StairsShape.INNER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.TOP, StairsShape.INNER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.NORTH, Half.TOP, StairsShape.INNER_RIGHT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.EAST, Half.TOP, StairsShape.INNER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.WEST, Half.TOP, StairsShape.INNER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180).with(VariantProperties.UV_LOCK, true)).select(Direction.SOUTH, Half.TOP, StairsShape.INNER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true)).select(Direction.NORTH, Half.TOP, StairsShape.INNER_LEFT, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270).with(VariantProperties.UV_LOCK, true)));
+    }
+ 
+    private static BlockStateGenerator createOrientableTrapdoor(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3) {
+       return MultiVariantGenerator.multiVariant(var0).with(PropertyDispatch.properties(BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.HALF, BlockStateProperties.OPEN).select(Direction.NORTH, Half.BOTTOM, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(Direction.SOUTH, Half.BOTTOM, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.EAST, Half.BOTTOM, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.WEST, Half.BOTTOM, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.NORTH, Half.TOP, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(Direction.SOUTH, Half.TOP, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.EAST, Half.TOP, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.WEST, Half.TOP, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.NORTH, Half.BOTTOM, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)).select(Direction.SOUTH, Half.BOTTOM, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.EAST, Half.BOTTOM, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.WEST, Half.BOTTOM, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.NORTH, Half.TOP, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.SOUTH, Half.TOP, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R0)).select(Direction.EAST, Half.TOP, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.WEST, Half.TOP, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.X_ROT, VariantProperties.Rotation.R180).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)));
+@@ -210,19 +211,19 @@
+ 
+    private static BlockStateGenerator createTrapdoor(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3) {
+       return MultiVariantGenerator.multiVariant(var0).with(PropertyDispatch.properties(BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.HALF, BlockStateProperties.OPEN).select(Direction.NORTH, Half.BOTTOM, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(Direction.SOUTH, Half.BOTTOM, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(Direction.EAST, Half.BOTTOM, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(Direction.WEST, Half.BOTTOM, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(Direction.NORTH, Half.TOP, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(Direction.SOUTH, Half.TOP, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(Direction.EAST, Half.TOP, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(Direction.WEST, Half.TOP, false, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(Direction.NORTH, Half.BOTTOM, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)).select(Direction.SOUTH, Half.BOTTOM, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.EAST, Half.BOTTOM, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.WEST, Half.BOTTOM, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)).select(Direction.NORTH, Half.TOP, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)).select(Direction.SOUTH, Half.TOP, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R180)).select(Direction.EAST, Half.TOP, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)).select(Direction.WEST, Half.TOP, true, (Variant)Variant.variant().with(VariantProperties.MODEL, var3).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R270)));
+    }
+ 
+-   private static MultiVariantGenerator createSimpleBlock(Block var0, ResourceLocation var1) {
++   static MultiVariantGenerator createSimpleBlock(Block var0, ResourceLocation var1) {
+       return MultiVariantGenerator.multiVariant(var0, Variant.variant().with(VariantProperties.MODEL, var1));
+    }
+ 
+    private static PropertyDispatch createRotatedPillar() {
+       return PropertyDispatch.property(BlockStateProperties.AXIS).select(Direction.Axis.Y, (Variant)Variant.variant()).select(Direction.Axis.Z, (Variant)Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)).select(Direction.Axis.X, (Variant)Variant.variant().with(VariantProperties.X_ROT, VariantProperties.Rotation.R90).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90));
+    }
+ 
+-   private static BlockStateGenerator createAxisAlignedPillarBlock(Block var0, ResourceLocation var1) {
++   static BlockStateGenerator createAxisAlignedPillarBlock(Block var0, ResourceLocation var1) {
+       return MultiVariantGenerator.multiVariant(var0, Variant.variant().with(VariantProperties.MODEL, var1)).with(createRotatedPillar());
+    }
+ 
+    private void createAxisAlignedPillarBlockCustomModel(Block var1, ResourceLocation var2) {
+       this.blockStateOutput.accept(createAxisAlignedPillarBlock(var1, var2));
+@@ -236,11 +237,11 @@
+    private void createHorizontallyRotatedBlock(Block var1, TexturedModel.Provider var2) {
+       ResourceLocation var3 = var2.create(var1, this.modelOutput);
+       this.blockStateOutput.accept(MultiVariantGenerator.multiVariant(var1, Variant.variant().with(VariantProperties.MODEL, var3)).with(createHorizontalFacingDispatch()));
+    }
+ 
+-   private static BlockStateGenerator createRotatedPillarWithHorizontalVariant(Block var0, ResourceLocation var1, ResourceLocation var2) {
++   static BlockStateGenerator createRotatedPillarWithHorizontalVariant(Block var0, ResourceLocation var1, ResourceLocation var2) {
+       return MultiVariantGenerator.multiVariant(var0).with(PropertyDispatch.property(BlockStateProperties.AXIS).select(Direction.Axis.Y, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(Direction.Axis.Z, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90)).select(Direction.Axis.X, (Variant)Variant.variant().with(VariantProperties.MODEL, var2).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90).with(VariantProperties.Y_ROT, VariantProperties.Rotation.R90)));
+    }
+ 
+    private void createRotatedPillarWithHorizontalVariant(Block var1, TexturedModel.Provider var2, TexturedModel.Provider var3) {
+       ResourceLocation var4 = var2.create(var1, this.modelOutput);
+@@ -250,15 +251,15 @@
+ 
+    private ResourceLocation createSuffixedVariant(Block var1, String var2, ModelTemplate var3, Function<ResourceLocation, TextureMapping> var4) {
+       return var3.createWithSuffix(var1, var2, (TextureMapping)var4.apply(TextureMapping.getBlockTexture(var1, var2)), this.modelOutput);
+    }
+ 
+-   private static BlockStateGenerator createPressurePlate(Block var0, ResourceLocation var1, ResourceLocation var2) {
++   static BlockStateGenerator createPressurePlate(Block var0, ResourceLocation var1, ResourceLocation var2) {
+       return MultiVariantGenerator.multiVariant(var0).with(createBooleanModelDispatch(BlockStateProperties.POWERED, var2, var1));
+    }
+ 
+-   private static BlockStateGenerator createSlab(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3) {
++   static BlockStateGenerator createSlab(Block var0, ResourceLocation var1, ResourceLocation var2, ResourceLocation var3) {
+       return MultiVariantGenerator.multiVariant(var0).with(PropertyDispatch.property(BlockStateProperties.SLAB_TYPE).select(SlabType.BOTTOM, (Variant)Variant.variant().with(VariantProperties.MODEL, var1)).select(SlabType.TOP, (Variant)Variant.variant().with(VariantProperties.MODEL, var2)).select(SlabType.DOUBLE, (Variant)Variant.variant().with(VariantProperties.MODEL, var3)));
+    }
+ 
+    private void createTrivialCube(Block var1) {
+       this.createTrivialBlock(var1, TexturedModel.CUBE);
+@@ -276,30 +277,30 @@
+    private BlockModelGenerators.BlockFamilyProvider family(Block var1) {
+       TexturedModel var2 = (TexturedModel)this.texturedModels.getOrDefault(var1, TexturedModel.CUBE.get(var1));
+       return (new BlockModelGenerators.BlockFamilyProvider(var2.getMapping())).fullBlock(var1, var2.getTemplate());
+    }
+ 
+-   private void createDoor(Block var1) {
++   void createDoor(Block var1) {
+       TextureMapping var2 = TextureMapping.door(var1);
+       ResourceLocation var3 = ModelTemplates.DOOR_BOTTOM.create(var1, var2, this.modelOutput);
+       ResourceLocation var4 = ModelTemplates.DOOR_BOTTOM_HINGE.create(var1, var2, this.modelOutput);
+       ResourceLocation var5 = ModelTemplates.DOOR_TOP.create(var1, var2, this.modelOutput);
+       ResourceLocation var6 = ModelTemplates.DOOR_TOP_HINGE.create(var1, var2, this.modelOutput);
+       this.createSimpleFlatItemModel(var1.asItem());
+       this.blockStateOutput.accept(createDoor(var1, var3, var4, var5, var6));
+    }
+ 
+-   private void createOrientableTrapdoor(Block var1) {
++   void createOrientableTrapdoor(Block var1) {
+       TextureMapping var2 = TextureMapping.defaultTexture(var1);
+       ResourceLocation var3 = ModelTemplates.ORIENTABLE_TRAPDOOR_TOP.create(var1, var2, this.modelOutput);
+       ResourceLocation var4 = ModelTemplates.ORIENTABLE_TRAPDOOR_BOTTOM.create(var1, var2, this.modelOutput);
+       ResourceLocation var5 = ModelTemplates.ORIENTABLE_TRAPDOOR_OPEN.create(var1, var2, this.modelOutput);
+       this.blockStateOutput.accept(createOrientableTrapdoor(var1, var3, var4, var5));
+       this.delegateItemModel(var1, var4);
+    }
+ 
+-   private void createTrapdoor(Block var1) {
++   void createTrapdoor(Block var1) {
+       TextureMapping var2 = TextureMapping.defaultTexture(var1);
+       ResourceLocation var3 = ModelTemplates.TRAPDOOR_TOP.create(var1, var2, this.modelOutput);
+       ResourceLocation var4 = ModelTemplates.TRAPDOOR_BOTTOM.create(var1, var2, this.modelOutput);
+       ResourceLocation var5 = ModelTemplates.TRAPDOOR_OPEN.create(var1, var2, this.modelOutput);
+       this.blockStateOutput.accept(createTrapdoor(var1, var3, var4, var5));
+@@ -774,11 +775,12 @@
+ 
+       this.blockStateOutput.accept(MultiVariantGenerator.multiVariant(Blocks.POINTED_DRIPSTONE).with(var1));
+    }
+ 
+    private Variant createPointedDripstoneVariant(Direction var1, DripstoneThickness var2) {
+-      String var3 = "_" + var1.getSerializedName() + "_" + var2.getSerializedName();
++      String var10000 = var1.getSerializedName();
++      String var3 = "_" + var10000 + "_" + var2.getSerializedName();
+       TextureMapping var4 = TextureMapping.cross(TextureMapping.getBlockTexture(Blocks.POINTED_DRIPSTONE, var3));
+       return Variant.variant().with(VariantProperties.MODEL, ModelTemplates.POINTED_DRIPSTONE.createWithSuffix(Blocks.POINTED_DRIPSTONE, var3, var4, this.modelOutput));
+    }
+ 
+    private void createNyliumBlock(Block var1) {
+@@ -1081,11 +1083,22 @@
+ 
+    private void createSnowBlocks() {
+       TextureMapping var1 = TextureMapping.cube(Blocks.SNOW);
+       ResourceLocation var2 = ModelTemplates.CUBE_ALL.create(Blocks.SNOW_BLOCK, var1, this.modelOutput);
+       this.blockStateOutput.accept(MultiVariantGenerator.multiVariant(Blocks.SNOW).with(PropertyDispatch.property(BlockStateProperties.LAYERS).generate((var1x) -> {
+-         return Variant.variant().with(VariantProperties.MODEL, var1x < 8 ? ModelLocationUtils.getModelLocation(Blocks.SNOW, "_height" + var1x * 2) : var2);
++         Variant var10000 = Variant.variant();
++         VariantProperty var10001 = VariantProperties.MODEL;
++         ResourceLocation var2x;
++         if (var1x < 8) {
++            Block var10002 = Blocks.SNOW;
++            int var10003 = var1x;
++            var2x = ModelLocationUtils.getModelLocation(var10002, "_height" + var10003 * 2);
++         } else {
++            var2x = var2;
++         }
++
++         return var10000.with(var10001, var2x);
+       })));
+       this.delegateItemModel(Blocks.SNOW, ModelLocationUtils.getModelLocation(Blocks.SNOW, "_height2"));
+       this.blockStateOutput.accept(createSimpleBlock(Blocks.SNOW_BLOCK, var2));
+    }
+ 
+@@ -1114,11 +1127,15 @@
+    }
+ 
+    private void createTripwireHook() {
+       this.createSimpleFlatItemModel(Blocks.TRIPWIRE_HOOK);
+       this.blockStateOutput.accept(MultiVariantGenerator.multiVariant(Blocks.TRIPWIRE_HOOK).with(PropertyDispatch.properties(BlockStateProperties.ATTACHED, BlockStateProperties.POWERED).generate((var0, var1) -> {
+-         return Variant.variant().with(VariantProperties.MODEL, TextureMapping.getBlockTexture(Blocks.TRIPWIRE_HOOK, (var0 ? "_attached" : "") + (var1 ? "_on" : "")));
++         Variant var10000 = Variant.variant();
++         VariantProperty var10001 = VariantProperties.MODEL;
++         Block var10002 = Blocks.TRIPWIRE_HOOK;
++         String var10003 = var0 ? "_attached" : "";
++         return var10000.with(var10001, TextureMapping.getBlockTexture(var10002, var10003 + (var1 ? "_on" : "")));
+       })).with(createHorizontalFacingDispatch()));
+    }
+ 
+    private ResourceLocation createTurtleEggModel(int var1, String var2, TextureMapping var3) {
+       switch(var1) {
+@@ -1633,11 +1650,11 @@
+       this.createSimpleFlatItemModel(Items.SUGAR_CANE);
+       this.createGrowingPlant(Blocks.KELP, Blocks.KELP_PLANT, BlockModelGenerators.TintState.TINTED);
+       this.createSimpleFlatItemModel(Items.KELP);
+       this.skipAutoItemBlock(Blocks.KELP_PLANT);
+       this.createCrossBlock(Blocks.HANGING_ROOTS, BlockModelGenerators.TintState.NOT_TINTED);
+-      this.createSimpleFlatItemModel(Blocks.HANGING_ROOTS);
++      this.skipAutoItemBlock(Blocks.HANGING_ROOTS);
+       this.skipAutoItemBlock(Blocks.CAVE_VINES_PLANT);
+       this.createGrowingPlant(Blocks.WEEPING_VINES, Blocks.WEEPING_VINES_PLANT, BlockModelGenerators.TintState.NOT_TINTED);
+       this.createGrowingPlant(Blocks.TWISTING_VINES, Blocks.TWISTING_VINES_PLANT, BlockModelGenerators.TintState.NOT_TINTED);
+       this.createSimpleFlatItemModel(Blocks.WEEPING_VINES, "_plant");
+       this.skipAutoItemBlock(Blocks.WEEPING_VINES_PLANT);
+@@ -1744,19 +1761,11 @@
+       this.blockStateOutput.accept(MultiVariantGenerator.multiVariant(var1).with(PropertyDispatch.property(BlockStateProperties.CANDLES).select(1, (Variant)Variant.variant().with(VariantProperties.MODEL, ModelTemplates.CANDLE.createWithSuffix(var1, "_one_candle", var3, this.modelOutput))).select(2, (Variant)Variant.variant().with(VariantProperties.MODEL, ModelTemplates.TWO_CANDLES.createWithSuffix(var1, "_two_candles", var3, this.modelOutput))).select(3, (Variant)Variant.variant().with(VariantProperties.MODEL, ModelTemplates.THREE_CANDLES.createWithSuffix(var1, "_three_candles", var3, this.modelOutput))).select(4, (Variant)Variant.variant().with(VariantProperties.MODEL, ModelTemplates.FOUR_CANDLES.createWithSuffix(var1, "_four_candles", var3, this.modelOutput)))));
+       this.blockStateOutput.accept(createSimpleBlock(var2, ModelTemplates.CANDLE_CAKE.create(var2, TextureMapping.candleCake(var1), this.modelOutput)));
+    }
+ 
+    static {
+-      SHAPE_CONSUMERS = ImmutableMap.builder().put(BlockFamily.Variant.BUTTON, BlockModelGenerators.BlockFamilyProvider::button).put(BlockFamily.Variant.DOOR, (var0, var1) -> {
+-         ((BlockModelGenerators.BlockFamilyProvider)var0).door(var1);
+-      }).put(BlockFamily.Variant.CHISELED, (var0, var1) -> {
+-         ((BlockModelGenerators.BlockFamilyProvider)var0).fullBlockVariant(var1);
+-      }).put(BlockFamily.Variant.CRACKED, (var0, var1) -> {
+-         ((BlockModelGenerators.BlockFamilyProvider)var0).fullBlockVariant(var1);
+-      }).put(BlockFamily.Variant.FENCE, BlockModelGenerators.BlockFamilyProvider::fence).put(BlockFamily.Variant.FENCE_GATE, BlockModelGenerators.BlockFamilyProvider::fenceGate).put(BlockFamily.Variant.SIGN, BlockModelGenerators.BlockFamilyProvider::sign).put(BlockFamily.Variant.SLAB, BlockModelGenerators.BlockFamilyProvider::slab).put(BlockFamily.Variant.STAIRS, BlockModelGenerators.BlockFamilyProvider::stairs).put(BlockFamily.Variant.PRESSURE_PLATE, BlockModelGenerators.BlockFamilyProvider::pressurePlate).put(BlockFamily.Variant.TRAPDOOR, (var0, var1) -> {
+-         ((BlockModelGenerators.BlockFamilyProvider)var0).trapdoor(var1);
+-      }).put(BlockFamily.Variant.WALL, BlockModelGenerators.BlockFamilyProvider::wall).build();
++      SHAPE_CONSUMERS = ImmutableMap.builder().put(BlockFamily.Variant.BUTTON, BlockModelGenerators.BlockFamilyProvider::button).put(BlockFamily.Variant.DOOR, BlockModelGenerators.BlockFamilyProvider::door).put(BlockFamily.Variant.CHISELED, BlockModelGenerators.BlockFamilyProvider::fullBlockVariant).put(BlockFamily.Variant.CRACKED, BlockModelGenerators.BlockFamilyProvider::fullBlockVariant).put(BlockFamily.Variant.FENCE, BlockModelGenerators.BlockFamilyProvider::fence).put(BlockFamily.Variant.FENCE_GATE, BlockModelGenerators.BlockFamilyProvider::fenceGate).put(BlockFamily.Variant.SIGN, BlockModelGenerators.BlockFamilyProvider::sign).put(BlockFamily.Variant.SLAB, BlockModelGenerators.BlockFamilyProvider::slab).put(BlockFamily.Variant.STAIRS, BlockModelGenerators.BlockFamilyProvider::stairs).put(BlockFamily.Variant.PRESSURE_PLATE, BlockModelGenerators.BlockFamilyProvider::pressurePlate).put(BlockFamily.Variant.TRAPDOOR, BlockModelGenerators.BlockFamilyProvider::trapdoor).put(BlockFamily.Variant.WALL, BlockModelGenerators.BlockFamilyProvider::wall).build();
+       MULTIFACE_GENERATOR = (Map)Util.make(Maps.newHashMap(), (var0) -> {
+          var0.put(BlockStateProperties.NORTH, (var0x) -> {
+             return Variant.variant().with(VariantProperties.MODEL, var0x);
+          });
+          var0.put(BlockStateProperties.EAST, (var0x) -> {
+@@ -1775,98 +1784,15 @@
+             return Variant.variant().with(VariantProperties.MODEL, var0x).with(VariantProperties.X_ROT, VariantProperties.Rotation.R90).with(VariantProperties.UV_LOCK, true);
+          });
+       });
+    }
+ 
+-   class BlockEntityModelGenerator {
+-      private final ResourceLocation baseModel;
+-
+-      public BlockEntityModelGenerator(ResourceLocation var2, Block var3) {
+-         this.baseModel = ModelTemplates.PARTICLE_ONLY.create(var2, TextureMapping.particle(var3), BlockModelGenerators.this.modelOutput);
+-      }
+-
+-      public BlockModelGenerators.BlockEntityModelGenerator create(Block... var1) {
+-         Block[] var2 = var1;
+-         int var3 = var1.length;
+-
+-         for(int var4 = 0; var4 < var3; ++var4) {
+-            Block var5 = var2[var4];
+-            BlockModelGenerators.this.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(var5, this.baseModel));
+-         }
+-
+-         return this;
+-      }
+-
+-      public BlockModelGenerators.BlockEntityModelGenerator createWithoutBlockItem(Block... var1) {
+-         Block[] var2 = var1;
+-         int var3 = var1.length;
+-
+-         for(int var4 = 0; var4 < var3; ++var4) {
+-            Block var5 = var2[var4];
+-            BlockModelGenerators.this.skipAutoItemBlock(var5);
+-         }
+-
+-         return this.create(var1);
+-      }
+-
+-      public BlockModelGenerators.BlockEntityModelGenerator createWithCustomBlockItemModel(ModelTemplate var1, Block... var2) {
+-         Block[] var3 = var2;
+-         int var4 = var2.length;
+-
+-         for(int var5 = 0; var5 < var4; ++var5) {
+-            Block var6 = var3[var5];
+-            var1.create(ModelLocationUtils.getModelLocation(var6.asItem()), TextureMapping.particle(var6), BlockModelGenerators.this.modelOutput);
+-         }
+-
+-         return this.create(var2);
+-      }
++   @FunctionalInterface
++   private interface BlockStateGeneratorSupplier {
++      BlockStateGenerator create(Block var1, ResourceLocation var2, TextureMapping var3, BiConsumer<ResourceLocation, Supplier<JsonElement>> var4);
+    }
+ 
+-   static enum TintState {
+-      TINTED,
+-      NOT_TINTED;
+-
+-      private TintState() {
+-      }
+-
+-      public ModelTemplate getCross() {
+-         return this == TINTED ? ModelTemplates.TINTED_CROSS : ModelTemplates.CROSS;
+-      }
+-
+-      public ModelTemplate getCrossPot() {
+-         return this == TINTED ? ModelTemplates.TINTED_FLOWER_POT_CROSS : ModelTemplates.FLOWER_POT_CROSS;
+-      }
+-   }
+-
+-   class WoodProvider {
+-      private final TextureMapping logMapping;
+-
+-      public WoodProvider(TextureMapping var2) {
+-         this.logMapping = var2;
+-      }
+-
+-      public BlockModelGenerators.WoodProvider wood(Block var1) {
+-         TextureMapping var2 = this.logMapping.copyAndUpdate(TextureSlot.END, this.logMapping.get(TextureSlot.SIDE));
+-         ResourceLocation var3 = ModelTemplates.CUBE_COLUMN.create(var1, var2, BlockModelGenerators.this.modelOutput);
+-         BlockModelGenerators.this.blockStateOutput.accept(BlockModelGenerators.createAxisAlignedPillarBlock(var1, var3));
+-         return this;
+-      }
+-
+-      public BlockModelGenerators.WoodProvider log(Block var1) {
+-         ResourceLocation var2 = ModelTemplates.CUBE_COLUMN.create(var1, this.logMapping, BlockModelGenerators.this.modelOutput);
+-         BlockModelGenerators.this.blockStateOutput.accept(BlockModelGenerators.createAxisAlignedPillarBlock(var1, var2));
+-         return this;
+-      }
+-
+-      public BlockModelGenerators.WoodProvider logWithHorizontal(Block var1) {
+-         ResourceLocation var2 = ModelTemplates.CUBE_COLUMN.create(var1, this.logMapping, BlockModelGenerators.this.modelOutput);
+-         ResourceLocation var3 = ModelTemplates.CUBE_COLUMN_HORIZONTAL.create(var1, this.logMapping, BlockModelGenerators.this.modelOutput);
+-         BlockModelGenerators.this.blockStateOutput.accept(BlockModelGenerators.createRotatedPillarWithHorizontalVariant(var1, var2, var3));
+-         return this;
+-      }
+-   }
+-
+    class BlockFamilyProvider {
+       private final TextureMapping mapping;
+       private final Map<ModelTemplate, ResourceLocation> models = Maps.newHashMap();
+       @Nullable
+       private BlockFamily family;
+@@ -2021,10 +1947,93 @@
+          });
+          return this;
+       }
+    }
+ 
+-   @FunctionalInterface
+-   interface BlockStateGeneratorSupplier {
+-      BlockStateGenerator create(Block var1, ResourceLocation var2, TextureMapping var3, BiConsumer<ResourceLocation, Supplier<JsonElement>> var4);
++   class WoodProvider {
++      private final TextureMapping logMapping;
++
++      public WoodProvider(TextureMapping var2) {
++         this.logMapping = var2;
++      }
++
++      public BlockModelGenerators.WoodProvider wood(Block var1) {
++         TextureMapping var2 = this.logMapping.copyAndUpdate(TextureSlot.END, this.logMapping.get(TextureSlot.SIDE));
++         ResourceLocation var3 = ModelTemplates.CUBE_COLUMN.create(var1, var2, BlockModelGenerators.this.modelOutput);
++         BlockModelGenerators.this.blockStateOutput.accept(BlockModelGenerators.createAxisAlignedPillarBlock(var1, var3));
++         return this;
++      }
++
++      public BlockModelGenerators.WoodProvider log(Block var1) {
++         ResourceLocation var2 = ModelTemplates.CUBE_COLUMN.create(var1, this.logMapping, BlockModelGenerators.this.modelOutput);
++         BlockModelGenerators.this.blockStateOutput.accept(BlockModelGenerators.createAxisAlignedPillarBlock(var1, var2));
++         return this;
++      }
++
++      public BlockModelGenerators.WoodProvider logWithHorizontal(Block var1) {
++         ResourceLocation var2 = ModelTemplates.CUBE_COLUMN.create(var1, this.logMapping, BlockModelGenerators.this.modelOutput);
++         ResourceLocation var3 = ModelTemplates.CUBE_COLUMN_HORIZONTAL.create(var1, this.logMapping, BlockModelGenerators.this.modelOutput);
++         BlockModelGenerators.this.blockStateOutput.accept(BlockModelGenerators.createRotatedPillarWithHorizontalVariant(var1, var2, var3));
++         return this;
++      }
+    }
++
++   static enum TintState {
++      TINTED,
++      NOT_TINTED;
++
++      private TintState() {
++      }
++
++      public ModelTemplate getCross() {
++         return this == TINTED ? ModelTemplates.TINTED_CROSS : ModelTemplates.CROSS;
++      }
++
++      public ModelTemplate getCrossPot() {
++         return this == TINTED ? ModelTemplates.TINTED_FLOWER_POT_CROSS : ModelTemplates.FLOWER_POT_CROSS;
++      }
++   }
++
++   class BlockEntityModelGenerator {
++      private final ResourceLocation baseModel;
++
++      public BlockEntityModelGenerator(ResourceLocation var2, Block var3) {
++         this.baseModel = ModelTemplates.PARTICLE_ONLY.create(var2, TextureMapping.particle(var3), BlockModelGenerators.this.modelOutput);
++      }
++
++      public BlockModelGenerators.BlockEntityModelGenerator create(Block... var1) {
++         Block[] var2 = var1;
++         int var3 = var1.length;
++
++         for(int var4 = 0; var4 < var3; ++var4) {
++            Block var5 = var2[var4];
++            BlockModelGenerators.this.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(var5, this.baseModel));
++         }
++
++         return this;
++      }
++
++      public BlockModelGenerators.BlockEntityModelGenerator createWithoutBlockItem(Block... var1) {
++         Block[] var2 = var1;
++         int var3 = var1.length;
++
++         for(int var4 = 0; var4 < var3; ++var4) {
++            Block var5 = var2[var4];
++            BlockModelGenerators.this.skipAutoItemBlock(var5);
++         }
++
++         return this.create(var1);
++      }
++
++      public BlockModelGenerators.BlockEntityModelGenerator createWithCustomBlockItemModel(ModelTemplate var1, Block... var2) {
++         Block[] var3 = var2;
++         int var4 = var2.length;
++
++         for(int var5 = 0; var5 < var4; ++var5) {
++            Block var6 = var3[var5];
++            var1.create(ModelLocationUtils.getModelLocation(var6.asItem()), TextureMapping.particle(var6), BlockModelGenerators.this.modelOutput);
++         }
++
++         return this.create(var2);
++      }
++   }
+ }

@@ -1,0 +1,28 @@
+--- net/minecraft/client/gui/components/EditBox.java
++++ net/minecraft/client/gui/components/EditBox.java
+@@ -431,11 +431,11 @@
+          if (var10) {
+             if (var17) {
+                var10002 = var12 - 1;
+                var10003 = var15 + 1;
+                var10004 = var12 + 1;
+-               this.font.getClass();
++               Objects.requireNonNull(this.font);
+                GuiComponent.fill(var1, var15, var10002, var10003, var10004 + 9, -3092272);
+             } else {
+                this.font.drawShadow(var1, "_", (float)var15, (float)var12, var5);
+             }
+          }
+@@ -443,11 +443,11 @@
+          if (var7 != var6) {
+             int var16 = var11 + this.font.width(var8.substring(0, var7));
+             var10002 = var12 - 1;
+             var10003 = var16 - 1;
+             var10004 = var12 + 1;
+-            this.font.getClass();
++            Objects.requireNonNull(this.font);
+             this.renderHighlight(var15, var10002, var10003, var10004 + 9);
+          }
+ 
+       }
+    }

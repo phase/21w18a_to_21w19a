@@ -1,0 +1,124 @@
+--- net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
++++ net/minecraft/world/level/saveddata/maps/MapItemSavedData.java
+@@ -6,10 +6,11 @@
+ import com.mojang.serialization.Dynamic;
+ import java.util.Collection;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.NbtOps;
+@@ -44,11 +45,11 @@
+    public byte[] colors = new byte[16384];
+    public final boolean locked;
+    private final List<MapItemSavedData.HoldingPlayer> carriedBy = Lists.newArrayList();
+    private final Map<Player, MapItemSavedData.HoldingPlayer> carriedByPlayers = Maps.newHashMap();
+    private final Map<String, MapBanner> bannerMarkers = Maps.newHashMap();
+-   private final Map<String, MapDecoration> decorations = Maps.newLinkedHashMap();
++   final Map<String, MapDecoration> decorations = Maps.newLinkedHashMap();
+    private final Map<String, MapFrame> frameMarkers = Maps.newHashMap();
+ 
+    private MapItemSavedData(int var1, int var2, byte var3, boolean var4, boolean var5, boolean var6, ResourceKey<Level> var7) {
+       this.scale = var3;
+       this.x = var1;
+@@ -74,11 +75,11 @@
+    }
+ 
+    public static MapItemSavedData load(CompoundTag var0) {
+       DataResult var10000 = DimensionType.parseLegacy(new Dynamic(NbtOps.INSTANCE, var0.get("dimension")));
+       Logger var10001 = LOGGER;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       ResourceKey var1 = (ResourceKey)var10000.resultOrPartial(var10001::error).orElseThrow(() -> {
+          return new IllegalArgumentException("Invalid map dimension: " + var0.get("dimension"));
+       });
+       int var2 = var0.getInt("xCenter");
+       int var3 = var0.getInt("zCenter");
+@@ -112,11 +113,11 @@
+    }
+ 
+    public CompoundTag save(CompoundTag var1) {
+       DataResult var10000 = ResourceLocation.CODEC.encodeStart(NbtOps.INSTANCE, this.dimension.location());
+       Logger var10001 = LOGGER;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       var10000.resultOrPartial(var10001::error).ifPresent((var1x) -> {
+          var1.put("dimension", var1x);
+       });
+       var1.putInt("xCenter", this.x);
+       var1.putInt("zCenter", this.z);
+@@ -315,13 +316,11 @@
+ 
+    }
+ 
+    private void setDecorationsDirty() {
+       this.setDirty();
+-      this.carriedBy.forEach((var0) -> {
+-         ((MapItemSavedData.HoldingPlayer)var0).markDecorationsDirty();
+-      });
++      this.carriedBy.forEach(MapItemSavedData.HoldingPlayer::markDecorationsDirty);
+    }
+ 
+    public MapItemSavedData.HoldingPlayer getHoldingPlayer(Player var1) {
+       MapItemSavedData.HoldingPlayer var2 = (MapItemSavedData.HoldingPlayer)this.carriedByPlayers.get(var1);
+       if (var2 == null) {
+@@ -425,24 +424,20 @@
+       return this.decorations.values();
+    }
+ 
+    public class HoldingPlayer {
+       public final Player player;
+-      private boolean dirtyData;
++      private boolean dirtyData = true;
+       private int minDirtyX;
+       private int minDirtyY;
+-      private int maxDirtyX;
+-      private int maxDirtyY;
+-      private boolean dirtyDecorations;
++      private int maxDirtyX = 127;
++      private int maxDirtyY = 127;
++      private boolean dirtyDecorations = true;
+       private int tick;
+       public int step;
+ 
+-      private HoldingPlayer(Player var2) {
+-         this.dirtyData = true;
+-         this.maxDirtyX = 127;
+-         this.maxDirtyY = 127;
+-         this.dirtyDecorations = true;
++      HoldingPlayer(Player var2) {
+          this.player = var2;
+       }
+ 
+       private MapItemSavedData.MapPatch createPatch() {
+          int var1 = this.minDirtyX;
+@@ -459,11 +454,11 @@
+ 
+          return new MapItemSavedData.MapPatch(var1, var2, var3, var4, var5);
+       }
+ 
+       @Nullable
+-      private Packet<?> nextUpdatePacket(int var1) {
++      Packet<?> nextUpdatePacket(int var1) {
+          MapItemSavedData.MapPatch var2;
+          if (this.dirtyData) {
+             this.dirtyData = false;
+             var2 = this.createPatch();
+          } else {
+@@ -479,11 +474,11 @@
+          }
+ 
+          return var3 == null && var2 == null ? null : new ClientboundMapItemDataPacket(var1, MapItemSavedData.this.scale, MapItemSavedData.this.locked, var3, var2);
+       }
+ 
+-      private void markColorsDirty(int var1, int var2) {
++      void markColorsDirty(int var1, int var2) {
+          if (this.dirtyData) {
+             this.minDirtyX = Math.min(this.minDirtyX, var1);
+             this.minDirtyY = Math.min(this.minDirtyY, var2);
+             this.maxDirtyX = Math.max(this.maxDirtyX, var1);
+             this.maxDirtyY = Math.max(this.maxDirtyY, var2);

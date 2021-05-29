@@ -1,0 +1,27 @@
+--- net/minecraft/world/item/Item.java
++++ net/minecraft/world/item/Item.java
+@@ -371,17 +371,17 @@
+    public boolean canFitInsideContainerItems() {
+       return true;
+    }
+ 
+    public static class Properties {
+-      private int maxStackSize = 64;
+-      private int maxDamage;
+-      private Item craftingRemainingItem;
+-      private CreativeModeTab category;
+-      private Rarity rarity;
+-      private FoodProperties foodProperties;
+-      private boolean isFireResistant;
++      int maxStackSize = 64;
++      int maxDamage;
++      Item craftingRemainingItem;
++      CreativeModeTab category;
++      Rarity rarity;
++      FoodProperties foodProperties;
++      boolean isFireResistant;
+ 
+       public Properties() {
+          this.rarity = Rarity.COMMON;
+       }
+ 

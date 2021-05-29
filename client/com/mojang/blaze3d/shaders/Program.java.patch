@@ -1,0 +1,15 @@
+--- com/mojang/blaze3d/shaders/Program.java
++++ com/mojang/blaze3d/shaders/Program.java
+@@ -91,11 +91,11 @@
+ 
+       public String getExtension() {
+          return this.extension;
+       }
+ 
+-      private int getGlType() {
++      int getGlType() {
+          return this.glType;
+       }
+ 
+       public Map<String, Program> getPrograms() {
+          return this.programs;

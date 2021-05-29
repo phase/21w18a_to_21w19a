@@ -1,0 +1,76 @@
+--- net/minecraft/util/SortedArraySet.java
++++ net/minecraft/util/SortedArraySet.java
+@@ -9,12 +9,12 @@
+ import javax.annotation.Nullable;
+ 
+ public class SortedArraySet<T> extends AbstractSet<T> {
+    private static final int DEFAULT_INITIAL_CAPACITY = 10;
+    private final Comparator<T> comparator;
+-   private T[] contents;
+-   private int size;
++   T[] contents;
++   int size;
+ 
+    private SortedArraySet(int var1, Comparator<T> var2) {
+       this.comparator = var2;
+       if (var1 < 0) {
+          throw new IllegalArgumentException("Initial capacity (" + var1 + ") is negative");
+@@ -38,11 +38,11 @@
+    public static <T> SortedArraySet<T> create(Comparator<T> var0, int var1) {
+       return new SortedArraySet(var1, var0);
+    }
+ 
+    private static <T> T[] castRawArray(Object[] var0) {
+-      return (Object[])var0;
++      return var0;
+    }
+ 
+    private int findIndex(T var1) {
+       return Arrays.binarySearch(this.contents, 0, this.size, var1, this.comparator);
+    }
+@@ -84,11 +84,11 @@
+ 
+       this.contents[var2] = var1;
+       ++this.size;
+    }
+ 
+-   private void removeInternal(int var1) {
++   void removeInternal(int var1) {
+       --this.size;
+       if (var1 != this.size) {
+          System.arraycopy(this.contents, var1 + 1, this.contents, var1, this.size - var1);
+       }
+ 
+@@ -150,11 +150,11 @@
+       return (Object[])this.contents.clone();
+    }
+ 
+    public <U> U[] toArray(U[] var1) {
+       if (var1.length < this.size) {
+-         return (Object[])Arrays.copyOf(this.contents, this.size, var1.getClass());
++         return Arrays.copyOf(this.contents, this.size, var1.getClass());
+       } else {
+          System.arraycopy(this.contents, 0, var1, 0, this.size);
+          if (var1.length > this.size) {
+             var1[this.size] = null;
+          }
+@@ -181,16 +181,15 @@
+ 
+          return super.equals(var1);
+       }
+    }
+ 
+-   class ArrayIterator implements Iterator<T> {
++   private class ArrayIterator implements Iterator<T> {
+       private int index;
+-      private int last;
++      private int last = -1;
+ 
+-      private ArrayIterator() {
+-         this.last = -1;
++      ArrayIterator() {
+       }
+ 
+       public boolean hasNext() {
+          return this.index < SortedArraySet.this.size;
+       }

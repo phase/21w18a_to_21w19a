@@ -1,0 +1,16 @@
+--- com/mojang/blaze3d/vertex/VertexFormat.java
++++ com/mojang/blaze3d/vertex/VertexFormat.java
+@@ -31,11 +31,12 @@
+ 
+       this.vertexSize = var2;
+    }
+ 
+    public String toString() {
+-      return "format: " + this.elementMapping.size() + " elements: " + (String)this.elementMapping.entrySet().stream().map(Object::toString).collect(Collectors.joining(" "));
++      int var10000 = this.elementMapping.size();
++      return "format: " + var10000 + " elements: " + (String)this.elementMapping.entrySet().stream().map(Object::toString).collect(Collectors.joining(" "));
+    }
+ 
+    public int getIntegerSize() {
+       return this.getVertexSize() / 4;
+    }

@@ -1,0 +1,12 @@
+--- net/minecraft/util/profiling/registry/Metric.java
++++ net/minecraft/util/profiling/registry/Metric.java
+@@ -10,8 +10,8 @@
+    public String getName() {
+       return this.name;
+    }
+ 
+    public String toString() {
+-      return "Metric{name='" + this.name + '\'' + '}';
++      return "Metric{name='" + this.name + "'}";
+    }
+ }

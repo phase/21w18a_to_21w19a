@@ -1,0 +1,38 @@
+--- net/minecraft/client/gui/screens/inventory/AbstractCommandBlockEditScreen.java
++++ net/minecraft/client/gui/screens/inventory/AbstractCommandBlockEditScreen.java
+@@ -1,8 +1,9 @@
+ package net.minecraft.client.gui.screens.inventory;
+ 
+ import com.mojang.blaze3d.vertex.PoseStack;
++import java.util.Objects;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.chat.NarratorChatListener;
+ import net.minecraft.client.gui.components.Button;
+ import net.minecraft.client.gui.components.CommandSuggestions;
+ import net.minecraft.client.gui.components.CycleButton;
+@@ -22,11 +23,11 @@
+    protected EditBox commandEdit;
+    protected EditBox previousEdit;
+    protected Button doneButton;
+    protected Button cancelButton;
+    protected CycleButton<Boolean> outputButton;
+-   private CommandSuggestions commandSuggestions;
++   CommandSuggestions commandSuggestions;
+ 
+    public AbstractCommandBlockEditScreen() {
+       super(NarratorChatListener.NO_TITLE);
+    }
+ 
+@@ -130,11 +131,11 @@
+       drawCenteredString(var1, this.font, SET_COMMAND_LABEL, this.width / 2, 20, 16777215);
+       drawString(var1, this.font, COMMAND_LABEL, this.width / 2 - 150, 40, 10526880);
+       this.commandEdit.render(var1, var2, var3, var4);
+       byte var5 = 75;
+       if (!this.previousEdit.getValue().isEmpty()) {
+-         this.font.getClass();
++         Objects.requireNonNull(this.font);
+          int var6 = var5 + (5 * 9 + 1 + this.getPreviousY() - 135);
+          drawString(var1, this.font, PREVIOUS_OUTPUT_LABEL, this.width / 2 - 150, var6 + 4, 10526880);
+          this.previousEdit.render(var1, var2, var3, var4);
+       }
+ 

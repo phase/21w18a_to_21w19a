@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/levelgen/feature/treedecorators/CocoaDecorator.java
++++ net/minecraft/world/level/levelgen/feature/treedecorators/CocoaDecorator.java
+@@ -39,11 +39,11 @@
+                Direction var5 = (Direction)var4.next();
+                if (var3.nextFloat() <= 0.25F) {
+                   Direction var6 = var5.getOpposite();
+                   BlockPos var7 = var3x.offset(var6.getStepX(), 0, var6.getStepZ());
+                   if (Feature.isAir(var1, var7)) {
+-                     var2.accept(var7, ((BlockState)Blocks.COCOA.defaultBlockState().setValue(CocoaBlock.AGE, var3.nextInt(3))).setValue(CocoaBlock.FACING, var5));
++                     var2.accept(var7, (BlockState)((BlockState)Blocks.COCOA.defaultBlockState().setValue(CocoaBlock.AGE, var3.nextInt(3))).setValue(CocoaBlock.FACING, var5));
+                   }
+                }
+             }
+ 
+          });

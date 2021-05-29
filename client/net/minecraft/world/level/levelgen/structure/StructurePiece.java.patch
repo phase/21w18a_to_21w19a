@@ -1,0 +1,53 @@
+--- net/minecraft/world/level/levelgen/structure/StructurePiece.java
++++ net/minecraft/world/level/levelgen/structure/StructurePiece.java
+@@ -1,10 +1,11 @@
+ package net.minecraft.world.level.levelgen.structure;
+ 
+ import com.google.common.collect.ImmutableSet;
+ import com.mojang.serialization.DataResult;
+ import java.util.Iterator;
++import java.util.Objects;
+ import java.util.Random;
+ import java.util.Set;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+@@ -57,11 +58,11 @@
+ 
+    public StructurePiece(StructurePieceType var1, CompoundTag var2) {
+       int var10002 = var2.getInt("GD");
+       DataResult var10003 = BoundingBox.CODEC.parse(NbtOps.INSTANCE, var2.get("BB"));
+       Logger var10004 = LOGGER;
+-      var10004.getClass();
++      Objects.requireNonNull(var10004);
+       this(var1, var10002, (BoundingBox)var10003.resultOrPartial(var10004::error).orElseThrow(() -> {
+          return new IllegalArgumentException("Invalid boundingbox");
+       }));
+       int var3 = var2.getInt("O");
+       this.setOrientation(var3 == -1 ? null : Direction.from2DDataValue(var3));
+@@ -78,11 +79,11 @@
+    public final CompoundTag createTag(ServerLevel var1) {
+       CompoundTag var2 = new CompoundTag();
+       var2.putString("id", Registry.STRUCTURE_PIECE.getKey(this.getType()).toString());
+       DataResult var10000 = BoundingBox.CODEC.encodeStart(NbtOps.INSTANCE, this.boundingBox);
+       Logger var10001 = LOGGER;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       var10000.resultOrPartial(var10001::error).ifPresent((var1x) -> {
+          var2.put("BB", var1x);
+       });
+       Direction var3 = this.getOrientation();
+       var2.putInt("O", var3 == null ? -1 : var3.get2DDataValue());
+@@ -460,11 +461,11 @@
+    static {
+       CAVE_AIR = Blocks.CAVE_AIR.defaultBlockState();
+       SHAPE_CHECK_BLOCKS = ImmutableSet.builder().add(Blocks.NETHER_BRICK_FENCE).add(Blocks.TORCH).add(Blocks.WALL_TORCH).add(Blocks.OAK_FENCE).add(Blocks.SPRUCE_FENCE).add(Blocks.DARK_OAK_FENCE).add(Blocks.ACACIA_FENCE).add(Blocks.BIRCH_FENCE).add(Blocks.JUNGLE_FENCE).add(Blocks.LADDER).add(Blocks.IRON_BARS).build();
+    }
+ 
+-   public abstract static class BlockSelector {
++   protected abstract static class BlockSelector {
+       protected BlockState next;
+ 
+       protected BlockSelector() {
+          this.next = Blocks.AIR.defaultBlockState();
+       }

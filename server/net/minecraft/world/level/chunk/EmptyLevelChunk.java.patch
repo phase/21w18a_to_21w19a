@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/chunk/EmptyLevelChunk.java
++++ net/minecraft/world/level/chunk/EmptyLevelChunk.java
+@@ -63,11 +63,11 @@
+ 
+    public ChunkHolder.FullChunkStatus getFullStatus() {
+       return ChunkHolder.FullChunkStatus.BORDER;
+    }
+ 
+-   static class EmptyChunkBiomeContainer extends ChunkBiomeContainer {
++   private static class EmptyChunkBiomeContainer extends ChunkBiomeContainer {
+       private static final Biome[] EMPTY_BIOMES = new Biome[0];
+ 
+       public EmptyChunkBiomeContainer(Level var1) {
+          super(var1.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), var1, (Biome[])EMPTY_BIOMES);
+       }

@@ -1,0 +1,16 @@
+--- net/minecraft/client/renderer/EffectInstance.java
++++ net/minecraft/client/renderer/EffectInstance.java
+@@ -146,11 +146,12 @@
+             } else {
+                var7 = "";
+             }
+ 
+             ChainedJsonException var8 = ChainedJsonException.forException(var25);
+-            var8.setFilenameAndFlush(var3.getPath() + var7);
++            String var10001 = var3.getPath();
++            var8.setFilenameAndFlush(var10001 + var7);
+             throw var8;
+          }
+       } finally {
+          IOUtils.closeQuietly(var4);
+       }

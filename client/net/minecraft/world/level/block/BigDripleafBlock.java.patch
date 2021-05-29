@@ -1,0 +1,28 @@
+--- net/minecraft/world/level/block/BigDripleafBlock.java
++++ net/minecraft/world/level/block/BigDripleafBlock.java
+@@ -92,11 +92,11 @@
+       return !var0.isOutsideBuildHeight(var1) && canReplace(var2);
+    }
+ 
+    protected static boolean place(LevelAccessor var0, BlockPos var1, FluidState var2, Direction var3) {
+       BlockState var4 = (BlockState)((BlockState)Blocks.BIG_DRIPLEAF.defaultBlockState().setValue(WATERLOGGED, var2.isSourceOfType(Fluids.WATER))).setValue(FACING, var3);
+-      return var0.setBlock(var1, var4, 2);
++      return var0.setBlock(var1, var4, 3);
+    }
+ 
+    public void onProjectileHit(Level var1, BlockState var2, BlockHitResult var3, Projectile var4) {
+       this.setTiltAndScheduleTick(var2, var1, var3.getBlockPos(), Tilt.FULL, SoundEvents.BIG_DRIPLEAF_TILT_DOWN);
+    }
+@@ -179,11 +179,11 @@
+       float var3 = Mth.randomBetween(var0.random, 0.8F, 1.2F);
+       var0.playSound((Player)null, (BlockPos)var1, var2, SoundSource.BLOCKS, 1.0F, var3);
+    }
+ 
+    private static boolean canEntityTilt(BlockPos var0, Entity var1) {
+-      return var1.position().y > (double)((float)var0.getY() + 0.6875F);
++      return var1.isOnGround() && var1.position().y > (double)((float)var0.getY() + 0.6875F);
+    }
+ 
+    private void setTiltAndScheduleTick(BlockState var1, Level var2, BlockPos var3, Tilt var4, @Nullable SoundEvent var5) {
+       setTilt(var1, var2, var3, var4);
+       if (var5 != null) {

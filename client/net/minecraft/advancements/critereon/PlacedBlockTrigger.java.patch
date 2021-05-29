@@ -1,0 +1,15 @@
+--- net/minecraft/advancements/critereon/PlacedBlockTrigger.java
++++ net/minecraft/advancements/critereon/PlacedBlockTrigger.java
+@@ -12,11 +12,11 @@
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public class PlacedBlockTrigger extends SimpleCriterionTrigger<PlacedBlockTrigger.TriggerInstance> {
+-   private static final ResourceLocation ID = new ResourceLocation("placed_block");
++   static final ResourceLocation ID = new ResourceLocation("placed_block");
+ 
+    public PlacedBlockTrigger() {
+    }
+ 
+    public ResourceLocation getId() {

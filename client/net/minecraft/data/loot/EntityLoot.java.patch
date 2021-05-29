@@ -1,0 +1,29 @@
+--- net/minecraft/data/loot/EntityLoot.java
++++ net/minecraft/data/loot/EntityLoot.java
+@@ -4,10 +4,11 @@
+ import com.google.common.collect.Maps;
+ import com.google.common.collect.Sets;
+ import java.util.HashSet;
+ import java.util.Iterator;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.function.BiConsumer;
+ import java.util.function.Consumer;
+ import net.minecraft.Util;
+ import net.minecraft.advancements.critereon.DamageSourcePredicate;
+@@ -172,11 +173,13 @@
+ 
+                var1.accept(var5, var6);
+             }
+          }
+ 
+-         this.map.forEach(var1::accept);
++         Map var10000 = this.map;
++         Objects.requireNonNull(var1);
++         var10000.forEach(var1::accept);
+          return;
+       } while(var5 == BuiltInLootTables.EMPTY || this.map.remove(var5) == null);
+ 
+       throw new IllegalStateException(String.format("Weird loottable '%s' for '%s', not a LivingEntity so should not have loot", var5, Registry.ENTITY_TYPE.getKey(var4)));
+    }

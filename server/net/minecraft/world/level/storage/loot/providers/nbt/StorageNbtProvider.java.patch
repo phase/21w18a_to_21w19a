@@ -1,0 +1,18 @@
+--- net/minecraft/world/level/storage/loot/providers/nbt/StorageNbtProvider.java
++++ net/minecraft/world/level/storage/loot/providers/nbt/StorageNbtProvider.java
+@@ -11,13 +11,13 @@
+ import net.minecraft.util.GsonHelper;
+ import net.minecraft.world.level.storage.loot.LootContext;
+ import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+ 
+ public class StorageNbtProvider implements NbtProvider {
+-   private final ResourceLocation id;
++   final ResourceLocation id;
+ 
+-   private StorageNbtProvider(ResourceLocation var1) {
++   StorageNbtProvider(ResourceLocation var1) {
+       this.id = var1;
+    }
+ 
+    public LootNbtProviderType getType() {
+       return NbtProviders.STORAGE;

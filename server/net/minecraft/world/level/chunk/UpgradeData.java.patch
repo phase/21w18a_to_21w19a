@@ -1,0 +1,48 @@
+--- net/minecraft/world/level/chunk/UpgradeData.java
++++ net/minecraft/world/level/chunk/UpgradeData.java
+@@ -40,12 +40,12 @@
+    public static final UpgradeData EMPTY;
+    private static final String TAG_INDICES = "Indices";
+    private static final Direction8[] DIRECTIONS;
+    private final EnumSet<Direction8> sides;
+    private final int[][] index;
+-   private static final Map<Block, UpgradeData.BlockFixer> MAP;
+-   private static final Set<UpgradeData.BlockFixer> CHUNKY_FIXERS;
++   static final Map<Block, UpgradeData.BlockFixer> MAP;
++   static final Set<UpgradeData.BlockFixer> CHUNKY_FIXERS;
+ 
+    private UpgradeData(LevelHeightAccessor var1) {
+       this.sides = EnumSet.noneOf(Direction8.class);
+       this.index = new int[var1.getSectionsCount()][];
+    }
+@@ -105,11 +105,11 @@
+          boolean var10 = var3.size() == 1;
+          ChunkPos var11 = var0.getPos();
+          int var12 = var11.getMinBlockX() + (var10 && (var9 || var8) ? 1 : (var7 ? 0 : 15));
+          int var13 = var11.getMinBlockX() + (!var10 || !var9 && !var8 ? (var7 ? 0 : 15) : 14);
+          int var14 = var11.getMinBlockZ() + (!var10 || !var6 && !var7 ? (var9 ? 0 : 15) : 1);
+-         int var15 = var11.getMinBlockZ() + (var10 && (var6 || var7) ? 14 : (var9 ? 0 : 15));
++         int var15 = var11.getMinBlockZ() + (!var10 || !var6 && !var7 ? (var9 ? 0 : 15) : 14);
+          Direction[] var16 = Direction.values();
+          BlockPos.MutableBlockPos var17 = new BlockPos.MutableBlockPos();
+          Iterator var18 = BlockPos.betweenClosed(var12, var2.getMinBuildHeight(), var14, var13, var2.getMaxBuildHeight() - 1, var15).iterator();
+ 
+          while(var18.hasNext()) {
+@@ -346,15 +346,15 @@
+          }
+       };
+ 
+       public static final Direction[] DIRECTIONS = Direction.values();
+ 
+-      private BlockFixers(Block... var3) {
++      BlockFixers(Block... var3) {
+          this(false, var3);
+       }
+ 
+-      private BlockFixers(boolean var3, Block... var4) {
++      BlockFixers(boolean var3, Block... var4) {
+          Block[] var5 = var4;
+          int var6 = var4.length;
+ 
+          for(int var7 = 0; var7 < var6; ++var7) {
+             Block var8 = var5[var7];

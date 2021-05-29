@@ -1,0 +1,19 @@
+--- net/minecraft/world/level/dimension/DimensionType.java
++++ net/minecraft/world/level/dimension/DimensionType.java
+@@ -202,12 +202,15 @@
+    public static File getStorageFolder(ResourceKey<Level> var0, File var1) {
+       if (var0 == Level.OVERWORLD) {
+          return var1;
+       } else if (var0 == Level.END) {
+          return new File(var1, "DIM1");
++      } else if (var0 == Level.NETHER) {
++         return new File(var1, "DIM-1");
+       } else {
+-         return var0 == Level.NETHER ? new File(var1, "DIM-1") : new File(var1, "dimensions/" + var0.location().getNamespace() + "/" + var0.location().getPath());
++         String var10003 = var0.location().getNamespace();
++         return new File(var1, "dimensions/" + var10003 + "/" + var0.location().getPath());
+       }
+    }
+ 
+    public boolean hasSkyLight() {
+       return this.hasSkylight;

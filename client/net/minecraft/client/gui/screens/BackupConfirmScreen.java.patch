@@ -1,0 +1,25 @@
+--- net/minecraft/client/gui/screens/BackupConfirmScreen.java
++++ net/minecraft/client/gui/screens/BackupConfirmScreen.java
+@@ -1,8 +1,9 @@
+ package net.minecraft.client.gui.screens;
+ 
+ import com.mojang.blaze3d.vertex.PoseStack;
++import java.util.Objects;
+ import javax.annotation.Nullable;
+ import net.minecraft.client.gui.components.Button;
+ import net.minecraft.client.gui.components.Checkbox;
+ import net.minecraft.client.gui.components.MultiLineLabel;
+ import net.minecraft.network.chat.CommonComponents;
+@@ -30,11 +31,11 @@
+ 
+    protected void init() {
+       super.init();
+       this.message = MultiLineLabel.create(this.font, this.description, this.width - 50);
+       int var10000 = this.message.getLineCount() + 1;
+-      this.font.getClass();
++      Objects.requireNonNull(this.font);
+       int var1 = var10000 * 9;
+       this.addButton(new Button(this.width / 2 - 155, 100 + var1, 150, 20, new TranslatableComponent("selectWorld.backupJoinConfirmButton"), (var1x) -> {
+          this.listener.proceed(true, this.eraseCache.selected());
+       }));
+       this.addButton(new Button(this.width / 2 - 155 + 160, 100 + var1, 150, 20, new TranslatableComponent("selectWorld.backupJoinSkipButton"), (var1x) -> {

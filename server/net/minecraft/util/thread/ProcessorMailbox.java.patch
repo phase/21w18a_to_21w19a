@@ -1,0 +1,37 @@
+--- net/minecraft/util/thread/ProcessorMailbox.java
++++ net/minecraft/util/thread/ProcessorMailbox.java
+@@ -1,10 +1,11 @@
+ package net.minecraft.util.thread;
+ 
+ import com.google.common.collect.ImmutableList;
+ import it.unimi.dsi.fastutil.ints.Int2BooleanFunction;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.concurrent.ConcurrentLinkedQueue;
+ import java.util.concurrent.Executor;
+ import java.util.concurrent.RejectedExecutionException;
+ import java.util.concurrent.atomic.AtomicInteger;
+ import net.minecraft.Util;
+@@ -133,16 +134,20 @@
+    public int size() {
+       return this.queue.size();
+    }
+ 
+    public String toString() {
+-      return this.name + " " + this.status.get() + " " + this.queue.isEmpty();
++      String var10000 = this.name;
++      return var10000 + " " + this.status.get() + " " + this.queue.isEmpty();
+    }
+ 
+    public String name() {
+       return this.name;
+    }
+ 
+    public List<MeasuredMetric> metrics() {
+-      return ImmutableList.of(new MeasuredMetric(new Metric(this.name + "-queuesize"), this.queue::size, MeasurementCategory.MAIL_BOX));
++      Metric var10002 = new Metric(this.name + "-queuesize");
++      StrictQueue var10003 = this.queue;
++      Objects.requireNonNull(var10003);
++      return ImmutableList.of(new MeasuredMetric(var10002, var10003::size, MeasurementCategory.MAIL_BOX));
+    }
+ }

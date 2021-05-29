@@ -1,0 +1,16 @@
+--- net/minecraft/client/gui/font/TextFieldHelper.java
++++ net/minecraft/client/gui/font/TextFieldHelper.java
+@@ -210,11 +210,12 @@
+       if (this.selectionPos == this.cursorPos) {
+          return var1;
+       } else {
+          int var2 = Math.min(this.cursorPos, this.selectionPos);
+          int var3 = Math.max(this.cursorPos, this.selectionPos);
+-         String var4 = var1.substring(0, var2) + var1.substring(var3);
++         String var10000 = var1.substring(0, var2);
++         String var4 = var10000 + var1.substring(var3);
+          this.selectionPos = this.cursorPos = var2;
+          return var4;
+       }
+    }
+ 

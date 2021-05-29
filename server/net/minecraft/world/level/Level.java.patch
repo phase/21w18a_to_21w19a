@@ -1,0 +1,31 @@
+--- net/minecraft/world/level/Level.java
++++ net/minecraft/world/level/Level.java
+@@ -4,10 +4,11 @@
+ import com.mojang.serialization.Codec;
+ import java.io.IOException;
+ import java.util.ArrayList;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Random;
+ import java.util.function.Consumer;
+ import java.util.function.Predicate;
+ import java.util.function.Supplier;
+ import javax.annotation.Nullable;
+@@ -753,13 +754,15 @@
+    }
+ 
+    public CrashReportCategory fillReportDetails(CrashReport var1) {
+       CrashReportCategory var2 = var1.addCategory("Affected level", 1);
+       var2.setDetail("All players", () -> {
+-         return this.players().size() + " total; " + this.players();
++         int var10000 = this.players().size();
++         return var10000 + " total; " + this.players();
+       });
+       ChunkSource var10002 = this.getChunkSource();
++      Objects.requireNonNull(var10002);
+       var2.setDetail("Chunk stats", var10002::gatherStats);
+       var2.setDetail("Level dimension", () -> {
+          return this.dimension().location().toString();
+       });
+ 

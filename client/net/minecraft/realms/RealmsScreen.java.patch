@@ -1,0 +1,28 @@
+--- net/minecraft/realms/RealmsScreen.java
++++ net/minecraft/realms/RealmsScreen.java
+@@ -1,9 +1,10 @@
+ package net.minecraft.realms;
+ 
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ import net.minecraft.client.gui.chat.NarratorChatListener;
+ import net.minecraft.client.gui.components.AbstractWidget;
+ import net.minecraft.client.gui.components.TickableWidget;
+@@ -61,12 +62,12 @@
+ 
+    }
+ 
+    public void narrateLabels() {
+       Stream var10000 = this.children.stream();
+-      RealmsLabel.class.getClass();
++      Objects.requireNonNull(RealmsLabel.class);
+       var10000 = var10000.filter(RealmsLabel.class::isInstance);
+-      RealmsLabel.class.getClass();
++      Objects.requireNonNull(RealmsLabel.class);
+       List var1 = (List)var10000.map(RealmsLabel.class::cast).map(RealmsLabel::getText).collect(Collectors.toList());
+       NarrationHelper.now((Iterable)var1);
+    }
+ }

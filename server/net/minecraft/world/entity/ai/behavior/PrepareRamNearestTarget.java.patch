@@ -1,0 +1,40 @@
+--- net/minecraft/world/entity/ai/behavior/PrepareRamNearestTarget.java
++++ net/minecraft/world/entity/ai/behavior/PrepareRamNearestTarget.java
+@@ -3,10 +3,11 @@
+ import com.google.common.collect.ImmutableMap;
+ import com.google.common.collect.Lists;
+ import java.util.ArrayList;
+ import java.util.Comparator;
+ import java.util.Iterator;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.function.Function;
+ import java.util.function.ToIntFunction;
+ import java.util.stream.Stream;
+ import net.minecraft.core.BlockPos;
+@@ -136,11 +137,11 @@
+          }
+ 
+          PathNavigation var9 = var1.getNavigation();
+          Stream var10000 = var4.stream();
+          BlockPos var10001 = var1.blockPosition();
+-         var10001.getClass();
++         Objects.requireNonNull(var10001);
+          return var10000.sorted(Comparator.comparingDouble(var10001::distSqr)).filter((var1x) -> {
+             Path var2 = var9.createPath((BlockPos)var1x, 0);
+             return var2 != null && var2.canReach();
+          }).findFirst();
+       }
+@@ -158,11 +159,11 @@
+    }
+ 
+    public static class RamCandidate {
+       private final BlockPos startPosition;
+       private final BlockPos targetPosition;
+-      private final LivingEntity target;
++      final LivingEntity target;
+ 
+       public RamCandidate(BlockPos var1, BlockPos var2, LivingEntity var3) {
+          this.startPosition = var1;
+          this.targetPosition = var2;
+          this.target = var3;

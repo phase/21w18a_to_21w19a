@@ -1,0 +1,45 @@
+--- com/mojang/realmsclient/gui/screens/RealmsSlotOptionsScreen.java
++++ com/mojang/realmsclient/gui/screens/RealmsSlotOptionsScreen.java
+@@ -24,11 +24,11 @@
+    private static final int DEFAULT_DIFFICULTY = 2;
+    public static final List<Difficulty> DIFFICULTIES;
+    private static final int DEFAULT_GAME_MODE = 0;
+    public static final List<GameType> GAME_MODES;
+    private static final Component NAME_LABEL;
+-   private static final Component SPAWN_PROTECTION_TEXT;
++   static final Component SPAWN_PROTECTION_TEXT;
+    private EditBox nameEdit;
+    protected final RealmsConfigureWorldScreen parent;
+    private int column1X;
+    private int columnWidth;
+    private final RealmsWorldOptions options;
+@@ -38,14 +38,14 @@
+    private GameType gameMode;
+    private boolean pvp;
+    private boolean spawnNPCs;
+    private boolean spawnAnimals;
+    private boolean spawnMonsters;
+-   private int spawnProtection;
++   int spawnProtection;
+    private boolean commandBlocks;
+    private boolean forceGameMode;
+-   private RealmsSlotOptionsScreen.SettingsSlider spawnProtectionButton;
++   RealmsSlotOptionsScreen.SettingsSlider spawnProtectionButton;
+    private RealmsLabel titleLabel;
+    private RealmsLabel warningLabel;
+ 
+    public RealmsSlotOptionsScreen(RealmsConfigureWorldScreen var1, RealmsWorldOptions var2, RealmsServer.WorldType var3, int var4) {
+       this.parent = var1;
+@@ -215,11 +215,11 @@
+       GAME_MODES = ImmutableList.of(GameType.SURVIVAL, GameType.CREATIVE, GameType.ADVENTURE);
+       NAME_LABEL = new TranslatableComponent("mco.configure.world.edit.slot.name");
+       SPAWN_PROTECTION_TEXT = new TranslatableComponent("mco.configure.world.spawnProtection");
+    }
+ 
+-   class SettingsSlider extends AbstractSliderButton {
++   private class SettingsSlider extends AbstractSliderButton {
+       private final double minValue;
+       private final double maxValue;
+ 
+       public SettingsSlider(int var2, int var3, int var4, int var5, float var6, float var7) {
+          super(var2, var3, var4, 20, TextComponent.EMPTY, 0.0D);

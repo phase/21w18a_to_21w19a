@@ -1,0 +1,15 @@
+--- net/minecraft/advancements/critereon/InventoryChangeTrigger.java
++++ net/minecraft/advancements/critereon/InventoryChangeTrigger.java
+@@ -11,11 +11,11 @@
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.alchemy.Potion;
+ import net.minecraft.world.level.ItemLike;
+ 
+ public class InventoryChangeTrigger extends SimpleCriterionTrigger<InventoryChangeTrigger.TriggerInstance> {
+-   private static final ResourceLocation ID = new ResourceLocation("inventory_changed");
++   static final ResourceLocation ID = new ResourceLocation("inventory_changed");
+ 
+    public InventoryChangeTrigger() {
+    }
+ 
+    public ResourceLocation getId() {

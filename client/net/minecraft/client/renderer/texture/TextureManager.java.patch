@@ -1,0 +1,50 @@
+--- net/minecraft/client/renderer/texture/TextureManager.java
++++ net/minecraft/client/renderer/texture/TextureManager.java
+@@ -6,10 +6,11 @@
+ import com.mojang.blaze3d.systems.RenderSystem;
+ import com.mojang.realmsclient.RealmsMainScreen;
+ import java.io.IOException;
+ import java.util.Iterator;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.Map.Entry;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.concurrent.Executor;
+ import net.minecraft.CrashReport;
+@@ -147,10 +148,11 @@
+       }
+    }
+ 
+    private static void execute(Runnable var0) {
+       Minecraft.getInstance().execute(() -> {
++         Objects.requireNonNull(var0);
+          RenderSystem.recordRenderCall(var0::run);
+       });
+    }
+ 
+    public void tick() {
+@@ -178,11 +180,11 @@
+       this.prefixRegister.clear();
+    }
+ 
+    public CompletableFuture<Void> reload(PreparableReloadListener.PreparationBarrier var1, ResourceManager var2, ProfilerFiller var3, ProfilerFiller var4, Executor var5, Executor var6) {
+       CompletableFuture var10000 = CompletableFuture.allOf(TitleScreen.preloadResources(this, var5), this.preload(AbstractWidget.WIDGETS_LOCATION, var5));
+-      var1.getClass();
++      Objects.requireNonNull(var1);
+       return var10000.thenCompose(var1::wait).thenAcceptAsync((var3x) -> {
+          MissingTextureAtlasSprite.getTexture();
+          RealmsMainScreen.updateTeaserImages(this.resourceManager);
+          Iterator var4 = this.byPath.entrySet().iterator();
+ 
+@@ -199,9 +201,10 @@
+             }
+ 
+             return;
+          }
+       }, (var0) -> {
++         Objects.requireNonNull(var0);
+          RenderSystem.recordRenderCall(var0::run);
+       });
+    }
+ }

@@ -1,0 +1,122 @@
+--- net/minecraft/world/entity/monster/Silverfish.java
++++ net/minecraft/world/entity/monster/Silverfish.java
+@@ -117,10 +117,61 @@
+ 
+    public MobType getMobType() {
+       return MobType.ARTHROPOD;
+    }
+ 
++   static class SilverfishWakeUpFriendsGoal extends Goal {
++      private final Silverfish silverfish;
++      private int lookForFriends;
++
++      public SilverfishWakeUpFriendsGoal(Silverfish var1) {
++         this.silverfish = var1;
++      }
++
++      public void notifyHurt() {
++         if (this.lookForFriends == 0) {
++            this.lookForFriends = 20;
++         }
++
++      }
++
++      public boolean canUse() {
++         return this.lookForFriends > 0;
++      }
++
++      public void tick() {
++         --this.lookForFriends;
++         if (this.lookForFriends <= 0) {
++            Level var1 = this.silverfish.level;
++            Random var2 = this.silverfish.getRandom();
++            BlockPos var3 = this.silverfish.blockPosition();
++
++            for(int var4 = 0; var4 <= 5 && var4 >= -5; var4 = (var4 <= 0 ? 1 : 0) - var4) {
++               for(int var5 = 0; var5 <= 10 && var5 >= -10; var5 = (var5 <= 0 ? 1 : 0) - var5) {
++                  for(int var6 = 0; var6 <= 10 && var6 >= -10; var6 = (var6 <= 0 ? 1 : 0) - var6) {
++                     BlockPos var7 = var3.offset(var5, var4, var6);
++                     BlockState var8 = var1.getBlockState(var7);
++                     Block var9 = var8.getBlock();
++                     if (var9 instanceof InfestedBlock) {
++                        if (var1.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
++                           var1.destroyBlock(var7, true, this.silverfish);
++                        } else {
++                           var1.setBlock(var7, ((InfestedBlock)var9).hostStateByInfested(var1.getBlockState(var7)), 3);
++                        }
++
++                        if (var2.nextBoolean()) {
++                           return;
++                        }
++                     }
++                  }
++               }
++            }
++         }
++
++      }
++   }
++
+    static class SilverfishMergeWithStoneGoal extends RandomStrollGoal {
+       private Direction selectedDirection;
+       private boolean doMerge;
+ 
+       public SilverfishMergeWithStoneGoal(Silverfish var1) {
+@@ -168,57 +219,6 @@
+             }
+ 
+          }
+       }
+    }
+-
+-   static class SilverfishWakeUpFriendsGoal extends Goal {
+-      private final Silverfish silverfish;
+-      private int lookForFriends;
+-
+-      public SilverfishWakeUpFriendsGoal(Silverfish var1) {
+-         this.silverfish = var1;
+-      }
+-
+-      public void notifyHurt() {
+-         if (this.lookForFriends == 0) {
+-            this.lookForFriends = 20;
+-         }
+-
+-      }
+-
+-      public boolean canUse() {
+-         return this.lookForFriends > 0;
+-      }
+-
+-      public void tick() {
+-         --this.lookForFriends;
+-         if (this.lookForFriends <= 0) {
+-            Level var1 = this.silverfish.level;
+-            Random var2 = this.silverfish.getRandom();
+-            BlockPos var3 = this.silverfish.blockPosition();
+-
+-            for(int var4 = 0; var4 <= 5 && var4 >= -5; var4 = (var4 <= 0 ? 1 : 0) - var4) {
+-               for(int var5 = 0; var5 <= 10 && var5 >= -10; var5 = (var5 <= 0 ? 1 : 0) - var5) {
+-                  for(int var6 = 0; var6 <= 10 && var6 >= -10; var6 = (var6 <= 0 ? 1 : 0) - var6) {
+-                     BlockPos var7 = var3.offset(var5, var4, var6);
+-                     BlockState var8 = var1.getBlockState(var7);
+-                     Block var9 = var8.getBlock();
+-                     if (var9 instanceof InfestedBlock) {
+-                        if (var1.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+-                           var1.destroyBlock(var7, true, this.silverfish);
+-                        } else {
+-                           var1.setBlock(var7, ((InfestedBlock)var9).hostStateByInfested(var1.getBlockState(var7)), 3);
+-                        }
+-
+-                        if (var2.nextBoolean()) {
+-                           return;
+-                        }
+-                     }
+-                  }
+-               }
+-            }
+-         }
+-
+-      }
+-   }
+ }

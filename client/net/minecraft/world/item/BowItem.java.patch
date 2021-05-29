@@ -1,0 +1,15 @@
+--- net/minecraft/world/item/BowItem.java
++++ net/minecraft/world/item/BowItem.java
+@@ -34,11 +34,11 @@
+             int var8 = this.getUseDuration(var1) - var4;
+             float var9 = getPowerForTime(var8);
+             if ((double)var9 >= 0.1D) {
+                boolean var10 = var6 && var7.is(Items.ARROW);
+                if (!var2.isClientSide) {
+-                  ArrowItem var11 = (ArrowItem)((ArrowItem)(var7.getItem() instanceof ArrowItem ? var7.getItem() : Items.ARROW));
++                  ArrowItem var11 = (ArrowItem)(var7.getItem() instanceof ArrowItem ? var7.getItem() : Items.ARROW);
+                   AbstractArrow var12 = var11.createArrow(var2, var7, var5);
+                   var12.shootFromRotation(var5, var5.getXRot(), var5.getYRot(), 0.0F, var9 * 3.0F, 1.0F);
+                   if (var9 == 1.0F) {
+                      var12.setCritArrow(true);
+                   }

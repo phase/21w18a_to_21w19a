@@ -1,0 +1,13 @@
+--- net/minecraft/server/commands/DataPackCommand.java
++++ net/minecraft/server/commands/DataPackCommand.java
+@@ -151,9 +151,9 @@
+             return var5;
+          }
+       }
+    }
+ 
+-   interface Inserter {
++   private interface Inserter {
+       void apply(List<Pack> var1, Pack var2) throws CommandSyntaxException;
+    }
+ }

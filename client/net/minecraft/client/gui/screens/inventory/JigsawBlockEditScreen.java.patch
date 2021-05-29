@@ -1,0 +1,15 @@
+--- net/minecraft/client/gui/screens/inventory/JigsawBlockEditScreen.java
++++ net/minecraft/client/gui/screens/inventory/JigsawBlockEditScreen.java
+@@ -31,11 +31,11 @@
+    private final JigsawBlockEntity jigsawEntity;
+    private EditBox nameEdit;
+    private EditBox targetEdit;
+    private EditBox poolEdit;
+    private EditBox finalStateEdit;
+-   private int levels;
++   int levels;
+    private boolean keepJigsaws = true;
+    private CycleButton<JigsawBlockEntity.JointType> jointButton;
+    private Button doneButton;
+    private JigsawBlockEntity.JointType joint;
+ 

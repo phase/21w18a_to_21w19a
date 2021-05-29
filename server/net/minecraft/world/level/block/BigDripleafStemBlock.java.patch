@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/block/BigDripleafStemBlock.java
++++ net/minecraft/world/level/block/BigDripleafStemBlock.java
+@@ -63,11 +63,11 @@
+       return (var5.is(this) || var5.isFaceSturdy(var2, var4, Direction.UP)) && (var6.is(this) || var6.is(Blocks.BIG_DRIPLEAF));
+    }
+ 
+    protected static boolean place(LevelAccessor var0, BlockPos var1, FluidState var2, Direction var3) {
+       BlockState var4 = (BlockState)((BlockState)Blocks.BIG_DRIPLEAF_STEM.defaultBlockState().setValue(WATERLOGGED, var2.isSourceOfType(Fluids.WATER))).setValue(FACING, var3);
+-      return var0.setBlock(var1, var4, 2);
++      return var0.setBlock(var1, var4, 3);
+    }
+ 
+    public BlockState updateShape(BlockState var1, Direction var2, BlockState var3, LevelAccessor var4, BlockPos var5, BlockPos var6) {
+       if ((var2 == Direction.DOWN || var2 == Direction.UP) && !var1.canSurvive(var4, var5)) {
+          var4.getBlockTicks().scheduleTick(var5, this, 1);

@@ -1,0 +1,15 @@
+--- net/minecraft/util/thread/BlockableEventLoop.java
++++ net/minecraft/util/thread/BlockableEventLoop.java
+@@ -101,11 +101,11 @@
+       while(this.pollTask()) {
+       }
+ 
+    }
+ 
+-   protected boolean pollTask() {
++   public boolean pollTask() {
+       Runnable var1 = (Runnable)this.pendingRunnables.peek();
+       if (var1 == null) {
+          return false;
+       } else if (this.blockingCount == 0 && !this.shouldRun(var1)) {
+          return false;

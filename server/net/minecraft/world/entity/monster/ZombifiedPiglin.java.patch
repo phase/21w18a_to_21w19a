@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/monster/ZombifiedPiglin.java
++++ net/minecraft/world/entity/monster/ZombifiedPiglin.java
+@@ -115,11 +115,11 @@
+ 
+    private void maybeAlertOthers() {
+       if (this.ticksUntilNextAlert > 0) {
+          --this.ticksUntilNextAlert;
+       } else {
+-         if (this.getSensing().canSee(this.getTarget())) {
++         if (this.getSensing().hasLineOfSight(this.getTarget())) {
+             this.alertOthers();
+          }
+ 
+          this.ticksUntilNextAlert = ALERT_INTERVAL.sample(this.random);
+       }

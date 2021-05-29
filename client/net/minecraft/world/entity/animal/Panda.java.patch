@@ -1,0 +1,620 @@
+--- net/minecraft/world/entity/animal/Panda.java
++++ net/minecraft/world/entity/animal/Panda.java
+@@ -3,10 +3,11 @@
+ import java.util.Arrays;
+ import java.util.Comparator;
+ import java.util.EnumSet;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Random;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.particles.ItemParticleOption;
+@@ -67,30 +68,30 @@
+    private static final EntityDataAccessor<Integer> SNEEZE_COUNTER;
+    private static final EntityDataAccessor<Integer> EAT_COUNTER;
+    private static final EntityDataAccessor<Byte> MAIN_GENE_ID;
+    private static final EntityDataAccessor<Byte> HIDDEN_GENE_ID;
+    private static final EntityDataAccessor<Byte> DATA_ID_FLAGS;
+-   private static final TargetingConditions BREED_TARGETING;
++   static final TargetingConditions BREED_TARGETING;
+    private static final int FLAG_SNEEZE = 2;
+    private static final int FLAG_ROLL = 4;
+    private static final int FLAG_SIT = 8;
+    private static final int FLAG_ON_BACK = 16;
+    private static final int EAT_TICK_INTERVAL = 5;
+    public static final int TOTAL_ROLL_STEPS = 32;
+    private static final int TOTAL_UNHAPPY_TIME = 32;
+-   private boolean gotBamboo;
+-   private boolean didBite;
++   boolean gotBamboo;
++   boolean didBite;
+    public int rollCounter;
+    private Vec3 rollDelta;
+    private float sitAmount;
+    private float sitAmountO;
+    private float onBackAmount;
+    private float onBackAmountO;
+    private float rollAmount;
+    private float rollAmountO;
+-   private Panda.PandaLookAtPlayerGoal lookAtPlayerGoal;
+-   private static final Predicate<ItemEntity> PANDA_ITEMS;
++   Panda.PandaLookAtPlayerGoal lookAtPlayerGoal;
++   static final Predicate<ItemEntity> PANDA_ITEMS;
+ 
+    public Panda(EntityType<? extends Panda> var1, Level var2) {
+       super(var1, var2);
+       this.moveControl = new Panda.PandaMoveControl(this);
+       if (!this.isBaby()) {
+@@ -569,11 +570,11 @@
+          this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.07000000029802322D);
+       }
+ 
+    }
+ 
+-   private void tryToSit() {
++   void tryToSit() {
+       if (!this.isInWater()) {
+          this.setZza(0.0F);
+          this.getNavigation().stop();
+          this.sit(true);
+       }
+@@ -662,17 +663,115 @@
+       SNEEZE_COUNTER = SynchedEntityData.defineId(Panda.class, EntityDataSerializers.INT);
+       EAT_COUNTER = SynchedEntityData.defineId(Panda.class, EntityDataSerializers.INT);
+       MAIN_GENE_ID = SynchedEntityData.defineId(Panda.class, EntityDataSerializers.BYTE);
+       HIDDEN_GENE_ID = SynchedEntityData.defineId(Panda.class, EntityDataSerializers.BYTE);
+       DATA_ID_FLAGS = SynchedEntityData.defineId(Panda.class, EntityDataSerializers.BYTE);
+-      BREED_TARGETING = (new TargetingConditions()).range(8.0D).allowSameTeam().allowInvulnerable();
++      BREED_TARGETING = TargetingConditions.forNonCombat().range(8.0D);
+       PANDA_ITEMS = (var0) -> {
+          ItemStack var1 = var0.getItem();
+          return (var1.is(Blocks.BAMBOO.asItem()) || var1.is(Blocks.CAKE.asItem())) && var0.isAlive() && !var0.hasPickUpDelay();
+       };
+    }
+ 
++   static class PandaMoveControl extends MoveControl {
++      private final Panda panda;
++
++      public PandaMoveControl(Panda var1) {
++         super(var1);
++         this.panda = var1;
++      }
++
++      public void tick() {
++         if (this.panda.canPerformAction()) {
++            super.tick();
++         }
++      }
++   }
++
++   public static enum Gene {
++      NORMAL(0, "normal", false),
++      LAZY(1, "lazy", false),
++      WORRIED(2, "worried", false),
++      PLAYFUL(3, "playful", false),
++      BROWN(4, "brown", true),
++      WEAK(5, "weak", true),
++      AGGRESSIVE(6, "aggressive", false);
++
++      private static final Panda.Gene[] BY_ID = (Panda.Gene[])Arrays.stream(values()).sorted(Comparator.comparingInt(Panda.Gene::getId)).toArray((var0) -> {
++         return new Panda.Gene[var0];
++      });
++      private static final int MAX_GENE = 6;
++      private final int id;
++      private final String name;
++      private final boolean isRecessive;
++
++      private Gene(int var3, String var4, boolean var5) {
++         this.id = var3;
++         this.name = var4;
++         this.isRecessive = var5;
++      }
++
++      public int getId() {
++         return this.id;
++      }
++
++      public String getName() {
++         return this.name;
++      }
++
++      public boolean isRecessive() {
++         return this.isRecessive;
++      }
++
++      static Panda.Gene getVariantFromGenes(Panda.Gene var0, Panda.Gene var1) {
++         if (var0.isRecessive()) {
++            return var0 == var1 ? var0 : NORMAL;
++         } else {
++            return var0;
++         }
++      }
++
++      public static Panda.Gene byId(int var0) {
++         if (var0 < 0 || var0 >= BY_ID.length) {
++            var0 = 0;
++         }
++
++         return BY_ID[var0];
++      }
++
++      public static Panda.Gene byName(String var0) {
++         Panda.Gene[] var1 = values();
++         int var2 = var1.length;
++
++         for(int var3 = 0; var3 < var2; ++var3) {
++            Panda.Gene var4 = var1[var3];
++            if (var4.name.equals(var0)) {
++               return var4;
++            }
++         }
++
++         return NORMAL;
++      }
++
++      public static Panda.Gene getRandom(Random var0) {
++         int var1 = var0.nextInt(16);
++         if (var1 == 0) {
++            return LAZY;
++         } else if (var1 == 1) {
++            return WORRIED;
++         } else if (var1 == 2) {
++            return PLAYFUL;
++         } else if (var1 == 4) {
++            return AGGRESSIVE;
++         } else if (var1 < 9) {
++            return WEAK;
++         } else {
++            return var1 < 11 ? BROWN : NORMAL;
++         }
++      }
++   }
++
+    static class PandaPanicGoal extends PanicGoal {
+       private final Panda panda;
+ 
+       public PandaPanicGoal(Panda var1, double var2) {
+          super(var1, var2);
+@@ -703,67 +802,90 @@
+             return super.canContinueToUse();
+          }
+       }
+    }
+ 
+-   static class PandaHurtByTargetGoal extends HurtByTargetGoal {
++   private class PandaBreedGoal extends BreedGoal {
+       private final Panda panda;
++      private int unhappyCooldown;
+ 
+-      public PandaHurtByTargetGoal(Panda var1, Class<?>... var2) {
+-         super(var1, var2);
+-         this.panda = var1;
++      public PandaBreedGoal(Panda var2, double var3) {
++         super(var2, var3);
++         this.panda = var2;
+       }
+ 
+-      public boolean canContinueToUse() {
+-         if (!this.panda.gotBamboo && !this.panda.didBite) {
+-            return super.canContinueToUse();
++      public boolean canUse() {
++         if (super.canUse() && this.panda.getUnhappyCounter() == 0) {
++            if (!this.canFindBamboo()) {
++               if (this.unhappyCooldown <= this.panda.tickCount) {
++                  this.panda.setUnhappyCounter(32);
++                  this.unhappyCooldown = this.panda.tickCount + 600;
++                  if (this.panda.isEffectiveAi()) {
++                     Player var1 = this.level.getNearestPlayer(Panda.BREED_TARGETING, this.panda);
++                     this.panda.lookAtPlayerGoal.setTarget(var1);
++                  }
++               }
++
++               return false;
++            } else {
++               return true;
++            }
+          } else {
+-            this.panda.setTarget((LivingEntity)null);
+             return false;
+          }
+       }
+ 
+-      protected void alertOther(Mob var1, LivingEntity var2) {
+-         if (var1 instanceof Panda && ((Panda)var1).isAggressive()) {
+-            var1.setTarget(var2);
++      private boolean canFindBamboo() {
++         BlockPos var1 = this.panda.blockPosition();
++         BlockPos.MutableBlockPos var2 = new BlockPos.MutableBlockPos();
++
++         for(int var3 = 0; var3 < 3; ++var3) {
++            for(int var4 = 0; var4 < 8; ++var4) {
++               for(int var5 = 0; var5 <= var4; var5 = var5 > 0 ? -var5 : 1 - var5) {
++                  for(int var6 = var5 < var4 && var5 > -var4 ? var4 : 0; var6 <= var4; var6 = var6 > 0 ? -var6 : 1 - var6) {
++                     var2.setWithOffset(var1, var5, var3, var6);
++                     if (this.level.getBlockState(var2).is(Blocks.BAMBOO)) {
++                        return true;
++                     }
++                  }
++               }
++            }
+          }
+ 
++         return false;
+       }
+    }
+ 
+-   static class PandaLieOnBackGoal extends Goal {
++   private static class PandaAttackGoal extends MeleeAttackGoal {
+       private final Panda panda;
+-      private int cooldown;
+ 
+-      public PandaLieOnBackGoal(Panda var1) {
++      public PandaAttackGoal(Panda var1, double var2, boolean var4) {
++         super(var1, var2, var4);
+          this.panda = var1;
+       }
+ 
+       public boolean canUse() {
+-         return this.cooldown < this.panda.tickCount && this.panda.isLazy() && this.panda.canPerformAction() && this.panda.random.nextInt(400) == 1;
++         return this.panda.canPerformAction() && super.canUse();
+       }
++   }
+ 
+-      public boolean canContinueToUse() {
+-         if (!this.panda.isInWater() && (this.panda.isLazy() || this.panda.random.nextInt(600) != 1)) {
+-            return this.panda.random.nextInt(2000) != 1;
+-         } else {
+-            return false;
+-         }
+-      }
++   private static class PandaAvoidGoal<T extends LivingEntity> extends AvoidEntityGoal<T> {
++      private final Panda panda;
+ 
+-      public void start() {
+-         this.panda.setOnBack(true);
+-         this.cooldown = 0;
++      public PandaAvoidGoal(Panda var1, Class<T> var2, float var3, double var4, double var6) {
++         Predicate var10006 = EntitySelector.NO_SPECTATORS;
++         Objects.requireNonNull(var10006);
++         super(var1, var2, var3, var4, var6, var10006::test);
++         this.panda = var1;
+       }
+ 
+-      public void stop() {
+-         this.panda.setOnBack(false);
+-         this.cooldown = this.panda.tickCount + 200;
++      public boolean canUse() {
++         return this.panda.isWorried() && this.panda.canPerformAction() && super.canUse();
+       }
+    }
+ 
+-   class PandaSitGoal extends Goal {
++   private class PandaSitGoal extends Goal {
+       private int cooldown;
+ 
+       public PandaSitGoal() {
+          this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+       }
+@@ -814,72 +936,38 @@
+ 
+          Panda.this.sit(false);
+       }
+    }
+ 
+-   static class PandaAvoidGoal<T extends LivingEntity> extends AvoidEntityGoal<T> {
++   static class PandaLieOnBackGoal extends Goal {
+       private final Panda panda;
++      private int cooldown;
+ 
+-      public PandaAvoidGoal(Panda var1, Class<T> var2, float var3, double var4, double var6) {
+-         Predicate var10006 = EntitySelector.NO_SPECTATORS;
+-         super(var1, var2, var3, var4, var6, var10006::test);
++      public PandaLieOnBackGoal(Panda var1) {
+          this.panda = var1;
+       }
+ 
+       public boolean canUse() {
+-         return this.panda.isWorried() && this.panda.canPerformAction() && super.canUse();
++         return this.cooldown < this.panda.tickCount && this.panda.isLazy() && this.panda.canPerformAction() && this.panda.random.nextInt(400) == 1;
+       }
+-   }
+ 
+-   class PandaBreedGoal extends BreedGoal {
+-      private final Panda panda;
+-      private int unhappyCooldown;
+-
+-      public PandaBreedGoal(Panda var2, double var3) {
+-         super(var2, var3);
+-         this.panda = var2;
+-      }
+-
+-      public boolean canUse() {
+-         if (super.canUse() && this.panda.getUnhappyCounter() == 0) {
+-            if (!this.canFindBamboo()) {
+-               if (this.unhappyCooldown <= this.panda.tickCount) {
+-                  this.panda.setUnhappyCounter(32);
+-                  this.unhappyCooldown = this.panda.tickCount + 600;
+-                  if (this.panda.isEffectiveAi()) {
+-                     Player var1 = this.level.getNearestPlayer(Panda.BREED_TARGETING, this.panda);
+-                     this.panda.lookAtPlayerGoal.setTarget(var1);
+-                  }
+-               }
+-
+-               return false;
+-            } else {
+-               return true;
+-            }
++      public boolean canContinueToUse() {
++         if (!this.panda.isInWater() && (this.panda.isLazy() || this.panda.random.nextInt(600) != 1)) {
++            return this.panda.random.nextInt(2000) != 1;
+          } else {
+             return false;
+          }
+       }
+ 
+-      private boolean canFindBamboo() {
+-         BlockPos var1 = this.panda.blockPosition();
+-         BlockPos.MutableBlockPos var2 = new BlockPos.MutableBlockPos();
++      public void start() {
++         this.panda.setOnBack(true);
++         this.cooldown = 0;
++      }
+ 
+-         for(int var3 = 0; var3 < 3; ++var3) {
+-            for(int var4 = 0; var4 < 8; ++var4) {
+-               for(int var5 = 0; var5 <= var4; var5 = var5 > 0 ? -var5 : 1 - var5) {
+-                  for(int var6 = var5 < var4 && var5 > -var4 ? var4 : 0; var6 <= var4; var6 = var6 > 0 ? -var6 : 1 - var6) {
+-                     var2.setWithOffset(var1, var5, var3, var6);
+-                     if (this.level.getBlockState(var2).is(Blocks.BAMBOO)) {
+-                        return true;
+-                     }
+-                  }
+-               }
+-            }
+-         }
+-
+-         return false;
++      public void stop() {
++         this.panda.setOnBack(false);
++         this.cooldown = this.panda.tickCount + 200;
+       }
+    }
+ 
+    static class PandaSneezeGoal extends Goal {
+       private final Panda panda;
+@@ -907,65 +995,13 @@
+       public void start() {
+          this.panda.sneeze(true);
+       }
+    }
+ 
+-   static class PandaRollGoal extends Goal {
++   private static class PandaLookAtPlayerGoal extends LookAtPlayerGoal {
+       private final Panda panda;
+ 
+-      public PandaRollGoal(Panda var1) {
+-         this.panda = var1;
+-         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
+-      }
+-
+-      public boolean canUse() {
+-         if ((this.panda.isBaby() || this.panda.isPlayful()) && this.panda.onGround) {
+-            if (!this.panda.canPerformAction()) {
+-               return false;
+-            } else {
+-               float var1 = this.panda.getYRot() * 0.017453292F;
+-               int var2 = 0;
+-               int var3 = 0;
+-               float var4 = -Mth.sin(var1);
+-               float var5 = Mth.cos(var1);
+-               if ((double)Math.abs(var4) > 0.5D) {
+-                  var2 = (int)((float)var2 + var4 / Math.abs(var4));
+-               }
+-
+-               if ((double)Math.abs(var5) > 0.5D) {
+-                  var3 = (int)((float)var3 + var5 / Math.abs(var5));
+-               }
+-
+-               if (this.panda.level.getBlockState(this.panda.blockPosition().offset(var2, -1, var3)).isAir()) {
+-                  return true;
+-               } else if (this.panda.isPlayful() && this.panda.random.nextInt(60) == 1) {
+-                  return true;
+-               } else {
+-                  return this.panda.random.nextInt(500) == 1;
+-               }
+-            }
+-         } else {
+-            return false;
+-         }
+-      }
+-
+-      public boolean canContinueToUse() {
+-         return false;
+-      }
+-
+-      public void start() {
+-         this.panda.roll(true);
+-      }
+-
+-      public boolean isInterruptable() {
+-         return false;
+-      }
+-   }
+-
+-   static class PandaLookAtPlayerGoal extends LookAtPlayerGoal {
+-      private final Panda panda;
+-
+       public PandaLookAtPlayerGoal(Panda var1, Class<? extends LivingEntity> var2, float var3) {
+          super(var1, var2, var3);
+          this.panda = var1;
+       }
+ 
+@@ -1001,116 +1037,82 @@
+          }
+ 
+       }
+    }
+ 
+-   static class PandaAttackGoal extends MeleeAttackGoal {
++   static class PandaRollGoal extends Goal {
+       private final Panda panda;
+ 
+-      public PandaAttackGoal(Panda var1, double var2, boolean var4) {
+-         super(var1, var2, var4);
++      public PandaRollGoal(Panda var1) {
+          this.panda = var1;
++         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK, Goal.Flag.JUMP));
+       }
+ 
+       public boolean canUse() {
+-         return this.panda.canPerformAction() && super.canUse();
+-      }
+-   }
++         if ((this.panda.isBaby() || this.panda.isPlayful()) && this.panda.onGround) {
++            if (!this.panda.canPerformAction()) {
++               return false;
++            } else {
++               float var1 = this.panda.getYRot() * 0.017453292F;
++               int var2 = 0;
++               int var3 = 0;
++               float var4 = -Mth.sin(var1);
++               float var5 = Mth.cos(var1);
++               if ((double)Math.abs(var4) > 0.5D) {
++                  var2 = (int)((float)var2 + var4 / Math.abs(var4));
++               }
+ 
+-   static class PandaMoveControl extends MoveControl {
+-      private final Panda panda;
++               if ((double)Math.abs(var5) > 0.5D) {
++                  var3 = (int)((float)var3 + var5 / Math.abs(var5));
++               }
+ 
+-      public PandaMoveControl(Panda var1) {
+-         super(var1);
+-         this.panda = var1;
+-      }
+-
+-      public void tick() {
+-         if (this.panda.canPerformAction()) {
+-            super.tick();
++               if (this.panda.level.getBlockState(this.panda.blockPosition().offset(var2, -1, var3)).isAir()) {
++                  return true;
++               } else if (this.panda.isPlayful() && this.panda.random.nextInt(60) == 1) {
++                  return true;
++               } else {
++                  return this.panda.random.nextInt(500) == 1;
++               }
++            }
++         } else {
++            return false;
+          }
+       }
+-   }
+ 
+-   public static enum Gene {
+-      NORMAL(0, "normal", false),
+-      LAZY(1, "lazy", false),
+-      WORRIED(2, "worried", false),
+-      PLAYFUL(3, "playful", false),
+-      BROWN(4, "brown", true),
+-      WEAK(5, "weak", true),
+-      AGGRESSIVE(6, "aggressive", false);
+-
+-      private static final Panda.Gene[] BY_ID = (Panda.Gene[])Arrays.stream(values()).sorted(Comparator.comparingInt(Panda.Gene::getId)).toArray((var0) -> {
+-         return new Panda.Gene[var0];
+-      });
+-      private static final int MAX_GENE = 6;
+-      private final int id;
+-      private final String name;
+-      private final boolean isRecessive;
+-
+-      private Gene(int var3, String var4, boolean var5) {
+-         this.id = var3;
+-         this.name = var4;
+-         this.isRecessive = var5;
++      public boolean canContinueToUse() {
++         return false;
+       }
+ 
+-      public int getId() {
+-         return this.id;
++      public void start() {
++         this.panda.roll(true);
+       }
+ 
+-      public String getName() {
+-         return this.name;
++      public boolean isInterruptable() {
++         return false;
+       }
++   }
+ 
+-      public boolean isRecessive() {
+-         return this.isRecessive;
++   private static class PandaHurtByTargetGoal extends HurtByTargetGoal {
++      private final Panda panda;
++
++      public PandaHurtByTargetGoal(Panda var1, Class<?>... var2) {
++         super(var1, var2);
++         this.panda = var1;
+       }
+ 
+-      private static Panda.Gene getVariantFromGenes(Panda.Gene var0, Panda.Gene var1) {
+-         if (var0.isRecessive()) {
+-            return var0 == var1 ? var0 : NORMAL;
++      public boolean canContinueToUse() {
++         if (!this.panda.gotBamboo && !this.panda.didBite) {
++            return super.canContinueToUse();
+          } else {
+-            return var0;
++            this.panda.setTarget((LivingEntity)null);
++            return false;
+          }
+       }
+ 
+-      public static Panda.Gene byId(int var0) {
+-         if (var0 < 0 || var0 >= BY_ID.length) {
+-            var0 = 0;
++      protected void alertOther(Mob var1, LivingEntity var2) {
++         if (var1 instanceof Panda && ((Panda)var1).isAggressive()) {
++            var1.setTarget(var2);
+          }
+ 
+-         return BY_ID[var0];
+       }
+-
+-      public static Panda.Gene byName(String var0) {
+-         Panda.Gene[] var1 = values();
+-         int var2 = var1.length;
+-
+-         for(int var3 = 0; var3 < var2; ++var3) {
+-            Panda.Gene var4 = var1[var3];
+-            if (var4.name.equals(var0)) {
+-               return var4;
+-            }
+-         }
+-
+-         return NORMAL;
+-      }
+-
+-      public static Panda.Gene getRandom(Random var0) {
+-         int var1 = var0.nextInt(16);
+-         if (var1 == 0) {
+-            return LAZY;
+-         } else if (var1 == 1) {
+-            return WORRIED;
+-         } else if (var1 == 2) {
+-            return PLAYFUL;
+-         } else if (var1 == 4) {
+-            return AGGRESSIVE;
+-         } else if (var1 < 9) {
+-            return WEAK;
+-         } else {
+-            return var1 < 11 ? BROWN : NORMAL;
+-         }
+-      }
+    }
+ }

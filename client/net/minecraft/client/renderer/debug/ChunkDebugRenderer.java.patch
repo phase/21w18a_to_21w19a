@@ -1,0 +1,49 @@
+--- net/minecraft/client/renderer/debug/ChunkDebugRenderer.java
++++ net/minecraft/client/renderer/debug/ChunkDebugRenderer.java
+@@ -21,11 +21,11 @@
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.world.level.ChunkPos;
+ import net.minecraft.world.level.chunk.LevelChunk;
+ 
+ public class ChunkDebugRenderer implements DebugRenderer.SimpleDebugRenderer {
+-   private final Minecraft minecraft;
++   final Minecraft minecraft;
+    private double lastUpdateTime = Double.MIN_VALUE;
+    private final int radius = 12;
+    @Nullable
+    private ChunkDebugRenderer.ChunkData data;
+ 
+@@ -80,15 +80,15 @@
+          RenderSystem.disableBlend();
+       }
+ 
+    }
+ 
+-   final class ChunkData {
+-      private final Map<ChunkPos, String> clientData;
+-      private final CompletableFuture<Map<ChunkPos, String>> serverData;
++   private final class ChunkData {
++      final Map<ChunkPos, String> clientData;
++      final CompletableFuture<Map<ChunkPos, String>> serverData;
+ 
+-      private ChunkData(IntegratedServer var2, double var3, double var5) {
++      ChunkData(IntegratedServer var2, double var3, double var5) {
+          ClientLevel var7 = ChunkDebugRenderer.this.minecraft.level;
+          ResourceKey var8 = var7.dimension();
+          int var9 = SectionPos.posToSectionCoord(var3);
+          int var10 = SectionPos.posToSectionCoord(var5);
+          Builder var11 = ImmutableMap.builder();
+@@ -121,11 +121,12 @@
+                ServerChunkCache var7 = var5.getChunkSource();
+ 
+                for(int var8x = var9 - 12; var8x <= var9 + 12; ++var8x) {
+                   for(int var9x = var10 - 12; var9x <= var10 + 12; ++var9x) {
+                      ChunkPos var10x = new ChunkPos(var8x, var9x);
+-                     var6.put(var10x, "Server: " + var7.getChunkDebugData(var10x));
++                     String var10002 = var7.getChunkDebugData(var10x);
++                     var6.put(var10x, "Server: " + var10002);
+                   }
+                }
+ 
+                return var6.build();
+             }

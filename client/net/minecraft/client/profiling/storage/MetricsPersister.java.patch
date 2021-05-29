@@ -1,0 +1,101 @@
+--- net/minecraft/client/profiling/storage/MetricsPersister.java
++++ net/minecraft/client/profiling/storage/MetricsPersister.java
+@@ -44,57 +44,58 @@
+    }
+ 
+    public Path saveReports(List<SamplerCategory> var1, List<FpsSpikeRecording> var2, ContinuousProfiler var3) {
+       try {
+          Files.createDirectories(PROFILING_RESULTS_DIR);
+-      } catch (IOException var20) {
+-         throw new UncheckedIOException(var20);
++      } catch (IOException var11) {
++         throw new UncheckedIOException(var11);
+       }
+ 
+-      Path var4 = PROFILING_RESULTS_DIR.resolve((new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + ".tmp");
++      Path var10000 = PROFILING_RESULTS_DIR;
++      SimpleDateFormat var10001 = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
++      Date var10002 = new Date();
++      Path var4 = var10000.resolve(var10001.format(var10002) + ".tmp");
+ 
+       try {
+          FileSystem var5 = ZIP_FILE_SYSTEM_PROVIDER.newFileSystem(var4, ImmutableMap.of("create", "true"));
+-         Throwable var6 = null;
+ 
+          try {
+             Files.createDirectories(PROFILING_RESULTS_DIR);
+-            Path var7 = var5.getPath("/");
+-            Path var8 = var7.resolve("metrics");
+-            Iterator var9 = var1.iterator();
++            Path var6 = var5.getPath("/");
++            Path var7 = var6.resolve("metrics");
++            Iterator var8 = var1.iterator();
+ 
+-            while(var9.hasNext()) {
+-               SamplerCategory var10 = (SamplerCategory)var9.next();
+-               this.saveMetrics(var10, var8);
++            while(var8.hasNext()) {
++               SamplerCategory var9 = (SamplerCategory)var8.next();
++               this.saveMetrics(var9, var7);
+             }
+ 
+             if (!var2.isEmpty()) {
+-               this.saveSpikeLogs(var2, var7.resolve("deviations"));
++               this.saveSpikeLogs(var2, var6.resolve("deviations"));
+             }
+ 
+-            this.saveProfilingTaskExecutionResult(var3, var7);
+-            return this.renameZipFile(var4);
+-         } catch (Throwable var21) {
+-            var6 = var21;
+-            throw var21;
+-         } finally {
++            this.saveProfilingTaskExecutionResult(var3, var6);
++         } catch (Throwable var12) {
+             if (var5 != null) {
+-               if (var6 != null) {
+-                  try {
+-                     var5.close();
+-                  } catch (Throwable var19) {
+-                     var6.addSuppressed(var19);
+-                  }
+-               } else {
++               try {
+                   var5.close();
++               } catch (Throwable var10) {
++                  var12.addSuppressed(var10);
+                }
+             }
+ 
++            throw var12;
+          }
+-      } catch (IOException var23) {
+-         throw new UncheckedIOException(var23);
++
++         if (var5 != null) {
++            var5.close();
++         }
++      } catch (IOException var13) {
++         throw new UncheckedIOException(var13);
+       }
++
++      return this.renameZipFile(var4);
+    }
+ 
+    private void saveMetrics(SamplerCategory var1, Path var2) {
+       String var3 = var1.getName();
+       List var4 = var1.getMetricSamplers();
+@@ -156,11 +157,12 @@
+       var1.getResults().saveResults(var2.resolve("profiling.txt"));
+    }
+ 
+    private Path renameZipFile(Path var1) {
+       try {
+-         return Files.move(var1, var1.resolveSibling(StringUtils.substringBefore(var1.getFileName().toString(), ".tmp") + ".zip"));
++         String var10002 = var1.getFileName().toString();
++         return Files.move(var1, var1.resolveSibling(StringUtils.substringBefore(var10002, ".tmp") + ".zip"));
+       } catch (IOException var3) {
+          throw new UncheckedIOException(var3);
+       }
+    }
+ }

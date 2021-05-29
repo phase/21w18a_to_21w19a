@@ -1,0 +1,35 @@
+--- net/minecraft/client/color/block/BlockTintCache.java
++++ net/minecraft/client/color/block/BlockTintCache.java
+@@ -8,13 +8,11 @@
+ import net.minecraft.core.SectionPos;
+ import net.minecraft.world.level.ChunkPos;
+ 
+ public class BlockTintCache {
+    private static final int MAX_CACHE_ENTRIES = 256;
+-   private final ThreadLocal<BlockTintCache.LatestCacheInfo> latestChunkOnThread = ThreadLocal.withInitial(() -> {
+-      return new BlockTintCache.LatestCacheInfo();
+-   });
++   private final ThreadLocal<BlockTintCache.LatestCacheInfo> latestChunkOnThread = ThreadLocal.withInitial(BlockTintCache.LatestCacheInfo::new);
+    private final Long2ObjectLinkedOpenHashMap<int[]> cache = new Long2ObjectLinkedOpenHashMap(256, 0.25F);
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+ 
+    public BlockTintCache() {
+    }
+@@ -99,15 +97,13 @@
+          return var6;
+       }
+    }
+ 
+    static class LatestCacheInfo {
+-      public int x;
+-      public int z;
++      public int x = Integer.MIN_VALUE;
++      public int z = Integer.MIN_VALUE;
+       public int[] cache;
+ 
+       private LatestCacheInfo() {
+-         this.x = Integer.MIN_VALUE;
+-         this.z = Integer.MIN_VALUE;
+       }
+    }
+ }

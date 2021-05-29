@@ -1,0 +1,28 @@
+--- net/minecraft/nbt/ShortTag.java
++++ net/minecraft/nbt/ShortTag.java
+@@ -24,11 +24,11 @@
+          return true;
+       }
+    };
+    private final short data;
+ 
+-   private ShortTag(short var1) {
++   ShortTag(short var1) {
+       this.data = var1;
+    }
+ 
+    public static ShortTag valueOf(short var0) {
+       return var0 >= -128 && var0 <= 1024 ? ShortTag.Cache.cache[var0 - -128] : new ShortTag(var0);
+@@ -92,11 +92,11 @@
+ 
+    public Number getAsNumber() {
+       return this.data;
+    }
+ 
+-   static class Cache {
++   private static class Cache {
+       private static final int HIGH = 1024;
+       private static final int LOW = -128;
+       static final ShortTag[] cache = new ShortTag[1153];
+ 
+       private Cache() {

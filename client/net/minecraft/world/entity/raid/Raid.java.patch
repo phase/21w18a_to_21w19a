@@ -1,0 +1,93 @@
+--- net/minecraft/world/entity/raid/Raid.java
++++ net/minecraft/world/entity/raid/Raid.java
+@@ -7,10 +7,11 @@
+ import java.util.HashSet;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Locale;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Random;
+ import java.util.Set;
+ import java.util.UUID;
+ import java.util.function.Predicate;
+@@ -412,11 +413,11 @@
+    }
+ 
+    private void moveRaidCenterToNearbyVillageSection() {
+       Stream var1 = SectionPos.cube(SectionPos.of(this.center), 2);
+       ServerLevel var10001 = this.level;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       var1.filter(var10001::isVillage).map(SectionPos::center).min(Comparator.comparingDouble((var1x) -> {
+          return var1x.distSqr(this.center);
+       })).ifPresent(this::setCenter);
+    }
+ 
+@@ -843,39 +844,22 @@
+    static {
+       RAID_BAR_VICTORY_COMPONENT = RAID_NAME_COMPONENT.copy().append(" - ").append(VICTORY);
+       RAID_BAR_DEFEAT_COMPONENT = RAID_NAME_COMPONENT.copy().append(" - ").append(DEFEAT);
+    }
+ 
+-   static enum RaiderType {
+-      VINDICATOR(EntityType.VINDICATOR, new int[]{0, 0, 2, 0, 1, 4, 2, 5}),
+-      EVOKER(EntityType.EVOKER, new int[]{0, 0, 0, 0, 0, 1, 1, 2}),
+-      PILLAGER(EntityType.PILLAGER, new int[]{0, 4, 3, 3, 4, 4, 4, 2}),
+-      WITCH(EntityType.WITCH, new int[]{0, 0, 0, 0, 3, 0, 0, 1}),
+-      RAVAGER(EntityType.RAVAGER, new int[]{0, 0, 0, 1, 0, 1, 0, 2});
+-
+-      private static final Raid.RaiderType[] VALUES = values();
+-      private final EntityType<? extends Raider> entityType;
+-      private final int[] spawnsPerWaveBeforeBonus;
+-
+-      private RaiderType(EntityType<? extends Raider> var3, int[] var4) {
+-         this.entityType = var3;
+-         this.spawnsPerWaveBeforeBonus = var4;
+-      }
+-   }
+-
+-   static enum RaidStatus {
++   private static enum RaidStatus {
+       ONGOING,
+       VICTORY,
+       LOSS,
+       STOPPED;
+ 
+       private static final Raid.RaidStatus[] VALUES = values();
+ 
+       private RaidStatus() {
+       }
+ 
+-      private static Raid.RaidStatus getByName(String var0) {
++      static Raid.RaidStatus getByName(String var0) {
+          Raid.RaidStatus[] var1 = VALUES;
+          int var2 = var1.length;
+ 
+          for(int var3 = 0; var3 < var2; ++var3) {
+             Raid.RaidStatus var4 = var1[var3];
+@@ -889,6 +873,23 @@
+ 
+       public String getName() {
+          return this.name().toLowerCase(Locale.ROOT);
+       }
+    }
++
++   private static enum RaiderType {
++      VINDICATOR(EntityType.VINDICATOR, new int[]{0, 0, 2, 0, 1, 4, 2, 5}),
++      EVOKER(EntityType.EVOKER, new int[]{0, 0, 0, 0, 0, 1, 1, 2}),
++      PILLAGER(EntityType.PILLAGER, new int[]{0, 4, 3, 3, 4, 4, 4, 2}),
++      WITCH(EntityType.WITCH, new int[]{0, 0, 0, 0, 3, 0, 0, 1}),
++      RAVAGER(EntityType.RAVAGER, new int[]{0, 0, 0, 1, 0, 1, 0, 2});
++
++      static final Raid.RaiderType[] VALUES = values();
++      final EntityType<? extends Raider> entityType;
++      final int[] spawnsPerWaveBeforeBonus;
++
++      private RaiderType(EntityType<? extends Raider> var3, int[] var4) {
++         this.entityType = var3;
++         this.spawnsPerWaveBeforeBonus = var4;
++      }
++   }
+ }

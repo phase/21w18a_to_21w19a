@@ -1,0 +1,59 @@
+--- net/minecraft/world/entity/boss/wither/WitherBoss.java
++++ net/minecraft/world/entity/boss/wither/WitherBoss.java
+@@ -22,10 +22,11 @@
+ import net.minecraft.world.Difficulty;
+ import net.minecraft.world.damagesource.DamageSource;
+ import net.minecraft.world.effect.MobEffectInstance;
+ import net.minecraft.world.effect.MobEffects;
+ import net.minecraft.world.entity.Entity;
++import net.minecraft.world.entity.EntitySelector;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.entity.LivingEntity;
+ import net.minecraft.world.entity.Mob;
+ import net.minecraft.world.entity.MobType;
+ import net.minecraft.world.entity.PowerableMob;
+@@ -247,12 +248,12 @@
+                }
+ 
+                var13 = this.getAlternativeTarget(var1);
+                if (var13 > 0) {
+                   Entity var16 = this.level.getEntity(var13);
+-                  if (var16 != null && var16.isAlive() && this.distanceToSqr(var16) <= 900.0D && this.canSee(var16)) {
+-                     if (var16 instanceof Player && ((Player)var16).getAbilities().invulnerable) {
++                  if (var16 != null && var16.isAlive() && this.distanceToSqr(var16) <= 900.0D && this.hasLineOfSight(var16)) {
++                     if (!EntitySelector.ATTACK_ALLOWED.test(var16)) {
+                         this.setAlternativeTarget(var1, 0);
+                      } else {
+                         this.performRangedAttack(var1 + 1, (LivingEntity)var16);
+                         this.nextHeadUpdate[var1 - 1] = this.tickCount + 40 + this.random.nextInt(20);
+                         this.idleHeadUpdates[var1 - 1] = 0;
+@@ -263,11 +264,11 @@
+                } else {
+                   List var15 = this.level.getNearbyEntities(LivingEntity.class, TARGETING_CONDITIONS, this, this.getBoundingBox().inflate(20.0D, 8.0D, 20.0D));
+ 
+                   for(int var18 = 0; var18 < 10 && !var15.isEmpty(); ++var18) {
+                      LivingEntity var5 = (LivingEntity)var15.get(this.random.nextInt(var15.size()));
+-                     if (var5 != this && var5.isAlive() && this.canSee(var5)) {
++                     if (var5 != this && var5.isAlive() && this.hasLineOfSight(var5)) {
+                         if (var5 instanceof Player) {
+                            if (!((Player)var5).getAbilities().invulnerable) {
+                               this.setAlternativeTarget(var1, var5.getId());
+                            }
+                         } else {
+@@ -530,14 +531,14 @@
+       DATA_TARGETS = ImmutableList.of(DATA_TARGET_A, DATA_TARGET_B, DATA_TARGET_C);
+       DATA_ID_INV = SynchedEntityData.defineId(WitherBoss.class, EntityDataSerializers.INT);
+       LIVING_ENTITY_SELECTOR = (var0) -> {
+          return var0.getMobType() != MobType.UNDEAD && var0.attackable();
+       };
+-      TARGETING_CONDITIONS = (new TargetingConditions()).range(20.0D).selector(LIVING_ENTITY_SELECTOR);
++      TARGETING_CONDITIONS = TargetingConditions.forCombat().range(20.0D).selector(LIVING_ENTITY_SELECTOR);
+    }
+ 
+-   class WitherDoNothingGoal extends Goal {
++   private class WitherDoNothingGoal extends Goal {
+       public WitherDoNothingGoal() {
+          this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.JUMP, Goal.Flag.LOOK));
+       }
+ 
+       public boolean canUse() {

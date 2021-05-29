@@ -1,0 +1,13 @@
+--- net/minecraft/world/level/saveddata/maps/MapBanner.java
++++ net/minecraft/world/level/saveddata/maps/MapBanner.java
+@@ -120,8 +120,9 @@
+ 
+       return var1;
+    }
+ 
+    public String getId() {
+-      return "banner-" + this.pos.getX() + "," + this.pos.getY() + "," + this.pos.getZ();
++      int var10000 = this.pos.getX();
++      return "banner-" + var10000 + "," + this.pos.getY() + "," + this.pos.getZ();
+    }
+ }

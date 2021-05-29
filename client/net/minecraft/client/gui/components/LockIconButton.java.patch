@@ -1,0 +1,15 @@
+--- net/minecraft/client/gui/components/LockIconButton.java
++++ net/minecraft/client/gui/components/LockIconButton.java
+@@ -40,11 +40,11 @@
+       }
+ 
+       this.blit(var1, this.x, this.y, var5.getX(), var5.getY(), this.width, this.height);
+    }
+ 
+-   static enum Icon {
++   private static enum Icon {
+       LOCKED(0, 146),
+       LOCKED_HOVER(0, 166),
+       LOCKED_DISABLED(0, 186),
+       UNLOCKED(20, 146),
+       UNLOCKED_HOVER(20, 166),

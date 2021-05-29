@@ -1,0 +1,40 @@
+--- net/minecraft/client/gui/components/toasts/ToastComponent.java
++++ net/minecraft/client/gui/components/toasts/ToastComponent.java
+@@ -12,11 +12,11 @@
+ import net.minecraft.client.gui.GuiComponent;
+ import net.minecraft.util.Mth;
+ 
+ public class ToastComponent extends GuiComponent {
+    private static final int VISIBLE_TOASTS = 5;
+-   private final Minecraft minecraft;
++   final Minecraft minecraft;
+    private final ToastComponent.ToastInstance<?>[] visible = new ToastComponent.ToastInstance[5];
+    private final Deque<Toast> queued = Queues.newArrayDeque();
+ 
+    public ToastComponent(Minecraft var1) {
+       this.minecraft = var1;
+@@ -75,20 +75,18 @@
+ 
+    public Minecraft getMinecraft() {
+       return this.minecraft;
+    }
+ 
+-   class ToastInstance<T extends Toast> {
++   private class ToastInstance<T extends Toast> {
+       private static final long ANIMATION_TIME = 600L;
+       private final T toast;
+-      private long animationTime;
+-      private long visibleTime;
++      private long animationTime = -1L;
++      private long visibleTime = -1L;
+       private Toast.Visibility visibility;
+ 
+-      private ToastInstance(T var2) {
+-         this.animationTime = -1L;
+-         this.visibleTime = -1L;
++      ToastInstance(T var2) {
+          this.visibility = Toast.Visibility.SHOW;
+          this.toast = var2;
+       }
+ 
+       public T getToast() {

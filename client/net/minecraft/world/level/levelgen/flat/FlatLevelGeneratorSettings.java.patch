@@ -1,0 +1,27 @@
+--- net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings.java
++++ net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings.java
+@@ -29,10 +29,11 @@
+ import net.minecraft.world.level.levelgen.StructureSettings;
+ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+ import net.minecraft.world.level.levelgen.feature.Feature;
+ import net.minecraft.world.level.levelgen.feature.StructureFeature;
+ import net.minecraft.world.level.levelgen.feature.configurations.LayerConfiguration;
++import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class FlatLevelGeneratorSettings {
+    private static final Logger LOGGER = LogManager.getLogger();
+@@ -230,11 +231,11 @@
+          return !var0.is(Blocks.AIR);
+       });
+    }
+ 
+    public static FlatLevelGeneratorSettings getDefault(Registry<Biome> var0) {
+-      StructureSettings var1 = new StructureSettings(Optional.of(StructureSettings.DEFAULT_STRONGHOLD), Maps.newHashMap(ImmutableMap.of(StructureFeature.VILLAGE, StructureSettings.DEFAULTS.get(StructureFeature.VILLAGE))));
++      StructureSettings var1 = new StructureSettings(Optional.of(StructureSettings.DEFAULT_STRONGHOLD), Maps.newHashMap(ImmutableMap.of(StructureFeature.VILLAGE, (StructureFeatureConfiguration)StructureSettings.DEFAULTS.get(StructureFeature.VILLAGE))));
+       FlatLevelGeneratorSettings var2 = new FlatLevelGeneratorSettings(var1, var0);
+       var2.biome = () -> {
+          return (Biome)var0.getOrThrow(Biomes.PLAINS);
+       };
+       var2.getLayersInfo().add(new FlatLayerInfo(1, Blocks.BEDROCK));

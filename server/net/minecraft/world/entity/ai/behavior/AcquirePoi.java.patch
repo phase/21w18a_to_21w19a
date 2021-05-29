@@ -1,0 +1,13 @@
+--- net/minecraft/world/entity/ai/behavior/AcquirePoi.java
++++ net/minecraft/world/entity/ai/behavior/AcquirePoi.java
+@@ -138,9 +138,9 @@
+       public boolean shouldRetry(long var1) {
+          return var1 >= this.nextScheduledAttemptTimestamp;
+       }
+ 
+       public String toString() {
+-         return "RetryMarker{, previousAttemptAt=" + this.previousAttemptTimestamp + ", nextScheduledAttemptAt=" + this.nextScheduledAttemptTimestamp + ", currentDelay=" + this.currentDelay + '}';
++         return "RetryMarker{, previousAttemptAt=" + this.previousAttemptTimestamp + ", nextScheduledAttemptAt=" + this.nextScheduledAttemptTimestamp + ", currentDelay=" + this.currentDelay + "}";
+       }
+    }
+ }

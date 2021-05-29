@@ -1,0 +1,158 @@
+--- net/minecraft/world/entity/monster/Drowned.java
++++ net/minecraft/world/entity/monster/Drowned.java
+@@ -52,11 +52,11 @@
+ import net.minecraft.world.level.pathfinder.Path;
+ import net.minecraft.world.phys.Vec3;
+ 
+ public class Drowned extends Zombie implements RangedAttackMob {
+    public static final float NAUTILUS_SHELL_CHANCE = 0.03F;
+-   private boolean searchingForLand;
++   boolean searchingForLand;
+    protected final WaterBoundPathNavigation waterNavigation;
+    protected final GroundPathNavigation groundNavigation;
+ 
+    public Drowned(EntityType<? extends Drowned> var1, Level var2) {
+       super(var1, var2);
+@@ -178,11 +178,11 @@
+ 
+    public boolean isPushedByFluid() {
+       return !this.isSwimming();
+    }
+ 
+-   private boolean wantsToSwim() {
++   boolean wantsToSwim() {
+       if (this.searchingForLand) {
+          return true;
+       } else {
+          LivingEntity var1 = this.getTarget();
+          return var1 != null && var1.isInWater();
+@@ -241,11 +241,11 @@
+ 
+    public void setSearchingForLand(boolean var1) {
+       this.searchingForLand = var1;
+    }
+ 
+-   static class DrownedMoveControl extends MoveControl {
++   private static class DrownedMoveControl extends MoveControl {
+       private final Drowned drowned;
+ 
+       public DrownedMoveControl(Drowned var1) {
+          super(var1);
+          this.drowned = var1;
+@@ -284,27 +284,10 @@
+          }
+ 
+       }
+    }
+ 
+-   static class DrownedAttackGoal extends ZombieAttackGoal {
+-      private final Drowned drowned;
+-
+-      public DrownedAttackGoal(Drowned var1, double var2, boolean var4) {
+-         super(var1, var2, var4);
+-         this.drowned = var1;
+-      }
+-
+-      public boolean canUse() {
+-         return super.canUse() && this.drowned.okTarget(this.drowned.getTarget());
+-      }
+-
+-      public boolean canContinueToUse() {
+-         return super.canContinueToUse() && this.drowned.okTarget(this.drowned.getTarget());
+-      }
+-   }
+-
+    static class DrownedGoToWaterGoal extends Goal {
+       private final PathfinderMob mob;
+       private double wantedX;
+       private double wantedY;
+       private double wantedZ;
+@@ -358,13 +341,55 @@
+ 
+          return null;
+       }
+    }
+ 
+-   static class DrownedGoToBeachGoal extends MoveToBlockGoal {
++   private static class DrownedTridentAttackGoal extends RangedAttackGoal {
+       private final Drowned drowned;
+ 
++      public DrownedTridentAttackGoal(RangedAttackMob var1, double var2, int var4, float var5) {
++         super(var1, var2, var4, var5);
++         this.drowned = (Drowned)var1;
++      }
++
++      public boolean canUse() {
++         return super.canUse() && this.drowned.getMainHandItem().is(Items.TRIDENT);
++      }
++
++      public void start() {
++         super.start();
++         this.drowned.setAggressive(true);
++         this.drowned.startUsingItem(InteractionHand.MAIN_HAND);
++      }
++
++      public void stop() {
++         super.stop();
++         this.drowned.stopUsingItem();
++         this.drowned.setAggressive(false);
++      }
++   }
++
++   private static class DrownedAttackGoal extends ZombieAttackGoal {
++      private final Drowned drowned;
++
++      public DrownedAttackGoal(Drowned var1, double var2, boolean var4) {
++         super(var1, var2, var4);
++         this.drowned = var1;
++      }
++
++      public boolean canUse() {
++         return super.canUse() && this.drowned.okTarget(this.drowned.getTarget());
++      }
++
++      public boolean canContinueToUse() {
++         return super.canContinueToUse() && this.drowned.okTarget(this.drowned.getTarget());
++      }
++   }
++
++   private static class DrownedGoToBeachGoal extends MoveToBlockGoal {
++      private final Drowned drowned;
++
+       public DrownedGoToBeachGoal(Drowned var1, double var2) {
+          super(var1, var2, 8, 2);
+          this.drowned = var1;
+       }
+ 
+@@ -432,31 +457,6 @@
+ 
+       public void stop() {
+          this.drowned.setSearchingForLand(false);
+       }
+    }
+-
+-   static class DrownedTridentAttackGoal extends RangedAttackGoal {
+-      private final Drowned drowned;
+-
+-      public DrownedTridentAttackGoal(RangedAttackMob var1, double var2, int var4, float var5) {
+-         super(var1, var2, var4, var5);
+-         this.drowned = (Drowned)var1;
+-      }
+-
+-      public boolean canUse() {
+-         return super.canUse() && this.drowned.getMainHandItem().is(Items.TRIDENT);
+-      }
+-
+-      public void start() {
+-         super.start();
+-         this.drowned.setAggressive(true);
+-         this.drowned.startUsingItem(InteractionHand.MAIN_HAND);
+-      }
+-
+-      public void stop() {
+-         super.stop();
+-         this.drowned.stopUsingItem();
+-         this.drowned.setAggressive(false);
+-      }
+-   }
+ }

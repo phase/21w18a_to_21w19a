@@ -1,0 +1,28 @@
+--- net/minecraft/world/entity/monster/Blaze.java
++++ net/minecraft/world/entity/monster/Blaze.java
+@@ -124,11 +124,11 @@
+ 
+    private boolean isCharged() {
+       return ((Byte)this.entityData.get(DATA_FLAGS_ID) & 1) != 0;
+    }
+ 
+-   private void setCharged(boolean var1) {
++   void setCharged(boolean var1) {
+       byte var2 = (Byte)this.entityData.get(DATA_FLAGS_ID);
+       if (var1) {
+          var2 = (byte)(var2 | 1);
+       } else {
+          var2 &= -2;
+@@ -168,11 +168,11 @@
+ 
+       public void tick() {
+          --this.attackTime;
+          LivingEntity var1 = this.blaze.getTarget();
+          if (var1 != null) {
+-            boolean var2 = this.blaze.getSensing().canSee(var1);
++            boolean var2 = this.blaze.getSensing().hasLineOfSight(var1);
+             if (var2) {
+                this.lastSeen = 0;
+             } else {
+                ++this.lastSeen;
+             }

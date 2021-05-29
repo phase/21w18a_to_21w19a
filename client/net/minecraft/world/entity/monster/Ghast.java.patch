@@ -1,0 +1,233 @@
+--- net/minecraft/world/entity/monster/Ghast.java
++++ net/minecraft/world/entity/monster/Ghast.java
+@@ -134,62 +134,82 @@
+ 
+    static {
+       DATA_IS_CHARGING = SynchedEntityData.defineId(Ghast.class, EntityDataSerializers.BOOLEAN);
+    }
+ 
+-   static class GhastShootFireballGoal extends Goal {
++   static class GhastMoveControl extends MoveControl {
+       private final Ghast ghast;
+-      public int chargeTime;
++      private int floatDuration;
+ 
+-      public GhastShootFireballGoal(Ghast var1) {
++      public GhastMoveControl(Ghast var1) {
++         super(var1);
+          this.ghast = var1;
+       }
+ 
+-      public boolean canUse() {
+-         return this.ghast.getTarget() != null;
+-      }
++      public void tick() {
++         if (this.operation == MoveControl.Operation.MOVE_TO) {
++            if (this.floatDuration-- <= 0) {
++               this.floatDuration += this.ghast.getRandom().nextInt(5) + 2;
++               Vec3 var1 = new Vec3(this.wantedX - this.ghast.getX(), this.wantedY - this.ghast.getY(), this.wantedZ - this.ghast.getZ());
++               double var2 = var1.length();
++               var1 = var1.normalize();
++               if (this.canReach(var1, Mth.ceil(var2))) {
++                  this.ghast.setDeltaMovement(this.ghast.getDeltaMovement().add(var1.scale(0.1D)));
++               } else {
++                  this.operation = MoveControl.Operation.WAIT;
++               }
++            }
+ 
+-      public void start() {
+-         this.chargeTime = 0;
++         }
+       }
+ 
+-      public void stop() {
+-         this.ghast.setCharging(false);
+-      }
++      private boolean canReach(Vec3 var1, int var2) {
++         AABB var3 = this.ghast.getBoundingBox();
+ 
+-      public void tick() {
+-         LivingEntity var1 = this.ghast.getTarget();
+-         double var2 = 64.0D;
+-         if (var1.distanceToSqr(this.ghast) < 4096.0D && this.ghast.canSee(var1)) {
+-            Level var4 = this.ghast.level;
+-            ++this.chargeTime;
+-            if (this.chargeTime == 10 && !this.ghast.isSilent()) {
+-               var4.levelEvent((Player)null, 1015, this.ghast.blockPosition(), 0);
++         for(int var4 = 1; var4 < var2; ++var4) {
++            var3 = var3.move(var1);
++            if (!this.ghast.level.noCollision(this.ghast, var3)) {
++               return false;
+             }
++         }
+ 
+-            if (this.chargeTime == 20) {
+-               double var5 = 4.0D;
+-               Vec3 var7 = this.ghast.getViewVector(1.0F);
+-               double var8 = var1.getX() - (this.ghast.getX() + var7.x * 4.0D);
+-               double var10 = var1.getY(0.5D) - (0.5D + this.ghast.getY(0.5D));
+-               double var12 = var1.getZ() - (this.ghast.getZ() + var7.z * 4.0D);
+-               if (!this.ghast.isSilent()) {
+-                  var4.levelEvent((Player)null, 1016, this.ghast.blockPosition(), 0);
+-               }
++         return true;
++      }
++   }
+ 
+-               LargeFireball var14 = new LargeFireball(var4, this.ghast, var8, var10, var12);
+-               var14.explosionPower = this.ghast.getExplosionPower();
+-               var14.setPos(this.ghast.getX() + var7.x * 4.0D, this.ghast.getY(0.5D) + 0.5D, var14.getZ() + var7.z * 4.0D);
+-               var4.addFreshEntity(var14);
+-               this.chargeTime = -40;
+-            }
+-         } else if (this.chargeTime > 0) {
+-            --this.chargeTime;
++   static class RandomFloatAroundGoal extends Goal {
++      private final Ghast ghast;
++
++      public RandomFloatAroundGoal(Ghast var1) {
++         this.ghast = var1;
++         this.setFlags(EnumSet.of(Goal.Flag.MOVE));
++      }
++
++      public boolean canUse() {
++         MoveControl var1 = this.ghast.getMoveControl();
++         if (!var1.hasWanted()) {
++            return true;
++         } else {
++            double var2 = var1.getWantedX() - this.ghast.getX();
++            double var4 = var1.getWantedY() - this.ghast.getY();
++            double var6 = var1.getWantedZ() - this.ghast.getZ();
++            double var8 = var2 * var2 + var4 * var4 + var6 * var6;
++            return var8 < 1.0D || var8 > 3600.0D;
+          }
++      }
+ 
+-         this.ghast.setCharging(this.chargeTime > 10);
++      public boolean canContinueToUse() {
++         return false;
+       }
++
++      public void start() {
++         Random var1 = this.ghast.getRandom();
++         double var2 = this.ghast.getX() + (double)((var1.nextFloat() * 2.0F - 1.0F) * 16.0F);
++         double var4 = this.ghast.getY() + (double)((var1.nextFloat() * 2.0F - 1.0F) * 16.0F);
++         double var6 = this.ghast.getZ() + (double)((var1.nextFloat() * 2.0F - 1.0F) * 16.0F);
++         this.ghast.getMoveControl().setWantedPosition(var2, var4, var6, 1.0D);
++      }
+    }
+ 
+    static class GhastLookGoal extends Goal {
+       private final Ghast ghast;
+ 
+@@ -219,79 +239,59 @@
+          }
+ 
+       }
+    }
+ 
+-   static class RandomFloatAroundGoal extends Goal {
++   static class GhastShootFireballGoal extends Goal {
+       private final Ghast ghast;
++      public int chargeTime;
+ 
+-      public RandomFloatAroundGoal(Ghast var1) {
++      public GhastShootFireballGoal(Ghast var1) {
+          this.ghast = var1;
+-         this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+       }
+ 
+       public boolean canUse() {
+-         MoveControl var1 = this.ghast.getMoveControl();
+-         if (!var1.hasWanted()) {
+-            return true;
+-         } else {
+-            double var2 = var1.getWantedX() - this.ghast.getX();
+-            double var4 = var1.getWantedY() - this.ghast.getY();
+-            double var6 = var1.getWantedZ() - this.ghast.getZ();
+-            double var8 = var2 * var2 + var4 * var4 + var6 * var6;
+-            return var8 < 1.0D || var8 > 3600.0D;
+-         }
++         return this.ghast.getTarget() != null;
+       }
+ 
+-      public boolean canContinueToUse() {
+-         return false;
+-      }
+-
+       public void start() {
+-         Random var1 = this.ghast.getRandom();
+-         double var2 = this.ghast.getX() + (double)((var1.nextFloat() * 2.0F - 1.0F) * 16.0F);
+-         double var4 = this.ghast.getY() + (double)((var1.nextFloat() * 2.0F - 1.0F) * 16.0F);
+-         double var6 = this.ghast.getZ() + (double)((var1.nextFloat() * 2.0F - 1.0F) * 16.0F);
+-         this.ghast.getMoveControl().setWantedPosition(var2, var4, var6, 1.0D);
++         this.chargeTime = 0;
+       }
+-   }
+ 
+-   static class GhastMoveControl extends MoveControl {
+-      private final Ghast ghast;
+-      private int floatDuration;
+-
+-      public GhastMoveControl(Ghast var1) {
+-         super(var1);
+-         this.ghast = var1;
++      public void stop() {
++         this.ghast.setCharging(false);
+       }
+ 
+       public void tick() {
+-         if (this.operation == MoveControl.Operation.MOVE_TO) {
+-            if (this.floatDuration-- <= 0) {
+-               this.floatDuration += this.ghast.getRandom().nextInt(5) + 2;
+-               Vec3 var1 = new Vec3(this.wantedX - this.ghast.getX(), this.wantedY - this.ghast.getY(), this.wantedZ - this.ghast.getZ());
+-               double var2 = var1.length();
+-               var1 = var1.normalize();
+-               if (this.canReach(var1, Mth.ceil(var2))) {
+-                  this.ghast.setDeltaMovement(this.ghast.getDeltaMovement().add(var1.scale(0.1D)));
+-               } else {
+-                  this.operation = MoveControl.Operation.WAIT;
+-               }
++         LivingEntity var1 = this.ghast.getTarget();
++         double var2 = 64.0D;
++         if (var1.distanceToSqr(this.ghast) < 4096.0D && this.ghast.hasLineOfSight(var1)) {
++            Level var4 = this.ghast.level;
++            ++this.chargeTime;
++            if (this.chargeTime == 10 && !this.ghast.isSilent()) {
++               var4.levelEvent((Player)null, 1015, this.ghast.blockPosition(), 0);
+             }
+ 
+-         }
+-      }
++            if (this.chargeTime == 20) {
++               double var5 = 4.0D;
++               Vec3 var7 = this.ghast.getViewVector(1.0F);
++               double var8 = var1.getX() - (this.ghast.getX() + var7.x * 4.0D);
++               double var10 = var1.getY(0.5D) - (0.5D + this.ghast.getY(0.5D));
++               double var12 = var1.getZ() - (this.ghast.getZ() + var7.z * 4.0D);
++               if (!this.ghast.isSilent()) {
++                  var4.levelEvent((Player)null, 1016, this.ghast.blockPosition(), 0);
++               }
+ 
+-      private boolean canReach(Vec3 var1, int var2) {
+-         AABB var3 = this.ghast.getBoundingBox();
+-
+-         for(int var4 = 1; var4 < var2; ++var4) {
+-            var3 = var3.move(var1);
+-            if (!this.ghast.level.noCollision(this.ghast, var3)) {
+-               return false;
++               LargeFireball var14 = new LargeFireball(var4, this.ghast, var8, var10, var12);
++               var14.explosionPower = this.ghast.getExplosionPower();
++               var14.setPos(this.ghast.getX() + var7.x * 4.0D, this.ghast.getY(0.5D) + 0.5D, var14.getZ() + var7.z * 4.0D);
++               var4.addFreshEntity(var14);
++               this.chargeTime = -40;
+             }
++         } else if (this.chargeTime > 0) {
++            --this.chargeTime;
+          }
+ 
+-         return true;
++         this.ghast.setCharging(this.chargeTime > 10);
+       }
+    }
+ }

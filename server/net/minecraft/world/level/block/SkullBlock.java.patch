@@ -1,0 +1,26 @@
+--- net/minecraft/world/level/block/SkullBlock.java
++++ net/minecraft/world/level/block/SkullBlock.java
+@@ -51,10 +51,13 @@
+    static {
+       ROTATION = BlockStateProperties.ROTATION_16;
+       SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 8.0D, 12.0D);
+    }
+ 
++   public interface Type {
++   }
++
+    public static enum Types implements SkullBlock.Type {
+       SKELETON,
+       WITHER_SKELETON,
+       PLAYER,
+       ZOMBIE,
+@@ -62,9 +65,6 @@
+       DRAGON;
+ 
+       private Types() {
+       }
+    }
+-
+-   public interface Type {
+-   }
+ }

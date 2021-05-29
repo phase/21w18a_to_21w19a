@@ -1,0 +1,15 @@
+--- net/minecraft/network/protocol/game/ClientboundLightUpdatePacket.java
++++ net/minecraft/network/protocol/game/ClientboundLightUpdatePacket.java
+@@ -51,11 +51,11 @@
+       if (var7 != null) {
+          if (var7.isEmpty()) {
+             var5.set(var3);
+          } else {
+             var4.set(var3);
+-            var6.add(var7.getData().clone());
++            var6.add((byte[])var7.getData().clone());
+          }
+       }
+ 
+    }
+ 

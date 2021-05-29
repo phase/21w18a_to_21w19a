@@ -1,0 +1,15 @@
+--- net/minecraft/client/renderer/block/model/ItemOverride.java
++++ net/minecraft/client/renderer/block/model/ItemOverride.java
+@@ -49,11 +49,11 @@
+       public float getValue() {
+          return this.value;
+       }
+    }
+ 
+-   public static class Deserializer implements JsonDeserializer<ItemOverride> {
++   protected static class Deserializer implements JsonDeserializer<ItemOverride> {
+       protected Deserializer() {
+       }
+ 
+       public ItemOverride deserialize(JsonElement var1, Type var2, JsonDeserializationContext var3) throws JsonParseException {
+          JsonObject var4 = var1.getAsJsonObject();

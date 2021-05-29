@@ -1,0 +1,26 @@
+--- net/minecraft/client/renderer/ViewArea.java
++++ net/minecraft/client/renderer/ViewArea.java
+@@ -1,7 +1,8 @@
+ package net.minecraft.client.renderer;
+ 
++import java.util.Objects;
+ import javax.annotation.Nullable;
+ import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.level.Level;
+@@ -27,11 +28,13 @@
+ 
+       for(int var3 = 0; var3 < this.chunkGridSizeX; ++var3) {
+          for(int var4 = 0; var4 < this.chunkGridSizeY; ++var4) {
+             for(int var5 = 0; var5 < this.chunkGridSizeZ; ++var5) {
+                int var6 = this.getChunkIndex(var3, var4, var5);
+-               this.chunks[var6] = var1.new RenderChunk(var6);
++               ChunkRenderDispatcher.RenderChunk[] var10000 = this.chunks;
++               Objects.requireNonNull(var1);
++               var10000[var6] = var1.new RenderChunk(var6);
+                this.chunks[var6].setOrigin(var3 * 16, var4 * 16, var5 * 16);
+             }
+          }
+       }
+ 

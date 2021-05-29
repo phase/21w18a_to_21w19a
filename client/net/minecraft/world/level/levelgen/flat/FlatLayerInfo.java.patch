@@ -1,0 +1,13 @@
+--- net/minecraft/world/level/levelgen/flat/FlatLayerInfo.java
++++ net/minecraft/world/level/levelgen/flat/FlatLayerInfo.java
+@@ -29,8 +29,9 @@
+    public BlockState getBlockState() {
+       return this.block.defaultBlockState();
+    }
+ 
+    public String toString() {
+-      return (this.height != 1 ? this.height + "*" : "") + Registry.BLOCK.getKey(this.block);
++      String var10000 = this.height != 1 ? this.height + "*" : "";
++      return var10000 + Registry.BLOCK.getKey(this.block);
+    }
+ }

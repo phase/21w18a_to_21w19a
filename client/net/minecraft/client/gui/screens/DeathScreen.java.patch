@@ -1,0 +1,39 @@
+--- net/minecraft/client/gui/screens/DeathScreen.java
++++ net/minecraft/client/gui/screens/DeathScreen.java
+@@ -1,9 +1,10 @@
+ package net.minecraft.client.gui.screens;
+ 
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import java.util.Iterator;
++import java.util.Objects;
+ import javax.annotation.Nullable;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.client.gui.components.AbstractWidget;
+ import net.minecraft.client.gui.components.Button;
+ import net.minecraft.network.chat.ClickEvent;
+@@ -85,11 +86,11 @@
+          drawCenteredString(var1, this.font, this.causeOfDeath, this.width / 2, 85, 16777215);
+       }
+ 
+       drawCenteredString(var1, this.font, this.deathScore, this.width / 2, 100, 16777215);
+       if (this.causeOfDeath != null && var3 > 85) {
+-         this.font.getClass();
++         Objects.requireNonNull(this.font);
+          if (var3 < 85 + 9) {
+             Style var5 = this.getClickedComponentStyleAt(var2);
+             this.renderComponentHoverEffect(var1, var5, var2, var3);
+          }
+       }
+@@ -109,11 +110,11 @@
+       }
+    }
+ 
+    public boolean mouseClicked(double var1, double var3, int var5) {
+       if (this.causeOfDeath != null && var3 > 85.0D) {
+-         this.font.getClass();
++         Objects.requireNonNull(this.font);
+          if (var3 < (double)(85 + 9)) {
+             Style var6 = this.getClickedComponentStyleAt((int)var1);
+             if (var6 != null && var6.getClickEvent() != null && var6.getClickEvent().getAction() == ClickEvent.Action.OPEN_URL) {
+                this.handleComponentClicked(var6);
+                return false;

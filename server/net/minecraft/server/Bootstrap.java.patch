@@ -1,0 +1,16 @@
+--- net/minecraft/server/Bootstrap.java
++++ net/minecraft/server/Bootstrap.java
+@@ -89,11 +89,12 @@
+       checkTranslations(Registry.MOB_EFFECT, MobEffect::getDescriptionId, var0);
+       checkTranslations(Registry.ITEM, Item::getDescriptionId, var0);
+       checkTranslations(Registry.ENCHANTMENT, Enchantment::getDescriptionId, var0);
+       checkTranslations(Registry.BLOCK, Block::getDescriptionId, var0);
+       checkTranslations(Registry.CUSTOM_STAT, (var0x) -> {
+-         return "stat." + var0x.toString().replace(':', '.');
++         String var10000 = var0x.toString();
++         return "stat." + var10000.replace(':', '.');
+       }, var0);
+       checkGameruleTranslations(var0);
+       return var0;
+    }
+ 

@@ -1,0 +1,27 @@
+--- net/minecraft/world/item/BlockItem.java
++++ net/minecraft/world/item/BlockItem.java
+@@ -1,10 +1,11 @@
+ package net.minecraft.world.item;
+ 
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
+ import net.minecraft.advancements.CriteriaTriggers;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.NonNullList;
+@@ -220,11 +221,11 @@
+       if (this.block instanceof ShulkerBoxBlock) {
+          CompoundTag var2 = var1.getItem().getTag();
+          if (var2 != null) {
+             ListTag var3 = var2.getCompound("BlockEntityTag").getList("Items", 10);
+             Stream var10001 = var3.stream();
+-            CompoundTag.class.getClass();
++            Objects.requireNonNull(CompoundTag.class);
+             ItemUtils.onContainerDestroyed(var1, var10001.map(CompoundTag.class::cast).map(ItemStack::of));
+          }
+       }
+ 
+    }

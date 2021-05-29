@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/entity/EntityTickList.java
++++ net/minecraft/world/level/entity/EntityTickList.java
+@@ -22,11 +22,11 @@
+          this.passive.clear();
+          ObjectIterator var1 = Int2ObjectMaps.fastIterable(this.active).iterator();
+ 
+          while(var1.hasNext()) {
+             Int2ObjectMap.Entry var2 = (Int2ObjectMap.Entry)var1.next();
+-            this.passive.put(var2.getIntKey(), var2.getValue());
++            this.passive.put(var2.getIntKey(), (Entity)var2.getValue());
+          }
+ 
+          Int2ObjectMap var3 = this.active;
+          this.active = this.passive;
+          this.passive = var3;

@@ -1,0 +1,18 @@
+--- net/minecraft/world/level/block/AnvilBlock.java
++++ net/minecraft/world/level/block/AnvilBlock.java
+@@ -97,13 +97,13 @@
+    }
+ 
+    @Nullable
+    public static BlockState damage(BlockState var0) {
+       if (var0.is(Blocks.ANVIL)) {
+-         return (BlockState)Blocks.CHIPPED_ANVIL.defaultBlockState().setValue(FACING, var0.getValue(FACING));
++         return (BlockState)Blocks.CHIPPED_ANVIL.defaultBlockState().setValue(FACING, (Direction)var0.getValue(FACING));
+       } else {
+-         return var0.is(Blocks.CHIPPED_ANVIL) ? (BlockState)Blocks.DAMAGED_ANVIL.defaultBlockState().setValue(FACING, var0.getValue(FACING)) : null;
++         return var0.is(Blocks.CHIPPED_ANVIL) ? (BlockState)Blocks.DAMAGED_ANVIL.defaultBlockState().setValue(FACING, (Direction)var0.getValue(FACING)) : null;
+       }
+    }
+ 
+    public BlockState rotate(BlockState var1, Rotation var2) {
+       return (BlockState)var1.setValue(FACING, var2.rotate((Direction)var1.getValue(FACING)));

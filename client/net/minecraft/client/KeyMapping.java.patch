@@ -1,0 +1,36 @@
+--- net/minecraft/client/KeyMapping.java
++++ net/minecraft/client/KeyMapping.java
+@@ -3,10 +3,11 @@
+ import com.google.common.collect.Maps;
+ import com.google.common.collect.Sets;
+ import com.mojang.blaze3d.platform.InputConstants;
+ import java.util.Iterator;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.function.Supplier;
+ import net.minecraft.Util;
+ import net.minecraft.client.resources.language.I18n;
+ import net.minecraft.network.chat.Component;
+@@ -140,13 +141,18 @@
+       return this.category.equals(var1.category) ? I18n.get(this.name).compareTo(I18n.get(var1.name)) : ((Integer)CATEGORY_SORT_ORDER.get(this.category)).compareTo((Integer)CATEGORY_SORT_ORDER.get(var1.category));
+    }
+ 
+    public static Supplier<Component> createNameSupplier(String var0) {
+       KeyMapping var1 = (KeyMapping)ALL.get(var0);
+-      return var1 == null ? () -> {
+-         return new TranslatableComponent(var0);
+-      } : var1::getTranslatedKeyMessage;
++      if (var1 == null) {
++         return () -> {
++            return new TranslatableComponent(var0);
++         };
++      } else {
++         Objects.requireNonNull(var1);
++         return var1::getTranslatedKeyMessage;
++      }
+    }
+ 
+    public boolean same(KeyMapping var1) {
+       return this.key.equals(var1.key);
+    }

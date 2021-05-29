@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/newbiome/layer/Layers.java
++++ net/minecraft/world/level/newbiome/layer/Layers.java
+@@ -180,11 +180,11 @@
+ 
+    protected static boolean isShallowOcean(int var0) {
+       return var0 == 44 || var0 == 45 || var0 == 0 || var0 == 46 || var0 == 10;
+    }
+ 
+-   static enum Category {
++   private static enum Category {
+       NONE,
+       TAIGA,
+       EXTREME_HILLS,
+       JUNGLE,
+       MESA,

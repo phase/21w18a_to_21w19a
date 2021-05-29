@@ -1,0 +1,91 @@
+--- net/minecraft/locale/Language.java
++++ net/minecraft/locale/Language.java
+@@ -11,10 +11,11 @@
+ import java.io.InputStreamReader;
+ import java.io.Reader;
+ import java.nio.charset.StandardCharsets;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Map.Entry;
+ import java.util.function.BiConsumer;
+ import java.util.regex.Pattern;
+ import net.minecraft.network.chat.FormattedText;
+@@ -35,48 +36,46 @@
+    public Language() {
+    }
+ 
+    private static Language loadDefault() {
+       ImmutableMap.Builder var0 = ImmutableMap.builder();
++      Objects.requireNonNull(var0);
+       BiConsumer var1 = var0::put;
+       String var2 = "/assets/minecraft/lang/en_us.json";
+ 
+       try {
+          InputStream var3 = Language.class.getResourceAsStream("/assets/minecraft/lang/en_us.json");
+-         Throwable var4 = null;
+ 
+          try {
+             loadFromJson(var3, var1);
+-         } catch (Throwable var14) {
+-            var4 = var14;
+-            throw var14;
+-         } finally {
++         } catch (Throwable var7) {
+             if (var3 != null) {
+-               if (var4 != null) {
+-                  try {
+-                     var3.close();
+-                  } catch (Throwable var13) {
+-                     var4.addSuppressed(var13);
+-                  }
+-               } else {
++               try {
+                   var3.close();
++               } catch (Throwable var6) {
++                  var7.addSuppressed(var6);
+                }
+             }
+ 
++            throw var7;
+          }
+-      } catch (JsonParseException | IOException var16) {
+-         LOGGER.error((String)"Couldn't read strings from {}", (Object)"/assets/minecraft/lang/en_us.json", (Object)var16);
++
++         if (var3 != null) {
++            var3.close();
++         }
++      } catch (JsonParseException | IOException var8) {
++         LOGGER.error((String)"Couldn't read strings from {}", (Object)"/assets/minecraft/lang/en_us.json", (Object)var8);
+       }
+ 
+-      final ImmutableMap var17 = var0.build();
++      final ImmutableMap var9 = var0.build();
+       return new Language() {
+          public String getOrDefault(String var1) {
+-            return (String)var17.getOrDefault(var1, var1);
++            return (String)var9.getOrDefault(var1, var1);
+          }
+ 
+          public boolean has(String var1) {
+-            return var17.containsKey(var1);
++            return var9.containsKey(var1);
+          }
+ 
+          public boolean isDefaultRightToLeft() {
+             return false;
+          }
+@@ -96,11 +95,11 @@
+       Iterator var3 = var2.entrySet().iterator();
+ 
+       while(var3.hasNext()) {
+          Entry var4 = (Entry)var3.next();
+          String var5 = UNSUPPORTED_FORMAT_PATTERN.matcher(GsonHelper.convertToString((JsonElement)var4.getValue(), (String)var4.getKey())).replaceAll("%$1s");
+-         var1.accept(var4.getKey(), var5);
++         var1.accept((String)var4.getKey(), var5);
+       }
+ 
+    }
+ 
+    public static Language getInstance() {

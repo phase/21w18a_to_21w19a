@@ -1,0 +1,99 @@
+--- net/minecraft/commands/CommandFunction.java
++++ net/minecraft/commands/CommandFunction.java
+@@ -14,11 +14,11 @@
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.server.ServerFunctionManager;
+ 
+ public class CommandFunction {
+    private final CommandFunction.Entry[] entries;
+-   private final ResourceLocation id;
++   final ResourceLocation id;
+ 
+    public CommandFunction(ResourceLocation var1, CommandFunction.Entry[] var2) {
+       this.id = var1;
+       this.entries = var2;
+    }
+@@ -63,10 +63,43 @@
+       }
+ 
+       return new CommandFunction(var0, (CommandFunction.Entry[])var4.toArray(new CommandFunction.Entry[0]));
+    }
+ 
++   @FunctionalInterface
++   public interface Entry {
++      void execute(ServerFunctionManager var1, CommandSourceStack var2, Deque<ServerFunctionManager.QueuedCommand> var3, int var4, int var5, @Nullable ServerFunctionManager.TraceCallbacks var6) throws CommandSyntaxException;
++   }
++
++   public static class CommandEntry implements CommandFunction.Entry {
++      private final ParseResults<CommandSourceStack> parse;
++
++      public CommandEntry(ParseResults<CommandSourceStack> var1) {
++         this.parse = var1;
++      }
++
++      public void execute(ServerFunctionManager var1, CommandSourceStack var2, Deque<ServerFunctionManager.QueuedCommand> var3, int var4, int var5, @Nullable ServerFunctionManager.TraceCallbacks var6) throws CommandSyntaxException {
++         if (var6 != null) {
++            String var7 = this.parse.getReader().getString();
++            var6.onCommand(var5, var7);
++            int var8 = this.execute(var1, var2);
++            var6.onReturn(var5, var7, var8);
++         } else {
++            this.execute(var1, var2);
++         }
++
++      }
++
++      private int execute(ServerFunctionManager var1, CommandSourceStack var2) throws CommandSyntaxException {
++         return var1.getDispatcher().execute(new ParseResults(this.parse.getContext().withSource(var2), this.parse.getReader(), this.parse.getExceptions()));
++      }
++
++      public String toString() {
++         return this.parse.getReader().getString();
++      }
++   }
++
+    public static class CacheableFunction {
+       public static final CommandFunction.CacheableFunction NONE = new CommandFunction.CacheableFunction((ResourceLocation)null);
+       @Nullable
+       private final ResourceLocation id;
+       private boolean resolved;
+@@ -133,39 +166,6 @@
+ 
+       public String toString() {
+          return "function " + this.function.getId();
+       }
+    }
+-
+-   public static class CommandEntry implements CommandFunction.Entry {
+-      private final ParseResults<CommandSourceStack> parse;
+-
+-      public CommandEntry(ParseResults<CommandSourceStack> var1) {
+-         this.parse = var1;
+-      }
+-
+-      public void execute(ServerFunctionManager var1, CommandSourceStack var2, Deque<ServerFunctionManager.QueuedCommand> var3, int var4, int var5, @Nullable ServerFunctionManager.TraceCallbacks var6) throws CommandSyntaxException {
+-         if (var6 != null) {
+-            String var7 = this.parse.getReader().getString();
+-            var6.onCommand(var5, var7);
+-            int var8 = this.execute(var1, var2);
+-            var6.onReturn(var5, var7, var8);
+-         } else {
+-            this.execute(var1, var2);
+-         }
+-
+-      }
+-
+-      private int execute(ServerFunctionManager var1, CommandSourceStack var2) throws CommandSyntaxException {
+-         return var1.getDispatcher().execute(new ParseResults(this.parse.getContext().withSource(var2), this.parse.getReader(), this.parse.getExceptions()));
+-      }
+-
+-      public String toString() {
+-         return this.parse.getReader().getString();
+-      }
+-   }
+-
+-   @FunctionalInterface
+-   public interface Entry {
+-      void execute(ServerFunctionManager var1, CommandSourceStack var2, Deque<ServerFunctionManager.QueuedCommand> var3, int var4, int var5, @Nullable ServerFunctionManager.TraceCallbacks var6) throws CommandSyntaxException;
+-   }
+ }

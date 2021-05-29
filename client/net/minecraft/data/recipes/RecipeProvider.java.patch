@@ -1,0 +1,220 @@
+--- net/minecraft/data/recipes/RecipeProvider.java
++++ net/minecraft/data/recipes/RecipeProvider.java
+@@ -73,14 +73,17 @@
+       HashSet var3 = Sets.newHashSet();
+       buildCraftingRecipes((var3x) -> {
+          if (!var3.add(var3x.getId())) {
+             throw new IllegalStateException("Duplicate recipe " + var3x.getId());
+          } else {
+-            saveRecipe(var1, var3x.serializeRecipe(), var2.resolve("data/" + var3x.getId().getNamespace() + "/recipes/" + var3x.getId().getPath() + ".json"));
++            JsonObject var10001 = var3x.serializeRecipe();
++            String var10003 = var3x.getId().getNamespace();
++            saveRecipe(var1, var10001, var2.resolve("data/" + var10003 + "/recipes/" + var3x.getId().getPath() + ".json"));
+             JsonObject var4 = var3x.serializeAdvancement();
+             if (var4 != null) {
+-               saveAdvancement(var1, var4, var2.resolve("data/" + var3x.getId().getNamespace() + "/advancements/" + var3x.getAdvancementId().getPath() + ".json"));
++               var10003 = var3x.getId().getNamespace();
++               saveAdvancement(var1, var4, var2.resolve("data/" + var10003 + "/advancements/" + var3x.getAdvancementId().getPath() + ".json"));
+             }
+ 
+          }
+       });
+       saveAdvancement(var1, Advancement.Builder.advancement().addCriterion("impossible", (CriterionTriggerInstance)(new ImpossibleTrigger.TriggerInstance())).serializeToJson(), var2.resolve("data/minecraft/advancements/recipes/root.json"));
+@@ -91,36 +94,33 @@
+          String var3 = GSON.toJson(var1);
+          String var4 = SHA1.hashUnencodedChars(var3).toString();
+          if (!Objects.equals(var0.getHash(var2), var4) || !Files.exists(var2, new LinkOption[0])) {
+             Files.createDirectories(var2.getParent());
+             BufferedWriter var5 = Files.newBufferedWriter(var2);
+-            Throwable var6 = null;
+ 
+             try {
+                var5.write(var3);
+-            } catch (Throwable var16) {
+-               var6 = var16;
+-               throw var16;
+-            } finally {
++            } catch (Throwable var9) {
+                if (var5 != null) {
+-                  if (var6 != null) {
+-                     try {
+-                        var5.close();
+-                     } catch (Throwable var15) {
+-                        var6.addSuppressed(var15);
+-                     }
+-                  } else {
++                  try {
+                      var5.close();
++                  } catch (Throwable var8) {
++                     var9.addSuppressed(var8);
+                   }
+                }
+ 
++               throw var9;
+             }
++
++            if (var5 != null) {
++               var5.close();
++            }
+          }
+ 
+          var0.putNew(var2, var4);
+-      } catch (IOException var18) {
+-         LOGGER.error("Couldn't save recipe {}", var2, var18);
++      } catch (IOException var10) {
++         LOGGER.error("Couldn't save recipe {}", var2, var10);
+       }
+ 
+    }
+ 
+    private static void saveAdvancement(HashCache var0, JsonObject var1, Path var2) {
+@@ -128,36 +128,33 @@
+          String var3 = GSON.toJson(var1);
+          String var4 = SHA1.hashUnencodedChars(var3).toString();
+          if (!Objects.equals(var0.getHash(var2), var4) || !Files.exists(var2, new LinkOption[0])) {
+             Files.createDirectories(var2.getParent());
+             BufferedWriter var5 = Files.newBufferedWriter(var2);
+-            Throwable var6 = null;
+ 
+             try {
+                var5.write(var3);
+-            } catch (Throwable var16) {
+-               var6 = var16;
+-               throw var16;
+-            } finally {
++            } catch (Throwable var9) {
+                if (var5 != null) {
+-                  if (var6 != null) {
+-                     try {
+-                        var5.close();
+-                     } catch (Throwable var15) {
+-                        var6.addSuppressed(var15);
+-                     }
+-                  } else {
++                  try {
+                      var5.close();
++                  } catch (Throwable var8) {
++                     var9.addSuppressed(var8);
+                   }
+                }
+ 
++               throw var9;
+             }
++
++            if (var5 != null) {
++               var5.close();
++            }
+          }
+ 
+          var0.putNew(var2, var4);
+-      } catch (IOException var18) {
+-         LOGGER.error("Couldn't save recipe advancement {}", var2, var18);
++      } catch (IOException var10) {
++         LOGGER.error("Couldn't save recipe advancement {}", var2, var10);
+       }
+ 
+    }
+ 
+    private static void buildCraftingRecipes(Consumer<FinishedRecipe> var0) {
+@@ -366,26 +363,10 @@
+       concretePowder(var0, Blocks.PINK_CONCRETE_POWDER, Items.PINK_DYE);
+       concretePowder(var0, Blocks.PURPLE_CONCRETE_POWDER, Items.PURPLE_DYE);
+       concretePowder(var0, Blocks.RED_CONCRETE_POWDER, Items.RED_DYE);
+       concretePowder(var0, Blocks.WHITE_CONCRETE_POWDER, Items.WHITE_DYE);
+       concretePowder(var0, Blocks.YELLOW_CONCRETE_POWDER, Items.YELLOW_DYE);
+-      candle(var0, Blocks.BLACK_CANDLE, Items.BLACK_DYE);
+-      candle(var0, Blocks.BLUE_CANDLE, Items.BLUE_DYE);
+-      candle(var0, Blocks.BROWN_CANDLE, Items.BROWN_DYE);
+-      candle(var0, Blocks.CYAN_CANDLE, Items.CYAN_DYE);
+-      candle(var0, Blocks.GRAY_CANDLE, Items.GRAY_DYE);
+-      candle(var0, Blocks.GREEN_CANDLE, Items.GREEN_DYE);
+-      candle(var0, Blocks.LIGHT_BLUE_CANDLE, Items.LIGHT_BLUE_DYE);
+-      candle(var0, Blocks.LIGHT_GRAY_CANDLE, Items.LIGHT_GRAY_DYE);
+-      candle(var0, Blocks.LIME_CANDLE, Items.LIME_DYE);
+-      candle(var0, Blocks.MAGENTA_CANDLE, Items.MAGENTA_DYE);
+-      candle(var0, Blocks.ORANGE_CANDLE, Items.ORANGE_DYE);
+-      candle(var0, Blocks.PINK_CANDLE, Items.PINK_DYE);
+-      candle(var0, Blocks.PURPLE_CANDLE, Items.PURPLE_DYE);
+-      candle(var0, Blocks.RED_CANDLE, Items.RED_DYE);
+-      candle(var0, Blocks.WHITE_CANDLE, Items.WHITE_DYE);
+-      candle(var0, Blocks.YELLOW_CANDLE, Items.YELLOW_DYE);
+       ShapedRecipeBuilder.shaped(Blocks.ACTIVATOR_RAIL, 6).define('#', (ItemLike)Blocks.REDSTONE_TORCH).define('S', (ItemLike)Items.STICK).define('X', (ItemLike)Items.IRON_INGOT).pattern("XSX").pattern("X#X").pattern("XSX").unlockedBy("has_rail", has((ItemLike)Blocks.RAIL)).save(var0);
+       ShapelessRecipeBuilder.shapeless(Blocks.ANDESITE, 2).requires((ItemLike)Blocks.DIORITE).requires((ItemLike)Blocks.COBBLESTONE).unlockedBy("has_stone", has((ItemLike)Blocks.DIORITE)).save(var0);
+       ShapedRecipeBuilder.shaped(Blocks.ANVIL).define('I', (ItemLike)Blocks.IRON_BLOCK).define('i', (ItemLike)Items.IRON_INGOT).pattern("III").pattern(" i ").pattern("iii").unlockedBy("has_iron_block", has((ItemLike)Blocks.IRON_BLOCK)).save(var0);
+       ShapedRecipeBuilder.shaped(Items.ARMOR_STAND).define('/', (ItemLike)Items.STICK).define('_', (ItemLike)Blocks.SMOOTH_STONE_SLAB).pattern("///").pattern(" / ").pattern("/_/").unlockedBy("has_stone_slab", has((ItemLike)Blocks.SMOOTH_STONE_SLAB)).save(var0);
+       ShapedRecipeBuilder.shaped(Items.ARROW, 4).define('#', (ItemLike)Items.STICK).define('X', (ItemLike)Items.FLINT).define('Y', (ItemLike)Items.FEATHER).pattern("X").pattern("#").pattern("Y").unlockedBy("has_feather", has((ItemLike)Items.FEATHER)).unlockedBy("has_flint", has((ItemLike)Items.FLINT)).save(var0);
+@@ -430,11 +411,11 @@
+       ShapedRecipeBuilder.shaped(Blocks.CRAFTING_TABLE).define('#', (Tag)ItemTags.PLANKS).pattern("##").pattern("##").unlockedBy("has_planks", has((Tag)ItemTags.PLANKS)).save(var0);
+       ShapedRecipeBuilder.shaped(Items.CROSSBOW).define('~', (ItemLike)Items.STRING).define('#', (ItemLike)Items.STICK).define('&', (ItemLike)Items.IRON_INGOT).define('$', (ItemLike)Blocks.TRIPWIRE_HOOK).pattern("#&#").pattern("~$~").pattern(" # ").unlockedBy("has_string", has((ItemLike)Items.STRING)).unlockedBy("has_stick", has((ItemLike)Items.STICK)).unlockedBy("has_iron_ingot", has((ItemLike)Items.IRON_INGOT)).unlockedBy("has_tripwire_hook", has((ItemLike)Blocks.TRIPWIRE_HOOK)).save(var0);
+       ShapedRecipeBuilder.shaped(Blocks.LOOM).define('#', (Tag)ItemTags.PLANKS).define('@', (ItemLike)Items.STRING).pattern("@@").pattern("##").unlockedBy("has_string", has((ItemLike)Items.STRING)).save(var0);
+       chiseledBuilder(Blocks.CHISELED_RED_SANDSTONE, Ingredient.of(Blocks.RED_SANDSTONE_SLAB)).unlockedBy("has_red_sandstone", has((ItemLike)Blocks.RED_SANDSTONE)).unlockedBy("has_chiseled_red_sandstone", has((ItemLike)Blocks.CHISELED_RED_SANDSTONE)).unlockedBy("has_cut_red_sandstone", has((ItemLike)Blocks.CUT_RED_SANDSTONE)).save(var0);
+       chiseled(var0, Blocks.CHISELED_SANDSTONE, Blocks.SANDSTONE_SLAB);
+-      nineBlockStorageRecipes(var0, Items.COPPER_INGOT, Items.COPPER_BLOCK);
++      nineBlockStorageRecipesRecipesWithCustomUnpacking(var0, Items.COPPER_INGOT, Items.COPPER_BLOCK, getSimpleRecipeName(Items.COPPER_INGOT), getItemName(Items.COPPER_INGOT));
+       ShapelessRecipeBuilder.shapeless(Items.COPPER_INGOT, 9).requires((ItemLike)Blocks.WAXED_COPPER_BLOCK).group(getItemName(Items.COPPER_INGOT)).unlockedBy(getHasName(Blocks.WAXED_COPPER_BLOCK), has((ItemLike)Blocks.WAXED_COPPER_BLOCK)).save(var0, getConversionRecipeName(Items.COPPER_INGOT, Blocks.WAXED_COPPER_BLOCK));
+       waxRecipes(var0);
+       ShapelessRecipeBuilder.shapeless(Items.CYAN_DYE, 2).requires((ItemLike)Items.BLUE_DYE).requires((ItemLike)Items.GREEN_DYE).unlockedBy("has_green_dye", has((ItemLike)Items.GREEN_DYE)).unlockedBy("has_blue_dye", has((ItemLike)Items.BLUE_DYE)).save(var0);
+       ShapedRecipeBuilder.shaped(Blocks.DARK_PRISMARINE).define('S', (ItemLike)Items.PRISMARINE_SHARD).define('I', (ItemLike)Items.BLACK_DYE).pattern("SSS").pattern("SIS").pattern("SSS").unlockedBy("has_prismarine_shard", has((ItemLike)Items.PRISMARINE_SHARD)).save(var0);
+       ShapedRecipeBuilder.shaped(Blocks.DAYLIGHT_DETECTOR).define('Q', (ItemLike)Items.QUARTZ).define('G', (ItemLike)Blocks.GLASS).define('W', Ingredient.of((Tag)ItemTags.WOODEN_SLABS)).pattern("GGG").pattern("QQQ").pattern("WWW").unlockedBy("has_quartz", has((ItemLike)Items.QUARTZ)).save(var0);
+@@ -666,17 +647,15 @@
+       ShapedRecipeBuilder.shaped(Blocks.LODESTONE).define('S', (ItemLike)Items.CHISELED_STONE_BRICKS).define('#', (ItemLike)Items.NETHERITE_INGOT).pattern("SSS").pattern("S#S").pattern("SSS").unlockedBy("has_netherite_ingot", has((ItemLike)Items.NETHERITE_INGOT)).save(var0);
+       nineBlockStorageRecipesRecipesWithCustomUnpacking(var0, Items.NETHERITE_INGOT, Items.NETHERITE_BLOCK, "netherite_ingot_from_netherite_block", "netherite_ingot");
+       ShapelessRecipeBuilder.shapeless(Items.NETHERITE_INGOT).requires((ItemLike)Items.NETHERITE_SCRAP, 4).requires((ItemLike)Items.GOLD_INGOT, 4).group("netherite_ingot").unlockedBy("has_netherite_scrap", has((ItemLike)Items.NETHERITE_SCRAP)).save(var0);
+       ShapedRecipeBuilder.shaped(Blocks.RESPAWN_ANCHOR).define('O', (ItemLike)Blocks.CRYING_OBSIDIAN).define('G', (ItemLike)Blocks.GLOWSTONE).pattern("OOO").pattern("GGG").pattern("OOO").unlockedBy("has_obsidian", has((ItemLike)Blocks.CRYING_OBSIDIAN)).save(var0);
+       ShapedRecipeBuilder.shaped(Blocks.CHAIN).define('I', (ItemLike)Items.IRON_INGOT).define('N', (ItemLike)Items.IRON_NUGGET).pattern("N").pattern("I").pattern("N").unlockedBy("has_iron_nugget", has((ItemLike)Items.IRON_NUGGET)).unlockedBy("has_iron_ingot", has((ItemLike)Items.IRON_INGOT)).save(var0);
+-      ShapedRecipeBuilder.shaped(Items.CANDLE).define('S', (ItemLike)Items.STRING).define('H', (ItemLike)Items.HONEYCOMB).pattern("S").pattern("H").unlockedBy("has_string", has((ItemLike)Items.STRING)).unlockedBy("has_honeycomb", has((ItemLike)Items.HONEYCOMB)).save(var0);
+       ShapedRecipeBuilder.shaped(Blocks.TINTED_GLASS, 2).define('G', (ItemLike)Blocks.GLASS).define('S', (ItemLike)Items.AMETHYST_SHARD).pattern(" S ").pattern("SGS").pattern(" S ").unlockedBy("has_amethyst_shard", has((ItemLike)Items.AMETHYST_SHARD)).save(var0);
+       ShapedRecipeBuilder.shaped(Blocks.AMETHYST_BLOCK).define('S', (ItemLike)Items.AMETHYST_SHARD).pattern("SS").pattern("SS").unlockedBy("has_amethyst_shard", has((ItemLike)Items.AMETHYST_SHARD)).save(var0);
+       SpecialRecipeBuilder.special(RecipeSerializer.ARMOR_DYE).save(var0, "armor_dye");
+       SpecialRecipeBuilder.special(RecipeSerializer.BANNER_DUPLICATE).save(var0, "banner_duplicate");
+       SpecialRecipeBuilder.special(RecipeSerializer.BOOK_CLONING).save(var0, "book_cloning");
+-      ShapedRecipeBuilder.shaped(Items.BUNDLE).define('#', (ItemLike)Items.RABBIT_HIDE).define('-', (ItemLike)Items.STRING).pattern("-#-").pattern("# #").pattern("###").unlockedBy("has_string", has((ItemLike)Items.STRING)).save(var0);
+       SpecialRecipeBuilder.special(RecipeSerializer.FIREWORK_ROCKET).save(var0, "firework_rocket");
+       SpecialRecipeBuilder.special(RecipeSerializer.FIREWORK_STAR).save(var0, "firework_star");
+       SpecialRecipeBuilder.special(RecipeSerializer.FIREWORK_STAR_FADE).save(var0, "firework_star_fade");
+       SpecialRecipeBuilder.special(RecipeSerializer.MAP_CLONING).save(var0, "map_cloning");
+       SpecialRecipeBuilder.special(RecipeSerializer.MAP_EXTENDING).save(var0, "map_extending");
+@@ -1140,11 +1119,13 @@
+    private static void stonecutterResultFromBase(Consumer<FinishedRecipe> var0, ItemLike var1, ItemLike var2) {
+       stonecutterResultFromBase(var0, var1, var2, 1);
+    }
+ 
+    private static void stonecutterResultFromBase(Consumer<FinishedRecipe> var0, ItemLike var1, ItemLike var2, int var3) {
+-      SingleItemRecipeBuilder.stonecutting(Ingredient.of(var2), var1, var3).unlockedBy(getHasName(var2), has(var2)).save(var0, getConversionRecipeName(var1, var2) + "_stonecutting");
++      SingleItemRecipeBuilder var10000 = SingleItemRecipeBuilder.stonecutting(Ingredient.of(var2), var1, var3).unlockedBy(getHasName(var2), has(var2));
++      String var10002 = getConversionRecipeName(var1, var2);
++      var10000.save(var0, var10002 + "_stonecutting");
+    }
+ 
+    private static void smeltingResultFromBase(Consumer<FinishedRecipe> var0, ItemLike var1, ItemLike var2) {
+       SimpleCookingRecipeBuilder.smelting(Ingredient.of(var2), var1, 0.1F, 200).unlockedBy(getHasName(var2), has(var2)).save(var0);
+    }
+@@ -1177,11 +1158,13 @@
+       simpleCookingRecipe(var0, var1, var2, var3, Items.POTATO, Items.BAKED_POTATO, 0.35F);
+       simpleCookingRecipe(var0, var1, var2, var3, Items.RABBIT, Items.COOKED_RABBIT, 0.35F);
+    }
+ 
+    private static void simpleCookingRecipe(Consumer<FinishedRecipe> var0, String var1, SimpleCookingSerializer<?> var2, int var3, ItemLike var4, ItemLike var5, float var6) {
+-      SimpleCookingRecipeBuilder.cooking(Ingredient.of(var4), var5, var6, var3, var2).unlockedBy(getHasName(var4), has(var4)).save(var0, getItemName(var5) + "_from_" + var1);
++      SimpleCookingRecipeBuilder var10000 = SimpleCookingRecipeBuilder.cooking(Ingredient.of(var4), var5, var6, var3, var2).unlockedBy(getHasName(var4), has(var4));
++      String var10002 = getItemName(var5);
++      var10000.save(var0, var10002 + "_from_" + var1);
+    }
+ 
+    private static void waxRecipes(Consumer<FinishedRecipe> var0) {
+       ((BiMap)HoneycombItem.WAXABLES.get()).forEach((var1, var2) -> {
+          ShapelessRecipeBuilder.shapeless(var2).requires((ItemLike)var1).requires((ItemLike)Items.HONEYCOMB).group(getItemName(var2)).unlockedBy(getHasName(var1), has((ItemLike)var1)).save(var0, getConversionRecipeName(var2, Items.HONEYCOMB));
+@@ -1253,11 +1236,12 @@
+    private static String getSimpleRecipeName(ItemLike var0) {
+       return getItemName(var0);
+    }
+ 
+    private static String getConversionRecipeName(ItemLike var0, ItemLike var1) {
+-      return getItemName(var0) + "_from_" + getItemName(var1);
++      String var10000 = getItemName(var0);
++      return var10000 + "_from_" + getItemName(var1);
+    }
+ 
+    private static String getSmeltingRecipeName(ItemLike var0) {
+       return getItemName(var0) + "_from_smelting";
+    }

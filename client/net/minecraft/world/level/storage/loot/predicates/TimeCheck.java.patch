@@ -1,0 +1,70 @@
+--- net/minecraft/world/level/storage/loot/predicates/TimeCheck.java
++++ net/minecraft/world/level/storage/loot/predicates/TimeCheck.java
+@@ -11,14 +11,14 @@
+ import net.minecraft.world.level.storage.loot.LootContext;
+ import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+ 
+ public class TimeCheck implements LootItemCondition {
+    @Nullable
+-   private final Long period;
+-   private final IntRange value;
++   final Long period;
++   final IntRange value;
+ 
+-   private TimeCheck(@Nullable Long var1, IntRange var2) {
++   TimeCheck(@Nullable Long var1, IntRange var2) {
+       this.period = var1;
+       this.value = var2;
+    }
+ 
+    public LootItemConditionType getType() {
+@@ -41,26 +41,10 @@
+ 
+    public static TimeCheck.Builder time(IntRange var0) {
+       return new TimeCheck.Builder(var0);
+    }
+ 
+-   public static class Serializer implements net.minecraft.world.level.storage.loot.Serializer<TimeCheck> {
+-      public Serializer() {
+-      }
+-
+-      public void serialize(JsonObject var1, TimeCheck var2, JsonSerializationContext var3) {
+-         var1.addProperty("period", var2.period);
+-         var1.add("value", var3.serialize(var2.value));
+-      }
+-
+-      public TimeCheck deserialize(JsonObject var1, JsonDeserializationContext var2) {
+-         Long var3 = var1.has("period") ? GsonHelper.getAsLong(var1, "period") : null;
+-         IntRange var4 = (IntRange)GsonHelper.getAsObject(var1, "value", var2, IntRange.class);
+-         return new TimeCheck(var3, var4);
+-      }
+-   }
+-
+    public static class Builder implements LootItemCondition.Builder {
+       @Nullable
+       private Long period;
+       private final IntRange value;
+ 
+@@ -75,6 +59,22 @@
+ 
+       public TimeCheck build() {
+          return new TimeCheck(this.period, this.value);
+       }
+    }
++
++   public static class Serializer implements net.minecraft.world.level.storage.loot.Serializer<TimeCheck> {
++      public Serializer() {
++      }
++
++      public void serialize(JsonObject var1, TimeCheck var2, JsonSerializationContext var3) {
++         var1.addProperty("period", var2.period);
++         var1.add("value", var3.serialize(var2.value));
++      }
++
++      public TimeCheck deserialize(JsonObject var1, JsonDeserializationContext var2) {
++         Long var3 = var1.has("period") ? GsonHelper.getAsLong(var1, "period") : null;
++         IntRange var4 = (IntRange)GsonHelper.getAsObject(var1, "value", var2, IntRange.class);
++         return new TimeCheck(var3, var4);
++      }
++   }
+ }

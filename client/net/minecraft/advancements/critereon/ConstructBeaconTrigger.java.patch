@@ -1,0 +1,15 @@
+--- net/minecraft/advancements/critereon/ConstructBeaconTrigger.java
++++ net/minecraft/advancements/critereon/ConstructBeaconTrigger.java
+@@ -3,11 +3,11 @@
+ import com.google.gson.JsonObject;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.server.level.ServerPlayer;
+ 
+ public class ConstructBeaconTrigger extends SimpleCriterionTrigger<ConstructBeaconTrigger.TriggerInstance> {
+-   private static final ResourceLocation ID = new ResourceLocation("construct_beacon");
++   static final ResourceLocation ID = new ResourceLocation("construct_beacon");
+ 
+    public ConstructBeaconTrigger() {
+    }
+ 
+    public ResourceLocation getId() {

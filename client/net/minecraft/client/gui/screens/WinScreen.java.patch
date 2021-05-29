@@ -1,0 +1,12 @@
+--- net/minecraft/client/gui/screens/WinScreen.java
++++ net/minecraft/client/gui/screens/WinScreen.java
+@@ -249,8 +249,8 @@
+       RenderSystem.disableBlend();
+       super.render(var1, var2, var3, var4);
+    }
+ 
+    static {
+-      OBFUSCATE_TOKEN = "" + ChatFormatting.WHITE + ChatFormatting.OBFUSCATED + ChatFormatting.GREEN + ChatFormatting.AQUA;
++      OBFUSCATE_TOKEN = ChatFormatting.WHITE + ChatFormatting.OBFUSCATED + ChatFormatting.GREEN + ChatFormatting.AQUA;
+    }
+ }

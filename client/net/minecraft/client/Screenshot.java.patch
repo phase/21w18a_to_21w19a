@@ -1,0 +1,17 @@
+--- net/minecraft/client/Screenshot.java
++++ net/minecraft/client/Screenshot.java
+@@ -104,11 +104,13 @@
+       this.width = var2;
+       this.height = var3;
+       this.rowHeight = var4;
+       File var5 = new File(var1, "screenshots");
+       var5.mkdir();
+-      String var6 = "huge_" + DATE_FORMAT.format(new Date());
++      DateFormat var10000 = DATE_FORMAT;
++      Date var10001 = new Date();
++      String var6 = "huge_" + var10000.format(var10001);
+ 
+       for(int var7 = 1; (this.file = new File(var5, var6 + (var7 == 1 ? "" : "_" + var7) + ".tga")).exists(); ++var7) {
+       }
+ 
+       byte[] var8 = new byte[18];

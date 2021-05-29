@@ -1,0 +1,40 @@
+--- net/minecraft/world/level/chunk/storage/SectionStorage.java
++++ net/minecraft/world/level/chunk/storage/SectionStorage.java
+@@ -13,10 +13,11 @@
+ import it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet;
+ import java.io.File;
+ import java.io.IOException;
+ import java.util.HashMap;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.function.BooleanSupplier;
+ import java.util.function.Function;
+ import javax.annotation.Nullable;
+ import net.minecraft.SharedConstants;
+@@ -138,11 +139,11 @@
+             Optional var13 = var9.get(Integer.toString(var10)).result().flatMap((var3x) -> {
+                DataResult var10000 = ((Codec)this.codec.apply(() -> {
+                   this.setDirty(var11);
+                })).parse(var3x);
+                Logger var10001 = LOGGER;
+-               var10001.getClass();
++               Objects.requireNonNull(var10001);
+                return var10000.resultOrPartial(var10001::error);
+             });
+             this.storage.put(var11, var13);
+             var13.ifPresent((var4x) -> {
+                this.onSectionLoad(var11);
+@@ -178,11 +179,11 @@
+             DataResult var8 = ((Codec)this.codec.apply(() -> {
+                this.setDirty(var5);
+             })).encodeStart(var2, var7.get());
+             String var9 = Integer.toString(var4);
+             Logger var10001 = LOGGER;
+-            var10001.getClass();
++            Objects.requireNonNull(var10001);
+             var8.resultOrPartial(var10001::error).ifPresent((var3x) -> {
+                var3.put(var2.createString(var9), var3x);
+             });
+          }
+       }

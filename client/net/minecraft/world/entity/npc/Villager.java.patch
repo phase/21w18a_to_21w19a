@@ -1,0 +1,67 @@
+--- net/minecraft/world/entity/npc/Villager.java
++++ net/minecraft/world/entity/npc/Villager.java
+@@ -9,10 +9,11 @@
+ import com.mojang.serialization.Dynamic;
+ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Set;
+ import java.util.function.BiPredicate;
+ import java.util.stream.Collectors;
+ import javax.annotation.Nullable;
+@@ -428,11 +429,11 @@
+ 
+    public void addAdditionalSaveData(CompoundTag var1) {
+       super.addAdditionalSaveData(var1);
+       DataResult var10000 = VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, this.getVillagerData());
+       Logger var10001 = LOGGER;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       var10000.resultOrPartial(var10001::error).ifPresent((var1x) -> {
+          var1.put("VillagerData", var1x);
+       });
+       var1.putByte("FoodLevel", this.foodLevel);
+       var1.put("Gossips", (Tag)this.gossips.store(NbtOps.INSTANCE).getValue());
+@@ -449,11 +450,11 @@
+    public void readAdditionalSaveData(CompoundTag var1) {
+       super.readAdditionalSaveData(var1);
+       if (var1.contains("VillagerData", 10)) {
+          DataResult var2 = VillagerData.CODEC.parse(new Dynamic(NbtOps.INSTANCE, var1.get("VillagerData")));
+          Logger var10001 = LOGGER;
+-         var10001.getClass();
++         Objects.requireNonNull(var10001);
+          var2.resultOrPartial(var10001::error).ifPresent(this::setVillagerData);
+       }
+ 
+       if (var1.contains("Offers", 10)) {
+          this.offers = new MerchantOffers(var1.getCompound("Offers"));
+@@ -599,11 +600,11 @@
+             ServerLevel var4 = var2.getLevel(var3.dimension());
+             if (var4 != null) {
+                PoiManager var5 = var4.getPoiManager();
+                Optional var6 = var5.getType(var3.pos());
+                BiPredicate var7 = (BiPredicate)POI_MEMORIES.get(var1);
+-               if (var6.isPresent() && var7.test(this, var6.get())) {
++               if (var6.isPresent() && var7.test(this, (PoiType)var6.get())) {
+                   var5.release(var3.pos());
+                   DebugPackets.sendPoiTicketCountPacket(var4, var3.pos());
+                }
+ 
+             }
+@@ -670,11 +671,12 @@
+       this.setVillagerData(this.getVillagerData().setLevel(this.getVillagerData().getLevel() + 1));
+       this.updateTrades();
+    }
+ 
+    protected Component getTypeName() {
+-      return new TranslatableComponent(this.getType().getDescriptionId() + '.' + Registry.VILLAGER_PROFESSION.getKey(this.getVillagerData().getProfession()).getPath());
++      String var10002 = this.getType().getDescriptionId();
++      return new TranslatableComponent(var10002 + "." + Registry.VILLAGER_PROFESSION.getKey(this.getVillagerData().getProfession()).getPath());
+    }
+ 
+    public void handleEntityEvent(byte var1) {
+       if (var1 == 12) {
+          this.addParticlesAroundSelf(ParticleTypes.HEART);

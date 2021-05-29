@@ -1,0 +1,29 @@
+--- net/minecraft/world/level/levelgen/feature/configurations/GlowLichenConfiguration.java
++++ net/minecraft/world/level/levelgen/feature/configurations/GlowLichenConfiguration.java
+@@ -5,10 +5,11 @@
+ import com.mojang.serialization.Codec;
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
+ import java.util.ArrayList;
+ import java.util.Collections;
+ import java.util.List;
++import java.util.Objects;
+ import net.minecraft.core.Direction;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public class GlowLichenConfiguration implements FeatureConfiguration {
+@@ -50,11 +51,13 @@
+       if (var2) {
+          var7.add(Direction.DOWN);
+       }
+ 
+       if (var4) {
+-         Direction.Plane.HORIZONTAL.forEach(var7::add);
++         Direction.Plane var10000 = Direction.Plane.HORIZONTAL;
++         Objects.requireNonNull(var7);
++         var10000.forEach(var7::add);
+       }
+ 
+       this.validDirections = Collections.unmodifiableList(var7);
+    }
+ 

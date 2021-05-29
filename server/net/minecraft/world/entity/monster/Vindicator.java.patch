@@ -1,0 +1,82 @@
+--- net/minecraft/world/entity/monster/Vindicator.java
++++ net/minecraft/world/entity/monster/Vindicator.java
+@@ -45,14 +45,14 @@
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.ServerLevelAccessor;
+ 
+ public class Vindicator extends AbstractIllager {
+    private static final String TAG_JOHNNY = "Johnny";
+-   private static final Predicate<Difficulty> DOOR_BREAKING_PREDICATE = (var0) -> {
++   static final Predicate<Difficulty> DOOR_BREAKING_PREDICATE = (var0) -> {
+       return var0 == Difficulty.NORMAL || var0 == Difficulty.HARD;
+    };
+-   private boolean isJohnny;
++   boolean isJohnny;
+ 
+    public Vindicator(EntityType<? extends Vindicator> var1, Level var2) {
+       super(var1, var2);
+    }
+ 
+@@ -176,26 +176,11 @@
+       }
+ 
+       this.setItemSlot(EquipmentSlot.MAINHAND, var3);
+    }
+ 
+-   static class VindicatorJohnnyAttackGoal extends NearestAttackableTargetGoal<LivingEntity> {
+-      public VindicatorJohnnyAttackGoal(Vindicator var1) {
+-         super(var1, LivingEntity.class, 0, true, true, LivingEntity::attackable);
+-      }
+-
+-      public boolean canUse() {
+-         return ((Vindicator)this.mob).isJohnny && super.canUse();
+-      }
+-
+-      public void start() {
+-         super.start();
+-         this.mob.setNoActionTime(0);
+-      }
+-   }
+-
+-   static class VindicatorBreakDoorGoal extends BreakDoorGoal {
++   private static class VindicatorBreakDoorGoal extends BreakDoorGoal {
+       public VindicatorBreakDoorGoal(Mob var1) {
+          super(var1, 6, Vindicator.DOOR_BREAKING_PREDICATE);
+          this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+       }
+ 
+@@ -213,11 +198,11 @@
+          super.start();
+          this.mob.setNoActionTime(0);
+       }
+    }
+ 
+-   class VindicatorMeleeAttackGoal extends MeleeAttackGoal {
++   private class VindicatorMeleeAttackGoal extends MeleeAttackGoal {
+       public VindicatorMeleeAttackGoal(Vindicator var2) {
+          super(var2, 1.0D, false);
+       }
+ 
+       protected double getAttackReachSqr(LivingEntity var1) {
+@@ -227,6 +212,21 @@
+          } else {
+             return super.getAttackReachSqr(var1);
+          }
+       }
+    }
++
++   private static class VindicatorJohnnyAttackGoal extends NearestAttackableTargetGoal<LivingEntity> {
++      public VindicatorJohnnyAttackGoal(Vindicator var1) {
++         super(var1, LivingEntity.class, 0, true, true, LivingEntity::attackable);
++      }
++
++      public boolean canUse() {
++         return ((Vindicator)this.mob).isJohnny && super.canUse();
++      }
++
++      public void start() {
++         super.start();
++         this.mob.setNoActionTime(0);
++      }
++   }
+ }

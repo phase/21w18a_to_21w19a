@@ -1,0 +1,28 @@
+--- net/minecraft/world/level/levelgen/OreVeinifier.java
++++ net/minecraft/world/level/levelgen/OreVeinifier.java
+@@ -116,19 +116,19 @@
+       } else {
+          return null;
+       }
+    }
+ 
+-   static enum VeinType {
++   private static enum VeinType {
+       COPPER(Blocks.COPPER_ORE.defaultBlockState(), Blocks.RAW_COPPER_BLOCK.defaultBlockState(), Blocks.GRANITE.defaultBlockState(), 0, 50),
+       IRON(Blocks.DEEPSLATE_IRON_ORE.defaultBlockState(), Blocks.RAW_IRON_BLOCK.defaultBlockState(), Blocks.TUFF.defaultBlockState(), -60, -8);
+ 
+-      private final BlockState ore;
+-      private final BlockState rawOreBlock;
+-      private final BlockState filler;
+-      private final int minY;
+-      private final int maxY;
++      final BlockState ore;
++      final BlockState rawOreBlock;
++      final BlockState filler;
++      final int minY;
++      final int maxY;
+ 
+       private VeinType(BlockState var3, BlockState var4, BlockState var5, int var6, int var7) {
+          this.ore = var3;
+          this.rawOreBlock = var4;
+          this.filler = var5;

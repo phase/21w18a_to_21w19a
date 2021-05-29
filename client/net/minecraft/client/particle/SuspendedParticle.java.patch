@@ -1,0 +1,27 @@
+--- net/minecraft/client/particle/SuspendedParticle.java
++++ net/minecraft/client/particle/SuspendedParticle.java
+@@ -6,22 +6,22 @@
+ import net.minecraft.core.particles.ParticleGroup;
+ import net.minecraft.core.particles.SimpleParticleType;
+ import net.minecraft.util.Mth;
+ 
+ public class SuspendedParticle extends TextureSheetParticle {
+-   private SuspendedParticle(ClientLevel var1, SpriteSet var2, double var3, double var5, double var7) {
++   SuspendedParticle(ClientLevel var1, SpriteSet var2, double var3, double var5, double var7) {
+       super(var1, var3, var5 - 0.125D, var7);
+       this.setSize(0.01F, 0.01F);
+       this.pickSprite(var2);
+       this.quadSize *= this.random.nextFloat() * 0.6F + 0.2F;
+       this.lifetime = (int)(16.0D / (Math.random() * 0.8D + 0.2D));
+       this.hasPhysics = false;
+       this.friction = 1.0F;
+       this.gravity = 0.0F;
+    }
+ 
+-   private SuspendedParticle(ClientLevel var1, SpriteSet var2, double var3, double var5, double var7, double var9, double var11, double var13) {
++   SuspendedParticle(ClientLevel var1, SpriteSet var2, double var3, double var5, double var7, double var9, double var11, double var13) {
+       super(var1, var3, var5 - 0.125D, var7, var9, var11, var13);
+       this.setSize(0.01F, 0.01F);
+       this.pickSprite(var2);
+       this.quadSize *= this.random.nextFloat() * 0.6F + 0.6F;
+       this.lifetime = (int)(16.0D / (Math.random() * 0.8D + 0.2D));

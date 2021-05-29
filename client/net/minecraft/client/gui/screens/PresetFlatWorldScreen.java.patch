@@ -1,0 +1,127 @@
+--- net/minecraft/client/gui/screens/PresetFlatWorldScreen.java
++++ net/minecraft/client/gui/screens/PresetFlatWorldScreen.java
+@@ -35,10 +35,11 @@
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.dimension.DimensionType;
+ import net.minecraft.world.level.levelgen.StructureSettings;
+ import net.minecraft.world.level.levelgen.feature.StructureFeature;
++import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
+ import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
+ import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+@@ -49,19 +50,19 @@
+    private static final int SLOT_STAT_HEIGHT = 20;
+    private static final int SLOT_BG_X = 1;
+    private static final int SLOT_BG_Y = 1;
+    private static final int SLOT_FG_X = 2;
+    private static final int SLOT_FG_Y = 2;
+-   private static final List<PresetFlatWorldScreen.PresetInfo> PRESETS = Lists.newArrayList();
++   static final List<PresetFlatWorldScreen.PresetInfo> PRESETS = Lists.newArrayList();
+    private static final ResourceKey<Biome> DEFAULT_BIOME;
+-   private final CreateFlatWorldScreen parent;
++   final CreateFlatWorldScreen parent;
+    private Component shareText;
+    private Component listText;
+    private PresetFlatWorldScreen.PresetsList list;
+    private Button selectButton;
+-   private EditBox export;
+-   private FlatLevelGeneratorSettings settings;
++   EditBox export;
++   FlatLevelGeneratorSettings settings;
+ 
+    public PresetFlatWorldScreen(CreateFlatWorldScreen var1) {
+       super(new TranslatableComponent("createWorld.customize.presets.title"));
+       this.parent = var1;
+    }
+@@ -152,11 +153,11 @@
+             return var5;
+          }
+       }
+    }
+ 
+-   private static String save(Registry<Biome> var0, FlatLevelGeneratorSettings var1) {
++   static String save(Registry<Biome> var0, FlatLevelGeneratorSettings var1) {
+       StringBuilder var2 = new StringBuilder();
+ 
+       for(int var3 = 0; var3 < var1.getLayersInfo().size(); ++var3) {
+          if (var3 > 0) {
+             var2.append(",");
+@@ -238,11 +239,11 @@
+          HashMap var7x = Maps.newHashMap();
+          Iterator var8 = var3.iterator();
+ 
+          while(var8.hasNext()) {
+             StructureFeature var9 = (StructureFeature)var8.next();
+-            var7x.put(var9, StructureSettings.DEFAULTS.get(var9));
++            var7x.put(var9, (StructureFeatureConfiguration)StructureSettings.DEFAULTS.get(var9));
+          }
+ 
+          StructureSettings var11 = new StructureSettings(var4 ? Optional.of(StructureSettings.DEFAULT_STRONGHOLD) : Optional.empty(), var7x);
+          FlatLevelGeneratorSettings var12 = new FlatLevelGeneratorSettings(var11, var6x);
+          if (var5) {
+@@ -276,26 +277,10 @@
+       preset(new TranslatableComponent("createWorld.customize.preset.desert"), Blocks.SAND, Biomes.DESERT, Arrays.asList(StructureFeature.VILLAGE, StructureFeature.DESERT_PYRAMID, StructureFeature.MINESHAFT), true, true, false, new FlatLayerInfo(8, Blocks.SAND), new FlatLayerInfo(52, Blocks.SANDSTONE), new FlatLayerInfo(3, Blocks.STONE), new FlatLayerInfo(1, Blocks.BEDROCK));
+       preset(new TranslatableComponent("createWorld.customize.preset.redstone_ready"), Items.REDSTONE, Biomes.DESERT, Collections.emptyList(), false, false, false, new FlatLayerInfo(52, Blocks.SANDSTONE), new FlatLayerInfo(3, Blocks.STONE), new FlatLayerInfo(1, Blocks.BEDROCK));
+       preset(new TranslatableComponent("createWorld.customize.preset.the_void"), Blocks.BARRIER, Biomes.THE_VOID, Collections.emptyList(), false, true, false, new FlatLayerInfo(1, Blocks.AIR));
+    }
+ 
+-   static class PresetInfo {
+-      public final Item icon;
+-      public final Component name;
+-      public final Function<Registry<Biome>, FlatLevelGeneratorSettings> settings;
+-
+-      public PresetInfo(Item var1, Component var2, Function<Registry<Biome>, FlatLevelGeneratorSettings> var3) {
+-         this.icon = var1;
+-         this.name = var2;
+-         this.settings = var3;
+-      }
+-
+-      public Component getName() {
+-         return this.name;
+-      }
+-   }
+-
+    class PresetsList extends ObjectSelectionList<PresetFlatWorldScreen.PresetsList.Entry> {
+       public PresetsList() {
+          super(PresetFlatWorldScreen.this.minecraft, PresetFlatWorldScreen.this.width, PresetFlatWorldScreen.this.height, 80, PresetFlatWorldScreen.this.height - 37, 24);
+ 
+          for(int var2 = 0; var2 < PresetFlatWorldScreen.PRESETS.size(); ++var2) {
+@@ -345,11 +330,11 @@
+             }
+ 
+             return false;
+          }
+ 
+-         private void select() {
++         void select() {
+             PresetsList.this.setSelected(this);
+             PresetFlatWorldScreen.PresetInfo var1 = (PresetFlatWorldScreen.PresetInfo)PresetFlatWorldScreen.PRESETS.get(PresetsList.this.children().indexOf(this));
+             Registry var2 = PresetFlatWorldScreen.this.parent.parent.worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.BIOME_REGISTRY);
+             PresetFlatWorldScreen.this.settings = (FlatLevelGeneratorSettings)var1.settings.apply(var2);
+             PresetFlatWorldScreen.this.export.setValue(PresetFlatWorldScreen.save(var2, PresetFlatWorldScreen.this.settings));
+@@ -366,6 +351,22 @@
+             RenderSystem.setShaderTexture(0, GuiComponent.STATS_ICON_LOCATION);
+             GuiComponent.blit(var1, var2, var3, PresetFlatWorldScreen.this.getBlitOffset(), 0.0F, 0.0F, 18, 18, 128, 128);
+          }
+       }
+    }
++
++   private static class PresetInfo {
++      public final Item icon;
++      public final Component name;
++      public final Function<Registry<Biome>, FlatLevelGeneratorSettings> settings;
++
++      public PresetInfo(Item var1, Component var2, Function<Registry<Biome>, FlatLevelGeneratorSettings> var3) {
++         this.icon = var1;
++         this.name = var2;
++         this.settings = var3;
++      }
++
++      public Component getName() {
++         return this.name;
++      }
++   }
+ }

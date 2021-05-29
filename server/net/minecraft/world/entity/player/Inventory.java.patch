@@ -1,0 +1,28 @@
+--- net/minecraft/world/entity/player/Inventory.java
++++ net/minecraft/world/entity/player/Inventory.java
+@@ -77,11 +77,11 @@
+          if (var2 == -1) {
+             this.selected = this.getSuitableHotbarSlot();
+             if (!((ItemStack)this.items.get(this.selected)).isEmpty()) {
+                int var3 = this.getFreeSlot();
+                if (var3 != -1) {
+-                  this.items.set(var3, this.items.get(this.selected));
++                  this.items.set(var3, (ItemStack)this.items.get(this.selected));
+                }
+             }
+ 
+             this.items.set(this.selected, var1);
+          } else {
+@@ -92,11 +92,11 @@
+    }
+ 
+    public void pickSlot(int var1) {
+       this.selected = this.getSuitableHotbarSlot();
+       ItemStack var2 = (ItemStack)this.items.get(this.selected);
+-      this.items.set(this.selected, this.items.get(var1));
++      this.items.set(this.selected, (ItemStack)this.items.get(var1));
+       this.items.set(var1, var2);
+    }
+ 
+    public static boolean isHotbarSlot(int var0) {
+       return var0 >= 0 && var0 < 9;

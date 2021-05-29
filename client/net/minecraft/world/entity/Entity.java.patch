@@ -1,0 +1,55 @@
+--- net/minecraft/world/entity/Entity.java
++++ net/minecraft/world/entity/Entity.java
+@@ -2372,11 +2372,12 @@
+       return false;
+    }
+ 
+    public void fillCrashReportCategory(CrashReportCategory var1) {
+       var1.setDetail("Entity Type", () -> {
+-         return EntityType.getKey(this.getType()) + " (" + this.getClass().getCanonicalName() + ")";
++         ResourceLocation var10000 = EntityType.getKey(this.getType());
++         return var10000 + " (" + this.getClass().getCanonicalName() + ")";
+       });
+       var1.setDetail("Entity ID", (Object)this.id);
+       var1.setDetail("Entity Name", () -> {
+          return this.getName().getString();
+       });
+@@ -2496,16 +2497,17 @@
+       Pose var2 = this.getPose();
+       EntityDimensions var3 = this.getDimensions(var2);
+       this.dimensions = var3;
+       this.eyeHeight = this.getEyeHeight(var2, var3);
+       this.reapplyPosition();
+-      if (!this.level.isClientSide && !this.firstTick && (var3.width > var1.width || var3.height > var1.height) && !(this instanceof Player)) {
+-         Vec3 var4 = this.position().add(0.0D, (double)var1.height / 2.0D, 0.0D);
+-         double var5 = (double)Math.max(0.0F, var3.width - var1.width) + 1.0E-6D;
+-         double var7 = (double)Math.max(0.0F, var3.height - var1.height) + 1.0E-6D;
+-         VoxelShape var9 = Shapes.create(AABB.ofSize(var4, var5, var7, var5));
+-         this.level.findFreePosition(this, var9, var4, (double)var3.width, (double)var3.height, (double)var3.width).ifPresent((var2x) -> {
++      boolean var4 = (double)var3.width <= 4.0D && (double)var3.height <= 4.0D;
++      if (!this.level.isClientSide && !this.firstTick && !this.noPhysics && var4 && (var3.width > var1.width || var3.height > var1.height) && !(this instanceof Player)) {
++         Vec3 var5 = this.position().add(0.0D, (double)var1.height / 2.0D, 0.0D);
++         double var6 = (double)Math.max(0.0F, var3.width - var1.width) + 1.0E-6D;
++         double var8 = (double)Math.max(0.0F, var3.height - var1.height) + 1.0E-6D;
++         VoxelShape var10 = Shapes.create(AABB.ofSize(var5, var6, var8, var6));
++         this.level.findFreePosition(this, var10, var5, (double)var3.width, (double)var3.height, (double)var3.width).ifPresent((var2x) -> {
+             this.setPos(var2x.add(0.0D, (double)(-var3.height) / 2.0D, 0.0D));
+          });
+       }
+ 
+    }
+@@ -2884,10 +2886,14 @@
+ 
+    public BlockPos blockPosition() {
+       return this.blockPosition;
+    }
+ 
++   public BlockState getFeetBlockState() {
++      return this.level.getBlockState(this.blockPosition());
++   }
++
+    public BlockPos eyeBlockPosition() {
+       return new BlockPos(this.getEyePosition(1.0F));
+    }
+ 
+    public ChunkPos chunkPosition() {

@@ -1,0 +1,20 @@
+--- net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java
++++ net/minecraft/world/entity/ai/goal/LookAtPlayerGoal.java
+@@ -26,15 +26,15 @@
+       this.lookAtType = var2;
+       this.lookDistance = var3;
+       this.probability = var4;
+       this.setFlags(EnumSet.of(Goal.Flag.LOOK));
+       if (var2 == Player.class) {
+-         this.lookAtContext = (new TargetingConditions()).range((double)var3).allowSameTeam().allowInvulnerable().allowNonAttackable().selector((var1x) -> {
++         this.lookAtContext = TargetingConditions.forNonCombat().range((double)var3).selector((var1x) -> {
+             return EntitySelector.notRiding(var1).test(var1x);
+          });
+       } else {
+-         this.lookAtContext = (new TargetingConditions()).range((double)var3).allowSameTeam().allowInvulnerable().allowNonAttackable();
++         this.lookAtContext = TargetingConditions.forNonCombat().range((double)var3);
+       }
+ 
+    }
+ 
+    public boolean canUse() {

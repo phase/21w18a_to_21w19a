@@ -1,0 +1,123 @@
+--- net/minecraft/server/network/ServerGamePacketListenerImpl.java
++++ net/minecraft/server/network/ServerGamePacketListenerImpl.java
+@@ -11,10 +11,11 @@
+ import it.unimi.dsi.fastutil.objects.ObjectIterator;
+ import java.util.ArrayList;
+ import java.util.Collections;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Set;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.function.BiFunction;
+ import java.util.function.Consumer;
+@@ -78,10 +79,11 @@
+ import net.minecraft.network.protocol.game.ServerboundPlaceRecipePacket;
+ import net.minecraft.network.protocol.game.ServerboundPlayerAbilitiesPacket;
+ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+ import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+ import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
++import net.minecraft.network.protocol.game.ServerboundPongPacket;
+ import net.minecraft.network.protocol.game.ServerboundRecipeBookChangeSettingsPacket;
+ import net.minecraft.network.protocol.game.ServerboundRecipeBookSeenRecipePacket;
+ import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
+ import net.minecraft.network.protocol.game.ServerboundResourcePackPacket;
+ import net.minecraft.network.protocol.game.ServerboundSeenAdvancementsPacket;
+@@ -153,11 +155,11 @@
+ import org.apache.commons.lang3.StringUtils;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, ServerGamePacketListener {
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+    private static final int LATENCY_CHECK_INTERVAL = 15000;
+    public final Connection connection;
+    private final MinecraftServer server;
+    public ServerPlayer player;
+    private int tickCount;
+@@ -292,12 +294,14 @@
+    public void disconnect(Component var1) {
+       this.connection.send(new ClientboundDisconnectPacket(var1), (var2) -> {
+          this.connection.disconnect(var1);
+       });
+       this.connection.setReadOnly();
++      MinecraftServer var10000 = this.server;
+       Connection var10001 = this.connection;
+-      this.server.executeBlocking(var10001::handleDisconnection);
++      Objects.requireNonNull(var10001);
++      var10000.executeBlocking(var10001::handleDisconnection);
+    }
+ 
+    private <T, R> void filterTextPacket(T var1, Consumer<R> var2, BiFunction<TextFilter, T, CompletableFuture<R>> var3) {
+       MinecraftServer var4 = this.player.getLevel().getServer();
+       Consumer var5 = (var2x) -> {
+@@ -424,10 +428,11 @@
+ 
+    public void handleRecipeBookSeenRecipePacket(ServerboundRecipeBookSeenRecipePacket var1) {
+       PacketUtils.ensureRunningOnSameThread(var1, this, (ServerLevel)this.player.getLevel());
+       Optional var10000 = this.server.getRecipeManager().byKey(var1.getRecipe());
+       ServerRecipeBook var10001 = this.player.getRecipeBook();
++      Objects.requireNonNull(var10001);
+       var10000.ifPresent(var10001::removeHighlight);
+    }
+ 
+    public void handleRecipeBookChangeSettingsPacket(ServerboundRecipeBookChangeSettingsPacket var1) {
+       PacketUtils.ensureRunningOnSameThread(var1, this, (ServerLevel)this.player.getLevel());
+@@ -554,11 +559,11 @@
+    public void handleRenameItem(ServerboundRenameItemPacket var1) {
+       PacketUtils.ensureRunningOnSameThread(var1, this, (ServerLevel)this.player.getLevel());
+       if (this.player.containerMenu instanceof AnvilMenu) {
+          AnvilMenu var2 = (AnvilMenu)this.player.containerMenu;
+          String var3 = SharedConstants.filterText(var1.getName());
+-         if (var3.length() <= 35) {
++         if (var3.length() <= 50) {
+             var2.setItemName(var3);
+          }
+       }
+ 
+    }
+@@ -731,13 +736,15 @@
+    }
+ 
+    private void updateBookPages(List<TextFilter.FilteredText> var1, UnaryOperator<String> var2, ItemStack var3) {
+       ListTag var4 = new ListTag();
+       if (this.player.isTextFilteringEnabled()) {
+-         var1.stream().map((var1x) -> {
++         Stream var10000 = var1.stream().map((var1x) -> {
+             return StringTag.valueOf((String)var2.apply(var1x.getFiltered()));
+-         }).forEach(var4::add);
++         });
++         Objects.requireNonNull(var4);
++         var10000.forEach(var4::add);
+       } else {
+          CompoundTag var5 = new CompoundTag();
+          int var6 = 0;
+ 
+          for(int var7 = var1.size(); var6 < var7; ++var6) {
+@@ -1051,10 +1058,13 @@
+          ((Boat)var2).setPaddleState(var1.getLeft(), var1.getRight());
+       }
+ 
+    }
+ 
++   public void handlePong(ServerboundPongPacket var1) {
++   }
++
+    public void onDisconnect(Component var1) {
+       LOGGER.info((String)"{} lost connection: {}", (Object)this.player.getName().getString(), (Object)var1.getString());
+       this.server.invalidateStatus();
+       this.server.getPlayerList().broadcastMessage((new TranslatableComponent("multiplayer.player.left", new Object[]{this.player.getDisplayName()})).withStyle(ChatFormatting.YELLOW), ChatType.SYSTEM, Util.NIL_UUID);
+       this.player.disconnect();
+@@ -1445,9 +1455,9 @@
+    public ServerPlayer getPlayer() {
+       return this.player;
+    }
+ 
+    @FunctionalInterface
+-   interface EntityInteraction {
++   private interface EntityInteraction {
+       InteractionResult run(ServerPlayer var1, Entity var2, InteractionHand var3);
+    }
+ }

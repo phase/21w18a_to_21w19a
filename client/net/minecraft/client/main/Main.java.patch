@@ -1,0 +1,15 @@
+--- net/minecraft/client/main/Main.java
++++ net/minecraft/client/main/Main.java
+@@ -37,11 +37,11 @@
+ import net.minecraft.world.entity.player.Player;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class Main {
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+ 
+    public Main() {
+    }
+ 
+    @DontObfuscate

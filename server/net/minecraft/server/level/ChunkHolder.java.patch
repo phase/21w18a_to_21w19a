@@ -1,0 +1,105 @@
+--- net/minecraft/server/level/ChunkHolder.java
++++ net/minecraft/server/level/ChunkHolder.java
+@@ -3,10 +3,11 @@
+ import com.mojang.datafixers.util.Either;
+ import it.unimi.dsi.fastutil.shorts.ShortArraySet;
+ import it.unimi.dsi.fastutil.shorts.ShortSet;
+ import java.util.BitSet;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.concurrent.Executor;
+ import java.util.concurrent.atomic.AtomicReferenceArray;
+ import java.util.function.IntConsumer;
+@@ -54,11 +55,11 @@
+    @Nullable
+    private final DebugBuffer<ChunkHolder.ChunkSaveDebug> chunkToSaveHistory;
+    private int oldTicketLevel;
+    private int ticketLevel;
+    private int queueLevel;
+-   private final ChunkPos pos;
++   final ChunkPos pos;
+    private boolean hasChangedSections;
+    private final ShortSet[] changedBlocksPerSection;
+    private final BitSet blockChangedLightSectionFilter;
+    private final BitSet skyChangedLightSectionFilter;
+    private final LevelLightEngine lightEngine;
+@@ -361,11 +362,11 @@
+ 
+       if (var15 && !var16) {
+          var11 = this.fullChunkFuture;
+          this.fullChunkFuture = UNLOADED_LEVEL_CHUNK_FUTURE;
+          this.updateChunkToSave(var11.thenApply((var1x) -> {
+-            var1.getClass();
++            Objects.requireNonNull(var1);
+             return var1x.ifLeft(var1::packTicks);
+          }), "unfull");
+       }
+ 
+       boolean var17 = var7.isOrAfter(ChunkHolder.FullChunkStatus.TICKING);
+@@ -443,39 +444,31 @@
+       UNLOADED_LEVEL_CHUNK_FUTURE = CompletableFuture.completedFuture(UNLOADED_LEVEL_CHUNK);
+       CHUNK_STATUSES = ChunkStatus.getStatusList();
+       FULL_CHUNK_STATUSES = ChunkHolder.FullChunkStatus.values();
+    }
+ 
++   @FunctionalInterface
++   public interface LevelChangeListener {
++      void onLevelChange(ChunkPos var1, IntSupplier var2, int var3, IntConsumer var4);
++   }
++
++   public interface PlayerProvider {
++      Stream<ServerPlayer> getPlayers(ChunkPos var1, boolean var2);
++   }
++
+    static final class ChunkSaveDebug {
+       private final Thread thread;
+       private final CompletableFuture<? extends Either<? extends ChunkAccess, ChunkHolder.ChunkLoadingFailure>> future;
+       private final String source;
+ 
+-      private ChunkSaveDebug(Thread var1, CompletableFuture<? extends Either<? extends ChunkAccess, ChunkHolder.ChunkLoadingFailure>> var2, String var3) {
++      ChunkSaveDebug(Thread var1, CompletableFuture<? extends Either<? extends ChunkAccess, ChunkHolder.ChunkLoadingFailure>> var2, String var3) {
+          this.thread = var1;
+          this.future = var2;
+          this.source = var3;
+       }
+    }
+ 
+-   public interface PlayerProvider {
+-      Stream<ServerPlayer> getPlayers(ChunkPos var1, boolean var2);
+-   }
+-
+-   @FunctionalInterface
+-   public interface LevelChangeListener {
+-      void onLevelChange(ChunkPos var1, IntSupplier var2, int var3, IntConsumer var4);
+-   }
+-
+-   public interface ChunkLoadingFailure {
+-      ChunkHolder.ChunkLoadingFailure UNLOADED = new ChunkHolder.ChunkLoadingFailure() {
+-         public String toString() {
+-            return "UNLOADED";
+-         }
+-      };
+-   }
+-
+    public static enum FullChunkStatus {
+       INACCESSIBLE,
+       BORDER,
+       TICKING,
+       ENTITY_TICKING;
+@@ -485,6 +478,14 @@
+ 
+       public boolean isOrAfter(ChunkHolder.FullChunkStatus var1) {
+          return this.ordinal() >= var1.ordinal();
+       }
+    }
++
++   public interface ChunkLoadingFailure {
++      ChunkHolder.ChunkLoadingFailure UNLOADED = new ChunkHolder.ChunkLoadingFailure() {
++         public String toString() {
++            return "UNLOADED";
++         }
++      };
++   }
+ }

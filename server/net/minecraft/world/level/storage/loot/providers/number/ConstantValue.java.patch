@@ -1,0 +1,18 @@
+--- net/minecraft/world/level/storage/loot/providers/number/ConstantValue.java
++++ net/minecraft/world/level/storage/loot/providers/number/ConstantValue.java
+@@ -8,13 +8,13 @@
+ import net.minecraft.util.GsonHelper;
+ import net.minecraft.world.level.storage.loot.GsonAdapterFactory;
+ import net.minecraft.world.level.storage.loot.LootContext;
+ 
+ public final class ConstantValue implements NumberProvider {
+-   private final float value;
++   final float value;
+ 
+-   private ConstantValue(float var1) {
++   ConstantValue(float var1) {
+       this.value = var1;
+    }
+ 
+    public LootNumberProviderType getType() {
+       return NumberProviders.CONSTANT;

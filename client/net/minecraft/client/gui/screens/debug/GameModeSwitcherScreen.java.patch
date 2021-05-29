@@ -1,0 +1,170 @@
+--- net/minecraft/client/gui/screens/debug/GameModeSwitcherScreen.java
++++ net/minecraft/client/gui/screens/debug/GameModeSwitcherScreen.java
+@@ -23,11 +23,11 @@
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.GameType;
+ import net.minecraft.world.level.block.Blocks;
+ 
+ public class GameModeSwitcherScreen extends Screen {
+-   private static final ResourceLocation GAMEMODE_SWITCHER_LOCATION = new ResourceLocation("textures/gui/container/gamemode_switcher.png");
++   static final ResourceLocation GAMEMODE_SWITCHER_LOCATION = new ResourceLocation("textures/gui/container/gamemode_switcher.png");
+    private static final int SPRITE_SHEET_WIDTH = 128;
+    private static final int SPRITE_SHEET_HEIGHT = 128;
+    private static final int SLOT_AREA = 26;
+    private static final int SLOT_PADDING = 5;
+    private static final int SLOT_AREA_PADDED = 31;
+@@ -145,58 +145,11 @@
+ 
+    static {
+       SELECT_KEY = new TranslatableComponent("debug.gamemodes.select_next", new Object[]{(new TranslatableComponent("debug.gamemodes.press_f4")).withStyle(ChatFormatting.AQUA)});
+    }
+ 
+-   public class GameModeSlot extends AbstractWidget {
+-      private final GameModeSwitcherScreen.GameModeIcon icon;
+-      private boolean isSelected;
+-
+-      public GameModeSlot(GameModeSwitcherScreen.GameModeIcon var2, int var3, int var4) {
+-         super(var3, var4, 26, 26, var2.getName());
+-         this.icon = var2;
+-      }
+-
+-      public void renderButton(PoseStack var1, int var2, int var3, float var4) {
+-         Minecraft var5 = Minecraft.getInstance();
+-         this.drawSlot(var1, var5.getTextureManager());
+-         this.icon.drawIcon(GameModeSwitcherScreen.this.itemRenderer, this.x + 5, this.y + 5);
+-         if (this.isSelected) {
+-            this.drawSelection(var1, var5.getTextureManager());
+-         }
+-
+-      }
+-
+-      public boolean isHovered() {
+-         return super.isHovered() || this.isSelected;
+-      }
+-
+-      public void setSelected(boolean var1) {
+-         this.isSelected = var1;
+-         this.narrate();
+-      }
+-
+-      private void drawSlot(PoseStack var1, TextureManager var2) {
+-         RenderSystem.setShader(GameRenderer::getPositionTexShader);
+-         RenderSystem.setShaderTexture(0, GameModeSwitcherScreen.GAMEMODE_SWITCHER_LOCATION);
+-         var1.pushPose();
+-         var1.translate((double)this.x, (double)this.y, 0.0D);
+-         blit(var1, 0, 0, 0.0F, 75.0F, 26, 26, 128, 128);
+-         var1.popPose();
+-      }
+-
+-      private void drawSelection(PoseStack var1, TextureManager var2) {
+-         RenderSystem.setShader(GameRenderer::getPositionTexShader);
+-         RenderSystem.setShaderTexture(0, GameModeSwitcherScreen.GAMEMODE_SWITCHER_LOCATION);
+-         var1.pushPose();
+-         var1.translate((double)this.x, (double)this.y, 0.0D);
+-         blit(var1, 0, 0, 26.0F, 75.0F, 26, 26, 128, 128);
+-         var1.popPose();
+-      }
+-   }
+-
+-   static enum GameModeIcon {
++   private static enum GameModeIcon {
+       CREATIVE(new TranslatableComponent("gameMode.creative"), "/gamemode creative", new ItemStack(Blocks.GRASS_BLOCK)),
+       SURVIVAL(new TranslatableComponent("gameMode.survival"), "/gamemode survival", new ItemStack(Items.IRON_SWORD)),
+       ADVENTURE(new TranslatableComponent("gameMode.adventure"), "/gamemode adventure", new ItemStack(Items.MAP)),
+       SPECTATOR(new TranslatableComponent("gameMode.spectator"), "/gamemode spectator", new ItemStack(Items.ENDER_EYE));
+ 
+@@ -211,23 +164,23 @@
+          this.name = var3;
+          this.command = var4;
+          this.renderStack = var5;
+       }
+ 
+-      private void drawIcon(ItemRenderer var1, int var2, int var3) {
++      void drawIcon(ItemRenderer var1, int var2, int var3) {
+          var1.renderAndDecorateItem(this.renderStack, var2, var3);
+       }
+ 
+-      private Component getName() {
++      Component getName() {
+          return this.name;
+       }
+ 
+-      private String getCommand() {
++      String getCommand() {
+          return this.command;
+       }
+ 
+-      private Optional<GameModeSwitcherScreen.GameModeIcon> getNext() {
++      Optional<GameModeSwitcherScreen.GameModeIcon> getNext() {
+          switch(this) {
+          case CREATIVE:
+             return Optional.of(SURVIVAL);
+          case SURVIVAL:
+             return Optional.of(ADVENTURE);
+@@ -236,11 +189,11 @@
+          default:
+             return Optional.of(CREATIVE);
+          }
+       }
+ 
+-      private static Optional<GameModeSwitcherScreen.GameModeIcon> getFromGameType(GameType var0) {
++      static Optional<GameModeSwitcherScreen.GameModeIcon> getFromGameType(GameType var0) {
+          switch(var0) {
+          case SPECTATOR:
+             return Optional.of(SPECTATOR);
+          case SURVIVAL:
+             return Optional.of(SURVIVAL);
+@@ -251,6 +204,53 @@
+          default:
+             return Optional.empty();
+          }
+       }
+    }
++
++   public class GameModeSlot extends AbstractWidget {
++      final GameModeSwitcherScreen.GameModeIcon icon;
++      private boolean isSelected;
++
++      public GameModeSlot(GameModeSwitcherScreen.GameModeIcon var2, int var3, int var4) {
++         super(var3, var4, 26, 26, var2.getName());
++         this.icon = var2;
++      }
++
++      public void renderButton(PoseStack var1, int var2, int var3, float var4) {
++         Minecraft var5 = Minecraft.getInstance();
++         this.drawSlot(var1, var5.getTextureManager());
++         this.icon.drawIcon(GameModeSwitcherScreen.this.itemRenderer, this.x + 5, this.y + 5);
++         if (this.isSelected) {
++            this.drawSelection(var1, var5.getTextureManager());
++         }
++
++      }
++
++      public boolean isHovered() {
++         return super.isHovered() || this.isSelected;
++      }
++
++      public void setSelected(boolean var1) {
++         this.isSelected = var1;
++         this.narrate();
++      }
++
++      private void drawSlot(PoseStack var1, TextureManager var2) {
++         RenderSystem.setShader(GameRenderer::getPositionTexShader);
++         RenderSystem.setShaderTexture(0, GameModeSwitcherScreen.GAMEMODE_SWITCHER_LOCATION);
++         var1.pushPose();
++         var1.translate((double)this.x, (double)this.y, 0.0D);
++         blit(var1, 0, 0, 0.0F, 75.0F, 26, 26, 128, 128);
++         var1.popPose();
++      }
++
++      private void drawSelection(PoseStack var1, TextureManager var2) {
++         RenderSystem.setShader(GameRenderer::getPositionTexShader);
++         RenderSystem.setShaderTexture(0, GameModeSwitcherScreen.GAMEMODE_SWITCHER_LOCATION);
++         var1.pushPose();
++         var1.translate((double)this.x, (double)this.y, 0.0D);
++         blit(var1, 0, 0, 26.0F, 75.0F, 26, 26, 128, 128);
++         var1.popPose();
++      }
++   }
+ }

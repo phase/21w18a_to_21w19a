@@ -1,0 +1,82 @@
+--- net/minecraft/client/multiplayer/ClientLevel.java
++++ net/minecraft/client/multiplayer/ClientLevel.java
+@@ -79,18 +79,18 @@
+ import net.minecraft.world.phys.shapes.VoxelShape;
+ import net.minecraft.world.scores.Scoreboard;
+ 
+ public class ClientLevel extends Level {
+    private static final double FLUID_PARTICLE_SPAWN_OFFSET = 0.05D;
+-   private final EntityTickList tickingEntities = new EntityTickList();
++   final EntityTickList tickingEntities = new EntityTickList();
+    private final TransientEntitySectionManager<Entity> entityStorage = new TransientEntitySectionManager(Entity.class, new ClientLevel.EntityCallbacks());
+    private final ClientPacketListener connection;
+    private final LevelRenderer levelRenderer;
+    private final ClientLevel.ClientLevelData clientLevelData;
+    private final DimensionSpecialEffects effects;
+    private final Minecraft minecraft = Minecraft.getInstance();
+-   private final List<AbstractClientPlayer> players = Lists.newArrayList();
++   final List<AbstractClientPlayer> players = Lists.newArrayList();
+    private Scoreboard scoreboard = new Scoreboard();
+    private final Map<String, MapItemSavedData> mapData = Maps.newHashMap();
+    private static final long CLOUD_COLOR = 16777215L;
+    private int skyFlashTime;
+    private final Object2ObjectArrayMap<ColorResolver, BlockTintCache> tintCaches = (Object2ObjectArrayMap)Util.make(new Object2ObjectArrayMap(3), (var0) -> {
+@@ -705,34 +705,22 @@
+    protected LevelEntityGetter<Entity> getEntities() {
+       return this.entityStorage.getEntityGetter();
+    }
+ 
+    public String gatherChunkSourceStats() {
+-      return "Chunks[C] W: " + this.chunkSource.gatherStats() + " E: " + this.entityStorage.gatherStats();
++      String var10000 = this.chunkSource.gatherStats();
++      return "Chunks[C] W: " + var10000 + " E: " + this.entityStorage.gatherStats();
+    }
+ 
+    public void addDestroyBlockEffect(BlockPos var1, BlockState var2) {
+       this.minecraft.particleEngine.destroy(var1, var2);
+    }
+ 
+-   static enum MarkerParticleStatus {
+-      BARRIER(Blocks.BARRIER, ParticleTypes.BARRIER),
+-      LIGHT(Blocks.LIGHT, ParticleTypes.LIGHT);
+-
+-      private final Block block;
+-      private final ParticleOptions particle;
+-
+-      private MarkerParticleStatus(Block var3, ParticleOptions var4) {
+-         this.block = var3;
+-         this.particle = var4;
++   private final class EntityCallbacks implements LevelCallback<Entity> {
++      EntityCallbacks() {
+       }
+-   }
+ 
+-   final class EntityCallbacks implements LevelCallback<Entity> {
+-      private EntityCallbacks() {
+-      }
+-
+       public void onCreated(Entity var1) {
+       }
+ 
+       public void onDestroyed(Entity var1) {
+       }
+@@ -880,6 +868,19 @@
+ 
+       public double getClearColorScale() {
+          return this.isFlat ? 1.0D : 0.03125D;
+       }
+    }
++
++   static enum MarkerParticleStatus {
++      BARRIER(Blocks.BARRIER, ParticleTypes.BARRIER),
++      LIGHT(Blocks.LIGHT, ParticleTypes.LIGHT);
++
++      final Block block;
++      final ParticleOptions particle;
++
++      private MarkerParticleStatus(Block var3, ParticleOptions var4) {
++         this.block = var3;
++         this.particle = var4;
++      }
++   }
+ }

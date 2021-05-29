@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/levelgen/feature/EndCityFeature.java
++++ net/minecraft/world/level/levelgen/feature/EndCityFeature.java
+@@ -36,11 +36,11 @@
+ 
+    public StructureFeature.StructureStartFactory<NoneFeatureConfiguration> getStartFactory() {
+       return EndCityFeature.EndCityStart::new;
+    }
+ 
+-   private static int getYPositionForFeature(ChunkPos var0, ChunkGenerator var1, LevelHeightAccessor var2) {
++   static int getYPositionForFeature(ChunkPos var0, ChunkGenerator var1, LevelHeightAccessor var2) {
+       Random var3 = new Random((long)(var0.x + var0.z * 10387313));
+       Rotation var4 = Rotation.getRandom(var3);
+       byte var5 = 5;
+       byte var6 = 5;
+       if (var4 == Rotation.CLOCKWISE_90) {

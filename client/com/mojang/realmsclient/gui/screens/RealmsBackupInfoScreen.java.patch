@@ -1,0 +1,54 @@
+--- com/mojang/realmsclient/gui/screens/RealmsBackupInfoScreen.java
++++ com/mojang/realmsclient/gui/screens/RealmsBackupInfoScreen.java
+@@ -17,11 +17,11 @@
+ import net.minecraft.world.level.GameType;
+ 
+ public class RealmsBackupInfoScreen extends RealmsScreen {
+    private static final Component TEXT_UNKNOWN = new TextComponent("UNKNOWN");
+    private final Screen lastScreen;
+-   private final Backup backup;
++   final Backup backup;
+    private RealmsBackupInfoScreen.BackupInfoList backupInfoList;
+ 
+    public RealmsBackupInfoScreen(Screen var1, Backup var2) {
+       this.lastScreen = var1;
+       this.backup = var2;
+@@ -58,11 +58,11 @@
+       drawCenteredString(var1, this.font, "Changes from last backup", this.width / 2, 10, 16777215);
+       this.backupInfoList.render(var1, var2, var3, var4);
+       super.render(var1, var2, var3, var4);
+    }
+ 
+-   private Component checkForSpecificMetadata(String var1, String var2) {
++   Component checkForSpecificMetadata(String var1, String var2) {
+       String var3 = var1.toLowerCase(Locale.ROOT);
+       if (var3.contains("game") && var3.contains("mode")) {
+          return this.gameModeMetadata(var2);
+       } else {
+          return (Component)(var3.contains("game") && var3.contains("difficulty") ? this.gameDifficultyMetadata(var2) : new TextComponent(var2));
+@@ -83,11 +83,11 @@
+       } catch (Exception var3) {
+          return TEXT_UNKNOWN;
+       }
+    }
+ 
+-   class BackupInfoList extends ObjectSelectionList<RealmsBackupInfoScreen.BackupInfoListEntry> {
++   private class BackupInfoList extends ObjectSelectionList<RealmsBackupInfoScreen.BackupInfoListEntry> {
+       public BackupInfoList(Minecraft var2) {
+          super(var2, RealmsBackupInfoScreen.this.width, RealmsBackupInfoScreen.this.height, 32, RealmsBackupInfoScreen.this.height - 64, 36);
+          this.setRenderSelection(false);
+          if (RealmsBackupInfoScreen.this.backup.changeList != null) {
+             RealmsBackupInfoScreen.this.backup.changeList.forEach((var1x, var2x) -> {
+@@ -96,11 +96,11 @@
+          }
+ 
+       }
+    }
+ 
+-   class BackupInfoListEntry extends ObjectSelectionList.Entry<RealmsBackupInfoScreen.BackupInfoListEntry> {
++   private class BackupInfoListEntry extends ObjectSelectionList.Entry<RealmsBackupInfoScreen.BackupInfoListEntry> {
+       private final String key;
+       private final String value;
+ 
+       public BackupInfoListEntry(String var2, String var3) {
+          this.key = var2;

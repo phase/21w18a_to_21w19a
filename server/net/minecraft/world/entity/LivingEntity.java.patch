@@ -1,0 +1,140 @@
+--- net/minecraft/world/entity/LivingEntity.java
++++ net/minecraft/world/entity/LivingEntity.java
+@@ -30,10 +30,11 @@
+ import net.minecraft.core.particles.ItemParticleOption;
+ import net.minecraft.core.particles.ParticleTypes;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.NbtOps;
++import net.minecraft.nbt.Tag;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ClientboundAddMobPacket;
+ import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+ import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
+ import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
+@@ -51,11 +52,10 @@
+ import net.minecraft.stats.Stats;
+ import net.minecraft.tags.BlockTags;
+ import net.minecraft.tags.EntityTypeTags;
+ import net.minecraft.tags.FluidTags;
+ import net.minecraft.tags.ItemTags;
+-import net.minecraft.tags.Tag;
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.InteractionHand;
+ import net.minecraft.world.damagesource.CombatRules;
+ import net.minecraft.world.damagesource.CombatTracker;
+ import net.minecraft.world.damagesource.DamageSource;
+@@ -241,11 +241,11 @@
+       this.timeOffs = (float)Math.random() * 12398.0F;
+       this.setYRot((float)(Math.random() * 6.2831854820251465D));
+       this.yHeadRot = this.getYRot();
+       this.maxUpStep = 0.6F;
+       NbtOps var3 = NbtOps.INSTANCE;
+-      this.brain = this.makeBrain(new Dynamic(var3, var3.createMap((Map)ImmutableMap.of(var3.createString("memories"), var3.emptyMap()))));
++      this.brain = this.makeBrain(new Dynamic(var3, (Tag)var3.createMap((Map)ImmutableMap.of(var3.createString("memories"), (Tag)var3.emptyMap()))));
+    }
+ 
+    public Brain<?> getBrain() {
+       return this.brain;
+    }
+@@ -654,11 +654,11 @@
+          var1.putInt("SleepingY", var1x.getY());
+          var1.putInt("SleepingZ", var1x.getZ());
+       });
+       DataResult var5 = this.brain.serializeStart(NbtOps.INSTANCE);
+       Logger var10001 = LOGGER;
+-      var10001.getClass();
++      java.util.Objects.requireNonNull(var10001);
+       var5.resultOrPartial(var10001::error).ifPresent((var1x) -> {
+          var1.put("Brain", var1x);
+       });
+    }
+ 
+@@ -822,14 +822,18 @@
+ 
+    public boolean canAttack(LivingEntity var1, TargetingConditions var2) {
+       return var2.test(this, var1);
+    }
+ 
+-   public boolean canBeTargeted() {
+-      return true;
++   public boolean canBeSeenAsEnemy() {
++      return !this.isInvulnerable() && this.canBeSeenByAnyone();
+    }
+ 
++   public boolean canBeSeenByAnyone() {
++      return !this.isSpectator() && this.isAlive();
++   }
++
+    public static boolean areAllEffectsAmbient(Collection<MobEffectInstance> var0) {
+       Iterator var1 = var0.iterator();
+ 
+       MobEffectInstance var2;
+       do {
+@@ -1403,14 +1407,10 @@
+             return false;
+          }
+       }
+    }
+ 
+-   public BlockState getFeetBlockState() {
+-      return this.level.getBlockState(this.blockPosition());
+-   }
+-
+    private boolean trapdoorUsableAsLadder(BlockPos var1, BlockState var2) {
+       if ((Boolean)var2.getValue(TrapDoorBlock.OPEN)) {
+          BlockState var3 = this.level.getBlockState(var1.below());
+          if (var3.is(Blocks.LADDER) && var3.getValue(LadderBlock.FACING) == var2.getValue(TrapDoorBlock.FACING)) {
+             return true;
+@@ -1941,11 +1941,11 @@
+ 
+    protected void goDownInWater() {
+       this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -0.03999999910593033D, 0.0D));
+    }
+ 
+-   protected void jumpInLiquid(Tag<Fluid> var1) {
++   protected void jumpInLiquid(net.minecraft.tags.Tag<Fluid> var1) {
+       this.setDeltaMovement(this.getDeltaMovement().add(0.0D, 0.03999999910593033D, 0.0D));
+    }
+ 
+    protected float getWaterSlowDown() {
+       return 0.8F;
+@@ -2691,11 +2691,11 @@
+          ((ServerLevel)this.level).getChunkSource().broadcast(var1, new ClientboundTakeItemEntityPacket(var1.getId(), this.getId(), var2));
+       }
+ 
+    }
+ 
+-   public boolean canSee(Entity var1) {
++   public boolean hasLineOfSight(Entity var1) {
+       Vec3 var2 = new Vec3(this.getX(), this.getEyeY(), this.getZ());
+       Vec3 var3 = new Vec3(var1.getX(), var1.getEyeY(), var1.getZ());
+       return this.level.clip(new ClipContext(var2, var3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS;
+    }
+ 
+@@ -3099,11 +3099,11 @@
+    }
+ 
+    public void stopSleeping() {
+       Optional var10000 = this.getSleepingPos();
+       Level var10001 = this.level;
+-      var10001.getClass();
++      java.util.Objects.requireNonNull(var10001);
+       var10000.filter(var10001::hasChunkAt).ifPresent((var1x) -> {
+          BlockState var2 = this.level.getBlockState(var1x);
+          if (var2.getBlock() instanceof BedBlock) {
+             this.level.setBlock(var1x, (BlockState)var2.setValue(BedBlock.OCCUPIED, false), 3);
+             Vec3 var3 = (Vec3)BedBlock.findStandUpPosition(this.getType(), this.level, var1x, this.getYRot()).orElseGet(() -> {
+@@ -3258,11 +3258,11 @@
+ 
+    public boolean canFreeze() {
+       if (this.isSpectator()) {
+          return false;
+       } else {
+-         boolean var1 = !this.getItemBySlot(EquipmentSlot.HEAD).is((Tag)ItemTags.FREEZE_IMMUNE_WEARABLES) && !this.getItemBySlot(EquipmentSlot.CHEST).is((Tag)ItemTags.FREEZE_IMMUNE_WEARABLES) && !this.getItemBySlot(EquipmentSlot.LEGS).is((Tag)ItemTags.FREEZE_IMMUNE_WEARABLES) && !this.getItemBySlot(EquipmentSlot.FEET).is((Tag)ItemTags.FREEZE_IMMUNE_WEARABLES);
++         boolean var1 = !this.getItemBySlot(EquipmentSlot.HEAD).is((net.minecraft.tags.Tag)ItemTags.FREEZE_IMMUNE_WEARABLES) && !this.getItemBySlot(EquipmentSlot.CHEST).is((net.minecraft.tags.Tag)ItemTags.FREEZE_IMMUNE_WEARABLES) && !this.getItemBySlot(EquipmentSlot.LEGS).is((net.minecraft.tags.Tag)ItemTags.FREEZE_IMMUNE_WEARABLES) && !this.getItemBySlot(EquipmentSlot.FEET).is((net.minecraft.tags.Tag)ItemTags.FREEZE_IMMUNE_WEARABLES);
+          return var1 && super.canFreeze();
+       }
+    }
+ 
+    public boolean isCurrentlyGlowing() {

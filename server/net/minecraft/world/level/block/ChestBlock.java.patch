@@ -1,0 +1,32 @@
+--- net/minecraft/world/level/block/ChestBlock.java
++++ net/minecraft/world/level/block/ChestBlock.java
+@@ -1,10 +1,11 @@
+ package net.minecraft.world.level.block;
+ 
+ import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Random;
+ import java.util.function.BiPredicate;
+ import java.util.function.Supplier;
+ import javax.annotation.Nullable;
+@@ -238,15 +239,17 @@
+                return Math.max(var1.getOpenNess(var2x), var2.getOpenNess(var2x));
+             };
+          }
+ 
+          public Float2FloatFunction acceptSingle(ChestBlockEntity var1) {
++            Objects.requireNonNull(var1);
+             return var1::getOpenNess;
+          }
+ 
+          public Float2FloatFunction acceptNone() {
+             LidBlockEntity var10000 = var0;
++            Objects.requireNonNull(var10000);
+             return var10000::getOpenNess;
+          }
+       };
+    }
+ 

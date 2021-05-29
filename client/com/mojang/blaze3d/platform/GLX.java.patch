@@ -1,0 +1,20 @@
+--- com/mojang/blaze3d/platform/GLX.java
++++ com/mojang/blaze3d/platform/GLX.java
+@@ -32,11 +32,16 @@
+    public GLX() {
+    }
+ 
+    public static String getOpenGLVersionString() {
+       RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+-      return GLFW.glfwGetCurrentContext() == 0L ? "NO CONTEXT" : GlStateManager._getString(7937) + " GL version " + GlStateManager._getString(7938) + ", " + GlStateManager._getString(7936);
++      if (GLFW.glfwGetCurrentContext() == 0L) {
++         return "NO CONTEXT";
++      } else {
++         String var10000 = GlStateManager._getString(7937);
++         return var10000 + " GL version " + GlStateManager._getString(7938) + ", " + GlStateManager._getString(7936);
++      }
+    }
+ 
+    public static int _getRefreshRate(Window var0) {
+       RenderSystem.assertThread(RenderSystem::isOnRenderThread);
+       long var1 = GLFW.glfwGetWindowMonitor(var0.getWindow());

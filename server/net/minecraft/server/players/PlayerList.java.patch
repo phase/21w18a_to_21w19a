@@ -1,0 +1,27 @@
+--- net/minecraft/server/players/PlayerList.java
++++ net/minecraft/server/players/PlayerList.java
+@@ -14,10 +14,11 @@
+ import java.util.Collection;
+ import java.util.HashSet;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.UUID;
+ import java.util.function.Function;
+ import javax.annotation.Nullable;
+ import net.minecraft.ChatFormatting;
+@@ -139,11 +140,11 @@
+       CompoundTag var7 = this.load(var2);
+       ResourceKey var23;
+       if (var7 != null) {
+          DataResult var10000 = DimensionType.parseLegacy(new Dynamic(NbtOps.INSTANCE, var7.get("Dimension")));
+          Logger var10001 = LOGGER;
+-         var10001.getClass();
++         Objects.requireNonNull(var10001);
+          var23 = (ResourceKey)var10000.resultOrPartial(var10001::error).orElse(Level.OVERWORLD);
+       } else {
+          var23 = Level.OVERWORLD;
+       }
+ 

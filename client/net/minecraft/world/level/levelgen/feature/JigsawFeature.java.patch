@@ -1,0 +1,19 @@
+--- net/minecraft/world/level/levelgen/feature/JigsawFeature.java
++++ net/minecraft/world/level/levelgen/feature/JigsawFeature.java
+@@ -13,13 +13,13 @@
+ import net.minecraft.world.level.levelgen.structure.NoiseAffectingStructureStart;
+ import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece;
+ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureManager;
+ 
+ public class JigsawFeature extends StructureFeature<JigsawConfiguration> {
+-   private final int startY;
+-   private final boolean doExpansionHack;
+-   private final boolean projectStartToHeightmap;
++   final int startY;
++   final boolean doExpansionHack;
++   final boolean projectStartToHeightmap;
+ 
+    public JigsawFeature(Codec<JigsawConfiguration> var1, int var2, boolean var3, boolean var4) {
+       super(var1);
+       this.startY = var2;
+       this.doExpansionHack = var3;

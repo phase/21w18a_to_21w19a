@@ -1,0 +1,43 @@
+--- net/minecraft/client/gui/screens/CreateFlatWorldScreen.java
++++ net/minecraft/client/gui/screens/CreateFlatWorldScreen.java
+@@ -31,11 +31,11 @@
+    private static final int SLOT_BG_Y = 1;
+    private static final int SLOT_FG_X = 2;
+    private static final int SLOT_FG_Y = 2;
+    protected final CreateWorldScreen parent;
+    private final Consumer<FlatLevelGeneratorSettings> applySettings;
+-   private FlatLevelGeneratorSettings generator;
++   FlatLevelGeneratorSettings generator;
+    private Component columnType;
+    private Component columnHeight;
+    private CreateFlatWorldScreen.DetailsList list;
+    private Button deleteLayerButton;
+ 
+@@ -87,11 +87,11 @@
+       }));
+       this.generator.updateLayers();
+       this.updateButtonValidity();
+    }
+ 
+-   private void updateButtonValidity() {
++   void updateButtonValidity() {
+       this.deleteLayerButton.active = this.hasValidSelection();
+    }
+ 
+    private boolean hasValidSelection() {
+       return this.list.getSelected() != null;
+@@ -155,12 +155,12 @@
+             this.setSelected((CreateFlatWorldScreen.DetailsList.Entry)var3.get(var1));
+          }
+ 
+       }
+ 
+-      class Entry extends ObjectSelectionList.Entry<CreateFlatWorldScreen.DetailsList.Entry> {
+-         private Entry() {
++      private class Entry extends ObjectSelectionList.Entry<CreateFlatWorldScreen.DetailsList.Entry> {
++         Entry() {
+          }
+ 
+          public void render(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10) {
+             FlatLayerInfo var11 = (FlatLayerInfo)CreateFlatWorldScreen.this.generator.getLayersInfo().get(CreateFlatWorldScreen.this.generator.getLayersInfo().size() - var2 - 1);
+             BlockState var12 = var11.getBlockState();

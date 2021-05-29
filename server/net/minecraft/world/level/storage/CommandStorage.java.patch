@@ -1,0 +1,26 @@
+--- net/minecraft/world/level/storage/CommandStorage.java
++++ net/minecraft/world/level/storage/CommandStorage.java
+@@ -48,19 +48,18 @@
+ 
+    private static String createId(String var0) {
+       return "command_storage_" + var0;
+    }
+ 
+-   static class Container extends SavedData {
++   private static class Container extends SavedData {
+       private static final String TAG_CONTENTS = "contents";
+-      private final Map<String, CompoundTag> storage;
++      private final Map<String, CompoundTag> storage = Maps.newHashMap();
+ 
+-      private Container() {
+-         this.storage = Maps.newHashMap();
++      Container() {
+       }
+ 
+-      private CommandStorage.Container load(CompoundTag var1) {
++      CommandStorage.Container load(CompoundTag var1) {
+          CompoundTag var2 = var1.getCompound("contents");
+          Iterator var3 = var2.getAllKeys().iterator();
+ 
+          while(var3.hasNext()) {
+             String var4 = (String)var3.next();

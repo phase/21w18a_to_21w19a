@@ -1,0 +1,31 @@
+--- net/minecraft/tags/TagCollection.java
++++ net/minecraft/tags/TagCollection.java
+@@ -50,11 +50,11 @@
+       Iterator var3 = this.getAllTags().entrySet().iterator();
+ 
+       while(var3.hasNext()) {
+          Entry var4 = (Entry)var3.next();
+          if (((Tag)var4.getValue()).contains(var1)) {
+-            var2.add(var4.getKey());
++            var2.add((ResourceLocation)var4.getKey());
+          }
+       }
+ 
+       return var2;
+    }
+@@ -116,13 +116,13 @@
+          }
+       };
+    }
+ 
+    public static class NetworkPayload {
+-      private final Map<ResourceLocation, IntList> tags;
++      final Map<ResourceLocation, IntList> tags;
+ 
+-      private NetworkPayload(Map<ResourceLocation, IntList> var1) {
++      NetworkPayload(Map<ResourceLocation, IntList> var1) {
+          this.tags = var1;
+       }
+ 
+       public void write(FriendlyByteBuf var1) {
+          var1.writeMap(this.tags, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::writeIntIdList);

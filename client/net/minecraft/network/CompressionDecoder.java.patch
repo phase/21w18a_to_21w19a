@@ -1,0 +1,15 @@
+--- net/minecraft/network/CompressionDecoder.java
++++ net/minecraft/network/CompressionDecoder.java
+@@ -28,11 +28,11 @@
+             if (var5 < this.threshold) {
+                throw new DecoderException("Badly compressed packet - size of " + var5 + " is below server threshold of " + this.threshold);
+             }
+ 
+             if (var5 > 2097152) {
+-               throw new DecoderException("Badly compressed packet - size of " + var5 + " is larger than protocol maximum of " + 2097152);
++               throw new DecoderException("Badly compressed packet - size of " + var5 + " is larger than protocol maximum of 2097152");
+             }
+ 
+             byte[] var6 = new byte[var4.readableBytes()];
+             var4.readBytes(var6);
+             this.inflater.setInput(var6);

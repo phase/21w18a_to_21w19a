@@ -1,0 +1,79 @@
+--- net/minecraft/world/entity/animal/horse/Llama.java
++++ net/minecraft/world/entity/animal/horse/Llama.java
+@@ -60,11 +60,11 @@
+    private static final int VARIANTS = 4;
+    private static final Ingredient FOOD_ITEMS;
+    private static final EntityDataAccessor<Integer> DATA_STRENGTH_ID;
+    private static final EntityDataAccessor<Integer> DATA_SWAG_ID;
+    private static final EntityDataAccessor<Integer> DATA_VARIANT_ID;
+-   private boolean didSpit;
++   boolean didSpit;
+    @Nullable
+    private Llama caravanHead;
+    @Nullable
+    private Llama caravanTail;
+ 
+@@ -370,11 +370,11 @@
+ 
+       this.level.addFreshEntity(var2);
+       this.didSpit = true;
+    }
+ 
+-   private void setDidSpit(boolean var1) {
++   void setDidSpit(boolean var1) {
+       this.didSpit = var1;
+    }
+ 
+    public boolean causeFallDamage(float var1, float var2, DamageSource var3) {
+       int var4 = this.calculateFallDamage(var1, var2);
+@@ -452,22 +452,10 @@
+       DATA_STRENGTH_ID = SynchedEntityData.defineId(Llama.class, EntityDataSerializers.INT);
+       DATA_SWAG_ID = SynchedEntityData.defineId(Llama.class, EntityDataSerializers.INT);
+       DATA_VARIANT_ID = SynchedEntityData.defineId(Llama.class, EntityDataSerializers.INT);
+    }
+ 
+-   static class LlamaAttackWolfGoal extends NearestAttackableTargetGoal<Wolf> {
+-      public LlamaAttackWolfGoal(Llama var1) {
+-         super(var1, Wolf.class, 16, false, true, (var0) -> {
+-            return !((Wolf)var0).isTame();
+-         });
+-      }
+-
+-      protected double getFollowDistance() {
+-         return super.getFollowDistance() * 0.25D;
+-      }
+-   }
+-
+    static class LlamaHurtByTargetGoal extends HurtByTargetGoal {
+       public LlamaHurtByTargetGoal(Llama var1) {
+          super(var1);
+       }
+ 
+@@ -482,14 +470,26 @@
+ 
+          return super.canContinueToUse();
+       }
+    }
+ 
++   static class LlamaAttackWolfGoal extends NearestAttackableTargetGoal<Wolf> {
++      public LlamaAttackWolfGoal(Llama var1) {
++         super(var1, Wolf.class, 16, false, true, (var0) -> {
++            return !((Wolf)var0).isTame();
++         });
++      }
++
++      protected double getFollowDistance() {
++         return super.getFollowDistance() * 0.25D;
++      }
++   }
++
+    static class LlamaGroupData extends AgeableMob.AgeableMobGroupData {
+       public final int variant;
+ 
+-      private LlamaGroupData(int var1) {
++      LlamaGroupData(int var1) {
+          super(true);
+          this.variant = var1;
+       }
+    }
+ }

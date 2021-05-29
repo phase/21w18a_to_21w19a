@@ -1,0 +1,35 @@
+--- net/minecraft/world/entity/projectile/FishingHook.java
++++ net/minecraft/world/entity/projectile/FishingHook.java
+@@ -530,23 +530,23 @@
+    static {
+       DATA_HOOKED_ENTITY = SynchedEntityData.defineId(FishingHook.class, EntityDataSerializers.INT);
+       DATA_BITING = SynchedEntityData.defineId(FishingHook.class, EntityDataSerializers.BOOLEAN);
+    }
+ 
+-   static enum OpenWaterType {
+-      ABOVE_WATER,
+-      INSIDE_WATER,
+-      INVALID;
+-
+-      private OpenWaterType() {
+-      }
+-   }
+-
+    static enum FishHookState {
+       FLYING,
+       HOOKED_IN_ENTITY,
+       BOBBING;
+ 
+       private FishHookState() {
+       }
+    }
++
++   static enum OpenWaterType {
++      ABOVE_WATER,
++      INSIDE_WATER,
++      INVALID;
++
++      private OpenWaterType() {
++      }
++   }
+ }

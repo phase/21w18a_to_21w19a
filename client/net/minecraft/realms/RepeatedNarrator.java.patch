@@ -1,0 +1,19 @@
+--- net/minecraft/realms/RepeatedNarrator.java
++++ net/minecraft/realms/RepeatedNarrator.java
+@@ -24,13 +24,13 @@
+          NarratorChatListener.INSTANCE.handle(ChatType.SYSTEM, new TextComponent(var1), Util.NIL_UUID);
+       }
+ 
+    }
+ 
+-   static class Params {
+-      private final String narration;
+-      private final RateLimiter rateLimiter;
++   private static class Params {
++      final String narration;
++      final RateLimiter rateLimiter;
+ 
+       Params(String var1, RateLimiter var2) {
+          this.narration = var1;
+          this.rateLimiter = var2;
+       }

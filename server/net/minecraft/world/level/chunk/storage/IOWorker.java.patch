@@ -1,0 +1,50 @@
+--- net/minecraft/world/level/chunk/storage/IOWorker.java
++++ net/minecraft/world/level/chunk/storage/IOWorker.java
+@@ -99,11 +99,11 @@
+ 
+    private <T> CompletableFuture<T> submitTask(Supplier<Either<T, Exception>> var1) {
+       return this.mailbox.askEither((var2) -> {
+          return new StrictQueue.IntRunnable(IOWorker.Priority.FOREGROUND.ordinal(), () -> {
+             if (!this.shutdownRequested.get()) {
+-               var2.tell(var1.get());
++               var2.tell((Either)var1.get());
+             }
+ 
+             this.tellStorePending();
+          });
+       });
+@@ -150,24 +150,24 @@
+          }
+ 
+       }
+    }
+ 
+-   static class PendingStore {
+-      @Nullable
+-      private CompoundTag data;
+-      private final CompletableFuture<Void> result = new CompletableFuture();
+-
+-      public PendingStore(@Nullable CompoundTag var1) {
+-         this.data = var1;
+-      }
+-   }
+-
+    static enum Priority {
+       FOREGROUND,
+       BACKGROUND,
+       SHUTDOWN;
+ 
+       private Priority() {
+       }
+    }
++
++   static class PendingStore {
++      @Nullable
++      CompoundTag data;
++      final CompletableFuture<Void> result = new CompletableFuture();
++
++      public PendingStore(@Nullable CompoundTag var1) {
++         this.data = var1;
++      }
++   }
+ }

@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/ai/goal/DolphinJumpGoal.java
++++ net/minecraft/world/entity/ai/goal/DolphinJumpGoal.java
+@@ -83,11 +83,11 @@
+       }
+ 
+       Vec3 var7 = this.dolphin.getDeltaMovement();
+       if (var7.y * var7.y < 0.029999999329447746D && this.dolphin.getXRot() != 0.0F) {
+          this.dolphin.setXRot(Mth.rotlerp(this.dolphin.getXRot(), 0.0F, 0.2F));
+-      } else {
++      } else if (var7.length() > 9.999999747378752E-6D) {
+          double var3 = Math.sqrt(Entity.getHorizontalDistanceSqr(var7));
+          double var5 = Math.signum(-var7.y) * Math.acos(var3 / var7.length()) * 57.2957763671875D;
+          this.dolphin.setXRot((float)var5);
+       }
+ 

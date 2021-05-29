@@ -1,0 +1,15 @@
+--- net/minecraft/world/inventory/GrindstoneMenu.java
++++ net/minecraft/world/inventory/GrindstoneMenu.java
+@@ -27,11 +27,11 @@
+    private static final int INV_SLOT_START = 3;
+    private static final int INV_SLOT_END = 30;
+    private static final int USE_ROW_SLOT_START = 30;
+    private static final int USE_ROW_SLOT_END = 39;
+    private final Container resultSlots;
+-   private final Container repairSlots;
++   final Container repairSlots;
+    private final ContainerLevelAccess access;
+ 
+    public GrindstoneMenu(int var1, Inventory var2) {
+       this(var1, var2, ContainerLevelAccess.NULL);
+    }

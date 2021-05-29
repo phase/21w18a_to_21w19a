@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/animal/horse/AbstractHorse.java
++++ net/minecraft/world/entity/animal/horse/AbstractHorse.java
+@@ -1045,11 +1045,11 @@
+    public boolean hasInventoryChanged(Container var1) {
+       return this.inventory != var1;
+    }
+ 
+    static {
+-      MOMMY_TARGETING = (new TargetingConditions()).range(16.0D).allowInvulnerable().allowSameTeam().allowUnseeable().selector(PARENT_HORSE_SELECTOR);
++      MOMMY_TARGETING = TargetingConditions.forNonCombat().range(16.0D).ignoreLineOfSight().selector(PARENT_HORSE_SELECTOR);
+       FOOD_ITEMS = Ingredient.of(Items.WHEAT, Items.SUGAR, Blocks.HAY_BLOCK.asItem(), Items.APPLE, Items.GOLDEN_CARROT, Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE);
+       DATA_ID_FLAGS = SynchedEntityData.defineId(AbstractHorse.class, EntityDataSerializers.BYTE);
+       DATA_ID_OWNER_UUID = SynchedEntityData.defineId(AbstractHorse.class, EntityDataSerializers.OPTIONAL_UUID);
+    }
+ }

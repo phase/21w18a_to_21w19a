@@ -1,0 +1,25 @@
+--- net/minecraft/world/inventory/LoomMenu.java
++++ net/minecraft/world/inventory/LoomMenu.java
+@@ -21,17 +21,17 @@
+    private static final int INV_SLOT_START = 4;
+    private static final int INV_SLOT_END = 31;
+    private static final int USE_ROW_SLOT_START = 31;
+    private static final int USE_ROW_SLOT_END = 40;
+    private final ContainerLevelAccess access;
+-   private final DataSlot selectedBannerPatternIndex;
+-   private Runnable slotUpdateListener;
+-   private final Slot bannerSlot;
+-   private final Slot dyeSlot;
++   final DataSlot selectedBannerPatternIndex;
++   Runnable slotUpdateListener;
++   final Slot bannerSlot;
++   final Slot dyeSlot;
+    private final Slot patternSlot;
+    private final Slot resultSlot;
+-   private long lastSoundTime;
++   long lastSoundTime;
+    private final Container inputContainer;
+    private final Container outputContainer;
+ 
+    public LoomMenu(int var1, Inventory var2) {
+       this(var1, var2, ContainerLevelAccess.NULL);

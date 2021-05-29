@@ -1,0 +1,16 @@
+--- net/minecraft/advancements/AdvancementRewards.java
++++ net/minecraft/advancements/AdvancementRewards.java
+@@ -81,11 +81,12 @@
+          var11.getFunctions().execute(var2x, var1.createCommandSourceStack().withSuppressedOutput().withPermission(2));
+       });
+    }
+ 
+    public String toString() {
+-      return "AdvancementRewards{experience=" + this.experience + ", loot=" + Arrays.toString(this.loot) + ", recipes=" + Arrays.toString(this.recipes) + ", function=" + this.function + '}';
++      int var10000 = this.experience;
++      return "AdvancementRewards{experience=" + var10000 + ", loot=" + Arrays.toString(this.loot) + ", recipes=" + Arrays.toString(this.recipes) + ", function=" + this.function + "}";
+    }
+ 
+    public JsonElement serializeToJson() {
+       if (this == EMPTY) {
+          return JsonNull.INSTANCE;

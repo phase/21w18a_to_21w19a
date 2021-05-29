@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.java
++++ net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.java
+@@ -13,11 +13,11 @@
+ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+ import net.minecraft.world.level.GameRules;
+ import net.minecraft.world.phys.AABB;
+ 
+ public class HurtByTargetGoal extends TargetGoal {
+-   private static final TargetingConditions HURT_BY_TARGETING = (new TargetingConditions()).allowUnseeable().ignoreInvisibilityTesting();
++   private static final TargetingConditions HURT_BY_TARGETING = TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting();
+    private static final int ALERT_RANGE_Y = 10;
+    private boolean alertSameType;
+    private int timestamp;
+    private final Class<?>[] toIgnoreDamage;
+    private Class<?>[] toIgnoreAlert;

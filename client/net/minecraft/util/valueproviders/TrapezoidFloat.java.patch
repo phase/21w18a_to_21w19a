@@ -1,0 +1,12 @@
+--- net/minecraft/util/valueproviders/TrapezoidFloat.java
++++ net/minecraft/util/valueproviders/TrapezoidFloat.java
+@@ -54,8 +54,8 @@
+    public FloatProviderType<?> getType() {
+       return FloatProviderType.TRAPEZOID;
+    }
+ 
+    public String toString() {
+-      return "trapezoid(" + this.plateau + ") in [" + this.min + '-' + this.max + ']';
++      return "trapezoid(" + this.plateau + ") in [" + this.min + "-" + this.max + "]";
+    }
+ }

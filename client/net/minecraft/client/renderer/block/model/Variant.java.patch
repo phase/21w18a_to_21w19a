@@ -1,0 +1,15 @@
+--- net/minecraft/client/renderer/block/model/Variant.java
++++ net/minecraft/client/renderer/block/model/Variant.java
+@@ -42,11 +42,11 @@
+    public int getWeight() {
+       return this.weight;
+    }
+ 
+    public String toString() {
+-      return "Variant{modelLocation=" + this.modelLocation + ", rotation=" + this.rotation + ", uvLock=" + this.uvLock + ", weight=" + this.weight + '}';
++      return "Variant{modelLocation=" + this.modelLocation + ", rotation=" + this.rotation + ", uvLock=" + this.uvLock + ", weight=" + this.weight + "}";
+    }
+ 
+    public boolean equals(Object var1) {
+       if (this == var1) {
+          return true;

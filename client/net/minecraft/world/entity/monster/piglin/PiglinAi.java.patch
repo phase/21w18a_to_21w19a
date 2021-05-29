@@ -1,0 +1,29 @@
+--- net/minecraft/world/entity/monster/piglin/PiglinAi.java
++++ net/minecraft/world/entity/monster/piglin/PiglinAi.java
+@@ -4,10 +4,11 @@
+ import com.google.common.collect.ImmutableSet;
+ import com.mojang.datafixers.util.Pair;
+ import java.util.Collections;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Random;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.sounds.SoundEvent;
+@@ -187,11 +188,13 @@
+       Brain var1 = var0.getBrain();
+       Activity var2 = (Activity)var1.getActiveNonCoreActivity().orElse((Object)null);
+       var1.setActiveActivityToFirstValid(ImmutableList.of(Activity.ADMIRE_ITEM, Activity.FIGHT, Activity.AVOID, Activity.CELEBRATE, Activity.RIDE, Activity.IDLE));
+       Activity var3 = (Activity)var1.getActiveNonCoreActivity().orElse((Object)null);
+       if (var2 != var3) {
+-         getSoundForCurrentActivity(var0).ifPresent(var0::playSound);
++         Optional var10000 = getSoundForCurrentActivity(var0);
++         Objects.requireNonNull(var0);
++         var10000.ifPresent(var0::playSound);
+       }
+ 
+       var0.setAggressive(var1.hasMemoryValue(MemoryModuleType.ATTACK_TARGET));
+       if (!var1.hasMemoryValue(MemoryModuleType.RIDE_TARGET) && isBabyRidingBaby(var0)) {
+          var0.stopRiding();

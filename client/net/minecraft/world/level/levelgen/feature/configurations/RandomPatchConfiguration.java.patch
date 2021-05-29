@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/levelgen/feature/configurations/RandomPatchConfiguration.java
++++ net/minecraft/world/level/levelgen/feature/configurations/RandomPatchConfiguration.java
+@@ -54,11 +54,11 @@
+ 
+    private RandomPatchConfiguration(BlockStateProvider var1, BlockPlacer var2, List<BlockState> var3, List<BlockState> var4, int var5, int var6, int var7, int var8, boolean var9, boolean var10, boolean var11) {
+       this(var1, var2, (Set)((Set)var3.stream().map(BlockBehaviour.BlockStateBase::getBlock).collect(Collectors.toSet())), (Set)ImmutableSet.copyOf(var4), var5, var6, var7, var8, var9, var10, var11);
+    }
+ 
+-   private RandomPatchConfiguration(BlockStateProvider var1, BlockPlacer var2, Set<Block> var3, Set<BlockState> var4, int var5, int var6, int var7, int var8, boolean var9, boolean var10, boolean var11) {
++   RandomPatchConfiguration(BlockStateProvider var1, BlockPlacer var2, Set<Block> var3, Set<BlockState> var4, int var5, int var6, int var7, int var8, boolean var9, boolean var10, boolean var11) {
+       this.stateProvider = var1;
+       this.blockPlacer = var2;
+       this.whitelist = var3;
+       this.blacklist = var4;
+       this.tries = var5;

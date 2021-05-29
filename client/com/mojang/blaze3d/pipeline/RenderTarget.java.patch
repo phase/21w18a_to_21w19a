@@ -1,0 +1,69 @@
+--- com/mojang/blaze3d/pipeline/RenderTarget.java
++++ com/mojang/blaze3d/pipeline/RenderTarget.java
+@@ -8,41 +8,38 @@
+ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+ import com.mojang.blaze3d.vertex.Tesselator;
+ import com.mojang.blaze3d.vertex.VertexFormat;
+ import com.mojang.math.Matrix4f;
+ import java.nio.IntBuffer;
++import net.minecraft.Util;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.renderer.ShaderInstance;
+ 
+-public class RenderTarget {
++public abstract class RenderTarget {
+    private static final int RED_CHANNEL = 0;
+    private static final int GREEN_CHANNEL = 1;
+    private static final int BLUE_CHANNEL = 2;
+    private static final int ALPHA_CHANNEL = 3;
+    public int width;
+    public int height;
+    public int viewWidth;
+    public int viewHeight;
+    public final boolean useDepth;
+    public int frameBufferId;
+-   private int colorTextureId;
+-   private int depthBufferId;
+-   public final float[] clearChannels;
++   protected int colorTextureId;
++   protected int depthBufferId;
++   private final float[] clearChannels = (float[])Util.make(() -> {
++      float[] var0 = new float[]{1.0F, 1.0F, 1.0F, 0.0F};
++      return var0;
++   });
+    public int filterMode;
+ 
+-   public RenderTarget(int var1, int var2, boolean var3, boolean var4) {
+-      RenderSystem.assertThread(RenderSystem::isOnRenderThreadOrInit);
+-      this.useDepth = var3;
++   public RenderTarget(boolean var1) {
++      this.useDepth = var1;
+       this.frameBufferId = -1;
+       this.colorTextureId = -1;
+       this.depthBufferId = -1;
+-      this.clearChannels = new float[4];
+-      this.clearChannels[0] = 1.0F;
+-      this.clearChannels[1] = 1.0F;
+-      this.clearChannels[2] = 1.0F;
+-      this.clearChannels[3] = 0.0F;
+-      this.resize(var1, var2, var4);
+    }
+ 
+    public void resize(int var1, int var2, boolean var3) {
+       if (!RenderSystem.isOnRenderThread()) {
+          RenderSystem.recordRenderCall(() -> {
+@@ -154,10 +151,14 @@
+             throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+          } else if (var1 == 36059) {
+             throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER");
+          } else if (var1 == 36060) {
+             throw new RuntimeException("GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER");
++         } else if (var1 == 36061) {
++            throw new RuntimeException("GL_FRAMEBUFFER_UNSUPPORTED");
++         } else if (var1 == 1285) {
++            throw new RuntimeException("GL_OUT_OF_MEMORY");
+          } else {
+             throw new RuntimeException("glCheckFramebufferStatus returned unknown status:" + var1);
+          }
+       }
+    }

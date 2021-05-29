@@ -1,0 +1,52 @@
+--- net/minecraft/world/level/levelgen/structure/RuinedPortalPiece.java
++++ net/minecraft/world/level/levelgen/structure/RuinedPortalPiece.java
+@@ -7,10 +7,11 @@
+ import com.mojang.serialization.Dynamic;
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
+ import java.util.ArrayList;
+ import java.util.Arrays;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Random;
+ import java.util.stream.Collectors;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
+ import net.minecraft.nbt.CompoundTag;
+@@ -68,22 +69,22 @@
+          return makeSettings(var1, var2, var2x);
+       });
+       this.verticalPlacement = RuinedPortalPiece.VerticalPlacement.byName(var2.getString("VerticalPlacement"));
+       DataResult var10001 = RuinedPortalPiece.Properties.CODEC.parse(new Dynamic(NbtOps.INSTANCE, var2.get("Properties")));
+       Logger var10003 = LOGGER;
+-      var10003.getClass();
++      Objects.requireNonNull(var10003);
+       this.properties = (RuinedPortalPiece.Properties)var10001.getOrThrow(true, var10003::error);
+    }
+ 
+    protected void addAdditionalSaveData(ServerLevel var1, CompoundTag var2) {
+       super.addAdditionalSaveData(var1, var2);
+       var2.putString("Rotation", this.placeSettings.getRotation().name());
+       var2.putString("Mirror", this.placeSettings.getMirror().name());
+       var2.putString("VerticalPlacement", this.verticalPlacement.getName());
+       DataResult var10000 = RuinedPortalPiece.Properties.CODEC.encodeStart(NbtOps.INSTANCE, this.properties);
+       Logger var10001 = LOGGER;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       var10000.resultOrPartial(var10001::error).ifPresent((var1x) -> {
+          var2.put("Properties", var1x);
+       });
+    }
+ 
+@@ -93,11 +94,11 @@
+       Mirror var10000 = Mirror.valueOf(var1.getString("Mirror"));
+       Rotation var10001 = Rotation.valueOf(var1.getString("Rotation"));
+       RuinedPortalPiece.VerticalPlacement var10002 = RuinedPortalPiece.VerticalPlacement.byName(var1.getString("VerticalPlacement"));
+       DataResult var10004 = RuinedPortalPiece.Properties.CODEC.parse(new Dynamic(NbtOps.INSTANCE, var1.get("Properties")));
+       Logger var10006 = LOGGER;
+-      var10006.getClass();
++      Objects.requireNonNull(var10006);
+       return makeSettings(var10000, var10001, var10002, var4, (RuinedPortalPiece.Properties)var10004.getOrThrow(true, var10006::error));
+    }
+ 
+    private static StructurePlaceSettings makeSettings(Mirror var0, Rotation var1, RuinedPortalPiece.VerticalPlacement var2, BlockPos var3, RuinedPortalPiece.Properties var4) {
+       BlockIgnoreProcessor var5 = var4.airPocket ? BlockIgnoreProcessor.STRUCTURE_BLOCK : BlockIgnoreProcessor.STRUCTURE_AND_AIR;

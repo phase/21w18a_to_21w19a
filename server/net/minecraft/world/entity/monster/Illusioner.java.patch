@@ -1,0 +1,114 @@
+--- net/minecraft/world/entity/monster/Illusioner.java
++++ net/minecraft/world/entity/monster/Illusioner.java
+@@ -197,85 +197,85 @@
+       } else {
+          return this.isAggressive() ? AbstractIllager.IllagerArmPose.BOW_AND_ARROW : AbstractIllager.IllagerArmPose.CROSSED;
+       }
+    }
+ 
+-   class IllusionerBlindnessSpellGoal extends SpellcasterIllager.SpellcasterUseSpellGoal {
+-      private int lastTargetId;
+-
+-      private IllusionerBlindnessSpellGoal() {
++   private class IllusionerMirrorSpellGoal extends SpellcasterIllager.SpellcasterUseSpellGoal {
++      IllusionerMirrorSpellGoal() {
+          super();
+       }
+ 
+       public boolean canUse() {
+          if (!super.canUse()) {
+             return false;
+-         } else if (Illusioner.this.getTarget() == null) {
+-            return false;
+-         } else if (Illusioner.this.getTarget().getId() == this.lastTargetId) {
+-            return false;
+          } else {
+-            return Illusioner.this.level.getCurrentDifficultyAt(Illusioner.this.blockPosition()).isHarderThan((float)Difficulty.NORMAL.ordinal());
++            return !Illusioner.this.hasEffect(MobEffects.INVISIBILITY);
+          }
+       }
+ 
+-      public void start() {
+-         super.start();
+-         this.lastTargetId = Illusioner.this.getTarget().getId();
+-      }
+-
+       protected int getCastingTime() {
+          return 20;
+       }
+ 
+       protected int getCastingInterval() {
+-         return 180;
++         return 340;
+       }
+ 
+       protected void performSpellCasting() {
+-         Illusioner.this.getTarget().addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 400));
++         Illusioner.this.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 1200));
+       }
+ 
++      @Nullable
+       protected SoundEvent getSpellPrepareSound() {
+-         return SoundEvents.ILLUSIONER_PREPARE_BLINDNESS;
++         return SoundEvents.ILLUSIONER_PREPARE_MIRROR;
+       }
+ 
+       protected SpellcasterIllager.IllagerSpell getSpell() {
+-         return SpellcasterIllager.IllagerSpell.BLINDNESS;
++         return SpellcasterIllager.IllagerSpell.DISAPPEAR;
+       }
+    }
+ 
+-   class IllusionerMirrorSpellGoal extends SpellcasterIllager.SpellcasterUseSpellGoal {
+-      private IllusionerMirrorSpellGoal() {
++   private class IllusionerBlindnessSpellGoal extends SpellcasterIllager.SpellcasterUseSpellGoal {
++      private int lastTargetId;
++
++      IllusionerBlindnessSpellGoal() {
+          super();
+       }
+ 
+       public boolean canUse() {
+          if (!super.canUse()) {
+             return false;
++         } else if (Illusioner.this.getTarget() == null) {
++            return false;
++         } else if (Illusioner.this.getTarget().getId() == this.lastTargetId) {
++            return false;
+          } else {
+-            return !Illusioner.this.hasEffect(MobEffects.INVISIBILITY);
++            return Illusioner.this.level.getCurrentDifficultyAt(Illusioner.this.blockPosition()).isHarderThan((float)Difficulty.NORMAL.ordinal());
+          }
+       }
+ 
++      public void start() {
++         super.start();
++         this.lastTargetId = Illusioner.this.getTarget().getId();
++      }
++
+       protected int getCastingTime() {
+          return 20;
+       }
+ 
+       protected int getCastingInterval() {
+-         return 340;
++         return 180;
+       }
+ 
+       protected void performSpellCasting() {
+-         Illusioner.this.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 1200));
++         Illusioner.this.getTarget().addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 400));
+       }
+ 
+-      @Nullable
+       protected SoundEvent getSpellPrepareSound() {
+-         return SoundEvents.ILLUSIONER_PREPARE_MIRROR;
++         return SoundEvents.ILLUSIONER_PREPARE_BLINDNESS;
+       }
+ 
+       protected SpellcasterIllager.IllagerSpell getSpell() {
+-         return SpellcasterIllager.IllagerSpell.DISAPPEAR;
++         return SpellcasterIllager.IllagerSpell.BLINDNESS;
+       }
+    }
+ }

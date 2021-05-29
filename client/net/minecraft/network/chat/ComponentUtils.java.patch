@@ -1,0 +1,15 @@
+--- net/minecraft/network/chat/ComponentUtils.java
++++ net/minecraft/network/chat/ComponentUtils.java
+@@ -85,11 +85,11 @@
+ 
+    public static <T extends Comparable<T>> Component formatAndSortList(Collection<T> var0, Function<T, Component> var1) {
+       if (var0.isEmpty()) {
+          return TextComponent.EMPTY;
+       } else if (var0.size() == 1) {
+-         return (Component)var1.apply(var0.iterator().next());
++         return (Component)var1.apply((Comparable)var0.iterator().next());
+       } else {
+          ArrayList var2 = Lists.newArrayList(var0);
+          var2.sort(Comparable::compareTo);
+          return formatList(var2, var1);
+       }

@@ -1,0 +1,175 @@
+--- net/minecraft/world/level/storage/loot/functions/SetAttributesFunction.java
++++ net/minecraft/world/level/storage/loot/functions/SetAttributesFunction.java
+@@ -30,13 +30,13 @@
+ import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+ import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
+ 
+ public class SetAttributesFunction extends LootItemConditionalFunction {
+-   private final List<SetAttributesFunction.Modifier> modifiers;
++   final List<SetAttributesFunction.Modifier> modifiers;
+ 
+-   private SetAttributesFunction(LootItemCondition[] var1, List<SetAttributesFunction.Modifier> var2) {
++   SetAttributesFunction(LootItemCondition[] var1, List<SetAttributesFunction.Modifier> var2) {
+       super(var1);
+       this.modifiers = ImmutableList.copyOf(var2);
+    }
+ 
+    public LootItemFunctionType getType() {
+@@ -74,19 +74,19 @@
+    public static SetAttributesFunction.Builder setAttributes() {
+       return new SetAttributesFunction.Builder();
+    }
+ 
+    static class Modifier {
+-      private final String name;
+-      private final Attribute attribute;
+-      private final AttributeModifier.Operation operation;
+-      private final NumberProvider amount;
++      final String name;
++      final Attribute attribute;
++      final AttributeModifier.Operation operation;
++      final NumberProvider amount;
+       @Nullable
+-      private final UUID id;
+-      private final EquipmentSlot[] slots;
++      final UUID id;
++      final EquipmentSlot[] slots;
+ 
+-      private Modifier(String var1, Attribute var2, AttributeModifier.Operation var3, NumberProvider var4, EquipmentSlot[] var5, @Nullable UUID var6) {
++      Modifier(String var1, Attribute var2, AttributeModifier.Operation var3, NumberProvider var4, EquipmentSlot[] var5, @Nullable UUID var6) {
+          this.name = var1;
+          this.attribute = var2;
+          this.operation = var3;
+          this.amount = var4;
+          this.id = var6;
+@@ -210,42 +210,38 @@
+             throw new JsonSyntaxException("Unknown attribute modifier operation " + var0);
+          }
+       }
+    }
+ 
+-   public static class Serializer extends LootItemConditionalFunction.Serializer<SetAttributesFunction> {
+-      public Serializer() {
++   public static class ModifierBuilder {
++      private final String name;
++      private final Attribute attribute;
++      private final AttributeModifier.Operation operation;
++      private final NumberProvider amount;
++      @Nullable
++      private UUID id;
++      private final Set<EquipmentSlot> slots = EnumSet.noneOf(EquipmentSlot.class);
++
++      public ModifierBuilder(String var1, Attribute var2, AttributeModifier.Operation var3, NumberProvider var4) {
++         this.name = var1;
++         this.attribute = var2;
++         this.operation = var3;
++         this.amount = var4;
+       }
+ 
+-      public void serialize(JsonObject var1, SetAttributesFunction var2, JsonSerializationContext var3) {
+-         super.serialize(var1, (LootItemConditionalFunction)var2, var3);
+-         JsonArray var4 = new JsonArray();
+-         Iterator var5 = var2.modifiers.iterator();
++      public SetAttributesFunction.ModifierBuilder forSlot(EquipmentSlot var1) {
++         this.slots.add(var1);
++         return this;
++      }
+ 
+-         while(var5.hasNext()) {
+-            SetAttributesFunction.Modifier var6 = (SetAttributesFunction.Modifier)var5.next();
+-            var4.add(var6.serialize(var3));
+-         }
+-
+-         var1.add("modifiers", var4);
++      public SetAttributesFunction.ModifierBuilder withUuid(UUID var1) {
++         this.id = var1;
++         return this;
+       }
+ 
+-      public SetAttributesFunction deserialize(JsonObject var1, JsonDeserializationContext var2, LootItemCondition[] var3) {
+-         JsonArray var4 = GsonHelper.getAsJsonArray(var1, "modifiers");
+-         ArrayList var5 = Lists.newArrayListWithExpectedSize(var4.size());
+-         Iterator var6 = var4.iterator();
+-
+-         while(var6.hasNext()) {
+-            JsonElement var7 = (JsonElement)var6.next();
+-            var5.add(SetAttributesFunction.Modifier.deserialize(GsonHelper.convertToJsonObject(var7, "modifier"), var2));
+-         }
+-
+-         if (var5.isEmpty()) {
+-            throw new JsonSyntaxException("Invalid attribute modifiers array; cannot be empty");
+-         } else {
+-            return new SetAttributesFunction(var3, var5);
+-         }
++      public SetAttributesFunction.Modifier build() {
++         return new SetAttributesFunction.Modifier(this.name, this.attribute, this.operation, this.amount, (EquipmentSlot[])this.slots.toArray(new EquipmentSlot[0]), this.id);
+       }
+    }
+ 
+    public static class Builder extends LootItemConditionalFunction.Builder<SetAttributesFunction.Builder> {
+       private final List<SetAttributesFunction.Modifier> modifiers = Lists.newArrayList();
+@@ -265,36 +261,40 @@
+       public LootItemFunction build() {
+          return new SetAttributesFunction(this.getConditions(), this.modifiers);
+       }
+    }
+ 
+-   public static class ModifierBuilder {
+-      private final String name;
+-      private final Attribute attribute;
+-      private final AttributeModifier.Operation operation;
+-      private final NumberProvider amount;
+-      @Nullable
+-      private UUID id;
+-      private final Set<EquipmentSlot> slots = EnumSet.noneOf(EquipmentSlot.class);
+-
+-      public ModifierBuilder(String var1, Attribute var2, AttributeModifier.Operation var3, NumberProvider var4) {
+-         this.name = var1;
+-         this.attribute = var2;
+-         this.operation = var3;
+-         this.amount = var4;
++   public static class Serializer extends LootItemConditionalFunction.Serializer<SetAttributesFunction> {
++      public Serializer() {
+       }
+ 
+-      public SetAttributesFunction.ModifierBuilder forSlot(EquipmentSlot var1) {
+-         this.slots.add(var1);
+-         return this;
+-      }
++      public void serialize(JsonObject var1, SetAttributesFunction var2, JsonSerializationContext var3) {
++         super.serialize(var1, (LootItemConditionalFunction)var2, var3);
++         JsonArray var4 = new JsonArray();
++         Iterator var5 = var2.modifiers.iterator();
+ 
+-      public SetAttributesFunction.ModifierBuilder withUuid(UUID var1) {
+-         this.id = var1;
+-         return this;
++         while(var5.hasNext()) {
++            SetAttributesFunction.Modifier var6 = (SetAttributesFunction.Modifier)var5.next();
++            var4.add(var6.serialize(var3));
++         }
++
++         var1.add("modifiers", var4);
+       }
+ 
+-      public SetAttributesFunction.Modifier build() {
+-         return new SetAttributesFunction.Modifier(this.name, this.attribute, this.operation, this.amount, (EquipmentSlot[])this.slots.toArray(new EquipmentSlot[0]), this.id);
++      public SetAttributesFunction deserialize(JsonObject var1, JsonDeserializationContext var2, LootItemCondition[] var3) {
++         JsonArray var4 = GsonHelper.getAsJsonArray(var1, "modifiers");
++         ArrayList var5 = Lists.newArrayListWithExpectedSize(var4.size());
++         Iterator var6 = var4.iterator();
++
++         while(var6.hasNext()) {
++            JsonElement var7 = (JsonElement)var6.next();
++            var5.add(SetAttributesFunction.Modifier.deserialize(GsonHelper.convertToJsonObject(var7, "modifier"), var2));
++         }
++
++         if (var5.isEmpty()) {
++            throw new JsonSyntaxException("Invalid attribute modifiers array; cannot be empty");
++         } else {
++            return new SetAttributesFunction(var3, var5);
++         }
+       }
+    }
+ }

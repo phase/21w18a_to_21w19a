@@ -1,0 +1,19 @@
+--- net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
++++ net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
+@@ -34,14 +34,14 @@
+    public static final int FUEL_USES = 20;
+    public static final int DATA_BREW_TIME = 0;
+    public static final int DATA_FUEL_USES = 1;
+    public static final int NUM_DATA_VALUES = 2;
+    private NonNullList<ItemStack> items;
+-   private int brewTime;
++   int brewTime;
+    private boolean[] lastPotionCount;
+    private Item ingredient;
+-   private int fuel;
++   int fuel;
+    protected final ContainerData dataAccess;
+ 
+    public BrewingStandBlockEntity(BlockPos var1, BlockState var2) {
+       super(BlockEntityType.BREWING_STAND, var1, var2);
+       this.items = NonNullList.withSize(5, ItemStack.EMPTY);

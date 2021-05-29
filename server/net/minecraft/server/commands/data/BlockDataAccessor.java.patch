@@ -1,0 +1,15 @@
+--- net/minecraft/server/commands/data/BlockDataAccessor.java
++++ net/minecraft/server/commands/data/BlockDataAccessor.java
+@@ -18,11 +18,11 @@
+ import net.minecraft.network.chat.TranslatableComponent;
+ import net.minecraft.world.level.block.entity.BlockEntity;
+ import net.minecraft.world.level.block.state.BlockState;
+ 
+ public class BlockDataAccessor implements DataAccessor {
+-   private static final SimpleCommandExceptionType ERROR_NOT_A_BLOCK_ENTITY = new SimpleCommandExceptionType(new TranslatableComponent("commands.data.block.invalid"));
++   static final SimpleCommandExceptionType ERROR_NOT_A_BLOCK_ENTITY = new SimpleCommandExceptionType(new TranslatableComponent("commands.data.block.invalid"));
+    public static final Function<String, DataCommands.DataProvider> PROVIDER = (var0) -> {
+       return new DataCommands.DataProvider() {
+          public DataAccessor access(CommandContext<CommandSourceStack> var1) throws CommandSyntaxException {
+             BlockPos var2 = BlockPosArgument.getLoadedBlockPos(var1, var0 + "Pos");
+             BlockEntity var3 = ((CommandSourceStack)var1.getSource()).getLevel().getBlockEntity(var2);

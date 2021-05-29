@@ -1,0 +1,30 @@
+--- net/minecraft/nbt/ByteTag.java
++++ net/minecraft/nbt/ByteTag.java
+@@ -26,11 +26,11 @@
+    };
+    public static final ByteTag ZERO = valueOf((byte)0);
+    public static final ByteTag ONE = valueOf((byte)1);
+    private final byte data;
+ 
+-   private ByteTag(byte var1) {
++   ByteTag(byte var1) {
+       this.data = var1;
+    }
+ 
+    public static ByteTag valueOf(byte var0) {
+       return ByteTag.Cache.cache[128 + var0];
+@@ -98,12 +98,12 @@
+ 
+    public Number getAsNumber() {
+       return this.data;
+    }
+ 
+-   static class Cache {
+-      private static final ByteTag[] cache = new ByteTag[256];
++   private static class Cache {
++      static final ByteTag[] cache = new ByteTag[256];
+ 
+       private Cache() {
+       }
+ 
+       static {

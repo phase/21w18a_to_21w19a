@@ -1,0 +1,41 @@
+--- net/minecraft/world/level/levelgen/feature/structures/ListPoolElement.java
++++ net/minecraft/world/level/levelgen/feature/structures/ListPoolElement.java
+@@ -2,10 +2,11 @@
+ 
+ import com.mojang.serialization.Codec;
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Random;
+ import java.util.function.BiFunction;
+ import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ import net.minecraft.core.BlockPos;
+@@ -60,11 +61,11 @@
+       Stream var4 = this.elements.stream().filter((var0) -> {
+          return var0 != EmptyPoolElement.INSTANCE;
+       }).map((var3x) -> {
+          return var3x.getBoundingBox(var1, var2, var3);
+       });
+-      var4.getClass();
++      Objects.requireNonNull(var4);
+       return (BoundingBox)BoundingBox.encapsulatingBoxes(var4::iterator).orElseThrow(() -> {
+          return new IllegalStateException("Unable to calculate boundingbox for ListPoolElement");
+       });
+    }
+ 
+@@ -92,11 +93,12 @@
+       this.setProjectionOnEachElement(var1);
+       return this;
+    }
+ 
+    public String toString() {
+-      return "List[" + (String)this.elements.stream().map(Object::toString).collect(Collectors.joining(", ")) + "]";
++      Stream var10000 = this.elements.stream().map(Object::toString);
++      return "List[" + (String)var10000.collect(Collectors.joining(", ")) + "]";
+    }
+ 
+    private void setProjectionOnEachElement(StructureTemplatePool.Projection var1) {
+       this.elements.forEach((var1x) -> {
+          var1x.setProjection(var1);

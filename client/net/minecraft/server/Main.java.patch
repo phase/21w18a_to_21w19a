@@ -1,0 +1,15 @@
+--- net/minecraft/server/Main.java
++++ net/minecraft/server/Main.java
+@@ -114,11 +114,11 @@
+          File var22 = new File((String)var16.valueOf(var11));
+          YggdrasilAuthenticationService var23 = new YggdrasilAuthenticationService(Proxy.NO_PROXY);
+          MinecraftSessionService var24 = var23.createMinecraftSessionService();
+          GameProfileRepository var25 = var23.createProfileRepository();
+          GameProfileCache var26 = new GameProfileCache(var25, new File(var22, MinecraftServer.USERID_CACHE_FILE.getName()));
+-         String var27 = (String)Optional.ofNullable(var16.valueOf(var12)).orElse(var19.getProperties().levelName);
++         String var27 = (String)Optional.ofNullable((String)var16.valueOf(var12)).orElse(var19.getProperties().levelName);
+          LevelStorageSource var28 = LevelStorageSource.createDefault(var22.toPath());
+          LevelStorageSource.LevelStorageAccess var29 = var28.createAccess(var27);
+          MinecraftServer.convertFromRegionFormatIfNeeded(var29);
+          LevelSummary var30 = var29.getSummary();
+          if (var30 != null && var30.isIncompatibleWorldHeight()) {

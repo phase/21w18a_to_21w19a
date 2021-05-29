@@ -1,0 +1,47 @@
+--- com/mojang/realmsclient/gui/screens/RealmsResetWorldScreen.java
++++ com/mojang/realmsclient/gui/screens/RealmsResetWorldScreen.java
+@@ -24,11 +24,11 @@
+ import net.minecraft.resources.ResourceLocation;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class RealmsResetWorldScreen extends RealmsScreen {
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+    private final Screen lastScreen;
+    private final RealmsServer serverData;
+    private RealmsLabel titleLabel;
+    private RealmsLabel subtitleLabel;
+    private Component title;
+@@ -40,14 +40,14 @@
+    private static final ResourceLocation ADVENTURE_MAP_LOCATION = new ResourceLocation("realms", "textures/gui/realms/adventure.png");
+    private static final ResourceLocation SURVIVAL_SPAWN_LOCATION = new ResourceLocation("realms", "textures/gui/realms/survival_spawn.png");
+    private static final ResourceLocation NEW_WORLD_LOCATION = new ResourceLocation("realms", "textures/gui/realms/new_world.png");
+    private static final ResourceLocation EXPERIENCE_LOCATION = new ResourceLocation("realms", "textures/gui/realms/experience.png");
+    private static final ResourceLocation INSPIRATION_LOCATION = new ResourceLocation("realms", "textures/gui/realms/inspiration.png");
+-   private WorldTemplatePaginatedList templates;
+-   private WorldTemplatePaginatedList adventuremaps;
+-   private WorldTemplatePaginatedList experiences;
+-   private WorldTemplatePaginatedList inspirations;
++   WorldTemplatePaginatedList templates;
++   WorldTemplatePaginatedList adventuremaps;
++   WorldTemplatePaginatedList experiences;
++   WorldTemplatePaginatedList inspirations;
+    public int slot;
+    private Component resetTitle;
+    private final Runnable resetWorldRunnable;
+    private final Runnable callback;
+ 
+@@ -159,11 +159,11 @@
+       this.titleLabel.render(this, var1);
+       this.subtitleLabel.render(this, var1);
+       super.render(var1, var2, var3, var4);
+    }
+ 
+-   private void drawFrame(PoseStack var1, int var2, int var3, Component var4, ResourceLocation var5, boolean var6, boolean var7) {
++   void drawFrame(PoseStack var1, int var2, int var3, Component var4, ResourceLocation var5, boolean var6, boolean var7) {
+       RenderSystem.setShaderTexture(0, var5);
+       if (var6) {
+          RenderSystem.setShaderColor(0.56F, 0.56F, 0.56F, 1.0F);
+       } else {
+          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);

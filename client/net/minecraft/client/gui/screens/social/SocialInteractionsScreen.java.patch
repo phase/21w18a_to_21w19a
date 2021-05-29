@@ -1,0 +1,69 @@
+--- net/minecraft/client/gui/screens/social/SocialInteractionsScreen.java
++++ net/minecraft/client/gui/screens/social/SocialInteractionsScreen.java
+@@ -3,10 +3,11 @@
+ import com.google.common.collect.ImmutableList;
+ import com.mojang.blaze3d.systems.RenderSystem;
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import java.util.Collection;
+ import java.util.Locale;
++import java.util.Objects;
+ import java.util.UUID;
+ import java.util.stream.Collectors;
+ import java.util.stream.Stream;
+ import javax.annotation.Nullable;
+ import net.minecraft.ChatFormatting;
+@@ -32,11 +33,11 @@
+    private static final Component TAB_BLOCKED = new TranslatableComponent("gui.socialInteractions.tab_blocked");
+    private static final Component TAB_ALL_SELECTED;
+    private static final Component TAB_HIDDEN_SELECTED;
+    private static final Component TAB_BLOCKED_SELECTED;
+    private static final Component SEARCH_HINT;
+-   private static final Component EMPTY_SEARCH;
++   static final Component EMPTY_SEARCH;
+    private static final Component EMPTY_HIDDEN;
+    private static final Component EMPTY_BLOCKED;
+    private static final Component BLOCKING_HINT;
+    private static final String BLOCK_LINK = "https://aka.ms/javablocking";
+    private static final int BG_BORDER_SIZE = 8;
+@@ -47,12 +48,12 @@
+    public static final int LIST_START = 88;
+    public static final int SEARCH_START = 78;
+    private static final int IMAGE_WIDTH = 238;
+    private static final int BUTTON_HEIGHT = 20;
+    private static final int ITEM_HEIGHT = 36;
+-   private SocialInteractionsPlayerList socialInteractionsPlayerList;
+-   private EditBox searchBox;
++   SocialInteractionsPlayerList socialInteractionsPlayerList;
++   EditBox searchBox;
+    private String lastSearch = "";
+    private SocialInteractionsScreen.Page page;
+    private Button allButton;
+    private Button hiddenButton;
+    private Button blockedButton;
+@@ -85,11 +86,12 @@
+    private int marginX() {
+       return (this.width - 238) / 2;
+    }
+ 
+    public String getNarrationMessage() {
+-      return super.getNarrationMessage() + ". " + this.serverLabel.getString();
++      String var10000 = super.getNarrationMessage();
++      return var10000 + ". " + this.serverLabel.getString();
+    }
+ 
+    public void tick() {
+       super.tick();
+       this.searchBox.tick();
+@@ -162,11 +164,11 @@
+          break;
+       case BLOCKED:
+          this.blockedButton.setMessage(TAB_BLOCKED_SELECTED);
+          PlayerSocialManager var3 = this.minecraft.getPlayerSocialManager();
+          Stream var10000 = this.minecraft.player.connection.getOnlinePlayerIds().stream();
+-         var3.getClass();
++         Objects.requireNonNull(var3);
+          var2 = (Collection)var10000.filter(var3::isBlocked).collect(Collectors.toSet());
+          break;
+       default:
+          var2 = ImmutableList.of();
+       }

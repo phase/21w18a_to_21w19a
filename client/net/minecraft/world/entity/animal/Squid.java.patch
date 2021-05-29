@@ -1,0 +1,108 @@
+--- net/minecraft/world/entity/animal/Squid.java
++++ net/minecraft/world/entity/animal/Squid.java
+@@ -20,10 +20,11 @@
+ import net.minecraft.world.entity.MoverType;
+ import net.minecraft.world.entity.Pose;
+ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+ import net.minecraft.world.entity.ai.attributes.Attributes;
+ import net.minecraft.world.entity.ai.goal.Goal;
++import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.LevelAccessor;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.material.FluidState;
+ import net.minecraft.world.phys.Vec3;
+@@ -77,10 +78,14 @@
+ 
+    protected SoundEvent getSquirtSound() {
+       return SoundEvents.SQUID_SQUIRT;
+    }
+ 
++   public boolean canBeLeashed(Player var1) {
++      return !this.isLeashed();
++   }
++
+    protected float getSoundVolume() {
+       return 0.4F;
+    }
+ 
+    protected Entity.MovementEmission getMovementEmission() {
+@@ -207,17 +212,43 @@
+ 
+    public boolean hasMovementVector() {
+       return this.tx != 0.0F || this.ty != 0.0F || this.tz != 0.0F;
+    }
+ 
+-   class SquidFleeGoal extends Goal {
++   private class SquidRandomMovementGoal extends Goal {
++      private final Squid squid;
++
++      public SquidRandomMovementGoal(Squid var2) {
++         this.squid = var2;
++      }
++
++      public boolean canUse() {
++         return true;
++      }
++
++      public void tick() {
++         int var1 = this.squid.getNoActionTime();
++         if (var1 > 100) {
++            this.squid.setMovementVector(0.0F, 0.0F, 0.0F);
++         } else if (this.squid.getRandom().nextInt(50) == 0 || !this.squid.wasTouchingWater || !this.squid.hasMovementVector()) {
++            float var2 = this.squid.getRandom().nextFloat() * 6.2831855F;
++            float var3 = Mth.cos(var2) * 0.2F;
++            float var4 = -0.1F + this.squid.getRandom().nextFloat() * 0.2F;
++            float var5 = Mth.sin(var2) * 0.2F;
++            this.squid.setMovementVector(var3, var4, var5);
++         }
++
++      }
++   }
++
++   private class SquidFleeGoal extends Goal {
+       private static final float SQUID_FLEE_SPEED = 3.0F;
+       private static final float SQUID_FLEE_MIN_DISTANCE = 5.0F;
+       private static final float SQUID_FLEE_MAX_DISTANCE = 10.0F;
+       private int fleeTicks;
+ 
+-      private SquidFleeGoal() {
++      SquidFleeGoal() {
+       }
+ 
+       public boolean canUse() {
+          LivingEntity var1 = Squid.this.getLastHurtByMob();
+          if (Squid.this.isInWater() && var1 != null) {
+@@ -264,32 +295,6 @@
+             }
+ 
+          }
+       }
+    }
+-
+-   class SquidRandomMovementGoal extends Goal {
+-      private final Squid squid;
+-
+-      public SquidRandomMovementGoal(Squid var2) {
+-         this.squid = var2;
+-      }
+-
+-      public boolean canUse() {
+-         return true;
+-      }
+-
+-      public void tick() {
+-         int var1 = this.squid.getNoActionTime();
+-         if (var1 > 100) {
+-            this.squid.setMovementVector(0.0F, 0.0F, 0.0F);
+-         } else if (this.squid.getRandom().nextInt(50) == 0 || !this.squid.wasTouchingWater || !this.squid.hasMovementVector()) {
+-            float var2 = this.squid.getRandom().nextFloat() * 6.2831855F;
+-            float var3 = Mth.cos(var2) * 0.2F;
+-            float var4 = -0.1F + this.squid.getRandom().nextFloat() * 0.2F;
+-            float var5 = Mth.sin(var2) * 0.2F;
+-            this.squid.setMovementVector(var3, var4, var5);
+-         }
+-
+-      }
+-   }
+ }

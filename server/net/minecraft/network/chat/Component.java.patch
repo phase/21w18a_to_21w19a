@@ -1,0 +1,86 @@
+--- net/minecraft/network/chat/Component.java
++++ net/minecraft/network/chat/Component.java
+@@ -188,61 +188,61 @@
+             JsonObject var4 = var1.getAsJsonObject();
+             Object var5;
+             if (var4.has("text")) {
+                var5 = new TextComponent(GsonHelper.getAsString(var4, "text"));
+             } else {
+-               String var6;
++               String var12;
+                if (var4.has("translate")) {
+-                  var6 = GsonHelper.getAsString(var4, "translate");
++                  var12 = GsonHelper.getAsString(var4, "translate");
+                   if (var4.has("with")) {
+-                     JsonArray var7 = GsonHelper.getAsJsonArray(var4, "with");
+-                     Object[] var8 = new Object[var7.size()];
++                     JsonArray var15 = GsonHelper.getAsJsonArray(var4, "with");
++                     Object[] var19 = new Object[var15.size()];
+ 
+-                     for(int var9 = 0; var9 < var8.length; ++var9) {
+-                        var8[var9] = this.deserialize(var7.get(var9), var2, var3);
+-                        if (var8[var9] instanceof TextComponent) {
+-                           TextComponent var10 = (TextComponent)var8[var9];
++                     for(int var9 = 0; var9 < var19.length; ++var9) {
++                        var19[var9] = this.deserialize(var15.get(var9), var2, var3);
++                        if (var19[var9] instanceof TextComponent) {
++                           TextComponent var10 = (TextComponent)var19[var9];
+                            if (var10.getStyle().isEmpty() && var10.getSiblings().isEmpty()) {
+-                              var8[var9] = var10.getText();
++                              var19[var9] = var10.getText();
+                            }
+                         }
+                      }
+ 
+-                     var5 = new TranslatableComponent(var6, var8);
++                     var5 = new TranslatableComponent(var12, var19);
+                   } else {
+-                     var5 = new TranslatableComponent(var6);
++                     var5 = new TranslatableComponent(var12);
+                   }
+                } else if (var4.has("score")) {
+-                  JsonObject var12 = GsonHelper.getAsJsonObject(var4, "score");
+-                  if (!var12.has("name") || !var12.has("objective")) {
++                  JsonObject var13 = GsonHelper.getAsJsonObject(var4, "score");
++                  if (!var13.has("name") || !var13.has("objective")) {
+                      throw new JsonParseException("A score component needs a least a name and an objective");
+                   }
+ 
+-                  var5 = new ScoreComponent(GsonHelper.getAsString(var12, "name"), GsonHelper.getAsString(var12, "objective"));
++                  var5 = new ScoreComponent(GsonHelper.getAsString(var13, "name"), GsonHelper.getAsString(var13, "objective"));
+                } else if (var4.has("selector")) {
+-                  Optional var13 = this.parseSeparator(var2, var3, var4);
+-                  var5 = new SelectorComponent(GsonHelper.getAsString(var4, "selector"), var13);
++                  Optional var6 = this.parseSeparator(var2, var3, var4);
++                  var5 = new SelectorComponent(GsonHelper.getAsString(var4, "selector"), var6);
+                } else if (var4.has("keybind")) {
+                   var5 = new KeybindComponent(GsonHelper.getAsString(var4, "keybind"));
+                } else {
+                   if (!var4.has("nbt")) {
+                      throw new JsonParseException("Don't know how to turn " + var1 + " into a Component");
+                   }
+ 
+-                  var6 = GsonHelper.getAsString(var4, "nbt");
+-                  Optional var15 = this.parseSeparator(var2, var3, var4);
+-                  boolean var19 = GsonHelper.getAsBoolean(var4, "interpret", false);
++                  var12 = GsonHelper.getAsString(var4, "nbt");
++                  Optional var7 = this.parseSeparator(var2, var3, var4);
++                  boolean var8 = GsonHelper.getAsBoolean(var4, "interpret", false);
+                   if (var4.has("block")) {
+-                     var5 = new NbtComponent.BlockNbtComponent(var6, var19, GsonHelper.getAsString(var4, "block"), var15);
++                     var5 = new NbtComponent.BlockNbtComponent(var12, var8, GsonHelper.getAsString(var4, "block"), var7);
+                   } else if (var4.has("entity")) {
+-                     var5 = new NbtComponent.EntityNbtComponent(var6, var19, GsonHelper.getAsString(var4, "entity"), var15);
++                     var5 = new NbtComponent.EntityNbtComponent(var12, var8, GsonHelper.getAsString(var4, "entity"), var7);
+                   } else {
+                      if (!var4.has("storage")) {
+                         throw new JsonParseException("Don't know how to turn " + var1 + " into a Component");
+                      }
+ 
+-                     var5 = new NbtComponent.StorageNbtComponent(var6, var19, new ResourceLocation(GsonHelper.getAsString(var4, "storage")), var15);
++                     var5 = new NbtComponent.StorageNbtComponent(var12, var8, new ResourceLocation(GsonHelper.getAsString(var4, "storage")), var7);
+                   }
+                }
+             }
+ 
+             if (var4.has("extra")) {

@@ -1,0 +1,29 @@
+--- net/minecraft/client/KeyboardHandler.java
++++ net/minecraft/client/KeyboardHandler.java
+@@ -18,10 +18,11 @@
+ import net.minecraft.client.gui.screens.Screen;
+ import net.minecraft.client.gui.screens.SimpleOptionsSubScreen;
+ import net.minecraft.client.gui.screens.controls.ControlsScreen;
+ import net.minecraft.client.gui.screens.debug.GameModeSwitcherScreen;
+ import net.minecraft.client.multiplayer.ClientPacketListener;
++import net.minecraft.client.player.LocalPlayer;
+ import net.minecraft.commands.arguments.blocks.BlockStateParser;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Registry;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.NbtUtils;
+@@ -163,11 +164,13 @@
+             if (!this.minecraft.player.hasPermissions(2)) {
+                this.debugFeedbackTranslated("debug.creative_spectator.error");
+             } else if (!this.minecraft.player.isSpectator()) {
+                this.minecraft.player.chat("/gamemode spectator");
+             } else {
+-               this.minecraft.player.chat("/gamemode " + ((GameType)MoreObjects.firstNonNull(this.minecraft.gameMode.getPreviousPlayerMode(), GameType.CREATIVE)).getName());
++               LocalPlayer var10000 = this.minecraft.player;
++               GameType var10001 = this.minecraft.gameMode.getPreviousPlayerMode();
++               var10000.chat("/gamemode " + ((GameType)MoreObjects.firstNonNull(var10001, GameType.CREATIVE)).getName());
+             }
+ 
+             return true;
+          case 80:
+             this.minecraft.options.pauseOnLostFocus = !this.minecraft.options.pauseOnLostFocus;

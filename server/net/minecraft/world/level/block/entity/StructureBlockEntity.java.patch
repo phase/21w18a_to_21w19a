@@ -1,0 +1,27 @@
+--- net/minecraft/world/level/block/entity/StructureBlockEntity.java
++++ net/minecraft/world/level/block/entity/StructureBlockEntity.java
+@@ -294,11 +294,11 @@
+    private Stream<BlockPos> getRelatedCorners(BlockPos var1, BlockPos var2) {
+       Stream var10000 = BlockPos.betweenClosedStream(var1, var2).filter((var1x) -> {
+          return this.level.getBlockState(var1x).is(Blocks.STRUCTURE_BLOCK);
+       });
+       Level var10001 = this.level;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       return var10000.map(var10001::getBlockEntity).filter((var0) -> {
+          return var0 instanceof StructureBlockEntity;
+       }).map((var0) -> {
+          return (StructureBlockEntity)var0;
+       }).filter((var1x) -> {
+@@ -312,10 +312,11 @@
+          return Optional.empty();
+       } else {
+          BlockPos var3 = (BlockPos)var2.next();
+          BoundingBox var4 = new BoundingBox(var3);
+          if (var2.hasNext()) {
++            Objects.requireNonNull(var4);
+             var2.forEachRemaining(var4::encapsulate);
+          } else {
+             var4.encapsulate(var0);
+          }
+ 

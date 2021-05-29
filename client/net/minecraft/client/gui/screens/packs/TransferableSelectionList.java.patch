@@ -1,0 +1,39 @@
+--- net/minecraft/client/gui/screens/packs/TransferableSelectionList.java
++++ net/minecraft/client/gui/screens/packs/TransferableSelectionList.java
+@@ -1,10 +1,11 @@
+ package net.minecraft.client.gui.screens.packs;
+ 
+ import com.mojang.blaze3d.systems.RenderSystem;
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import com.mojang.blaze3d.vertex.Tesselator;
++import java.util.Objects;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.GuiComponent;
+ import net.minecraft.client.gui.components.MultiLineLabel;
+ import net.minecraft.client.gui.components.ObjectSelectionList;
+@@ -20,20 +21,20 @@
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.server.packs.repository.PackCompatibility;
+ import net.minecraft.util.FormattedCharSequence;
+ 
+ public class TransferableSelectionList extends ObjectSelectionList<TransferableSelectionList.PackEntry> {
+-   private static final ResourceLocation ICON_OVERLAY_LOCATION = new ResourceLocation("textures/gui/resource_packs.png");
+-   private static final Component INCOMPATIBLE_TITLE = new TranslatableComponent("pack.incompatible");
+-   private static final Component INCOMPATIBLE_CONFIRM_TITLE = new TranslatableComponent("pack.incompatible.confirm.title");
++   static final ResourceLocation ICON_OVERLAY_LOCATION = new ResourceLocation("textures/gui/resource_packs.png");
++   static final Component INCOMPATIBLE_TITLE = new TranslatableComponent("pack.incompatible");
++   static final Component INCOMPATIBLE_CONFIRM_TITLE = new TranslatableComponent("pack.incompatible.confirm.title");
+    private final Component title;
+ 
+    public TransferableSelectionList(Minecraft var1, int var2, int var3, Component var4) {
+       super(var1, var2, var3, 32, var3 - 55 + 4, 36);
+       this.title = var4;
+       this.centerListVertically = false;
+-      var1.font.getClass();
++      Objects.requireNonNull(var1.font);
+       this.setRenderHeader(true, (int)(9.0F * 1.5F));
+    }
+ 
+    protected void renderHeader(PoseStack var1, int var2, int var3, Tesselator var4) {
+       MutableComponent var5 = (new TextComponent("")).append(this.title).withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD);

@@ -1,0 +1,161 @@
+--- net/minecraft/world/level/levelgen/structure/templatesystem/StructureManager.java
++++ net/minecraft/world/level/levelgen/structure/templatesystem/StructureManager.java
+@@ -71,38 +71,35 @@
+    private StructureTemplate loadFromResource(ResourceLocation var1) {
+       ResourceLocation var2 = new ResourceLocation(var1.getNamespace(), "structures/" + var1.getPath() + ".nbt");
+ 
+       try {
+          Resource var3 = this.resourceManager.getResource(var2);
+-         Throwable var4 = null;
+ 
+-         StructureTemplate var5;
++         StructureTemplate var4;
+          try {
+-            var5 = this.readStructure(var3.getInputStream());
+-         } catch (Throwable var16) {
+-            var4 = var16;
+-            throw var16;
+-         } finally {
++            var4 = this.readStructure(var3.getInputStream());
++         } catch (Throwable var7) {
+             if (var3 != null) {
+-               if (var4 != null) {
+-                  try {
+-                     var3.close();
+-                  } catch (Throwable var15) {
+-                     var4.addSuppressed(var15);
+-                  }
+-               } else {
++               try {
+                   var3.close();
++               } catch (Throwable var6) {
++                  var7.addSuppressed(var6);
+                }
+             }
+ 
++            throw var7;
+          }
+ 
+-         return var5;
+-      } catch (FileNotFoundException var18) {
++         if (var3 != null) {
++            var3.close();
++         }
++
++         return var4;
++      } catch (FileNotFoundException var8) {
+          return null;
+-      } catch (Throwable var19) {
+-         LOGGER.error((String)"Couldn't load structure {}: {}", (Object)var1, (Object)var19.toString());
++      } catch (Throwable var9) {
++         LOGGER.error((String)"Couldn't load structure {}: {}", (Object)var1, (Object)var9.toString());
+          return null;
+       }
+    }
+ 
+    @Nullable
+@@ -112,38 +109,30 @@
+       } else {
+          Path var2 = this.createAndValidatePathToStructure(var1, ".nbt");
+ 
+          try {
+             FileInputStream var3 = new FileInputStream(var2.toFile());
+-            Throwable var4 = null;
+ 
+-            StructureTemplate var5;
++            StructureTemplate var4;
+             try {
+-               var5 = this.readStructure((InputStream)var3);
+-            } catch (Throwable var16) {
+-               var4 = var16;
+-               throw var16;
+-            } finally {
+-               if (var3 != null) {
+-                  if (var4 != null) {
+-                     try {
+-                        var3.close();
+-                     } catch (Throwable var15) {
+-                        var4.addSuppressed(var15);
+-                     }
+-                  } else {
+-                     var3.close();
+-                  }
++               var4 = this.readStructure((InputStream)var3);
++            } catch (Throwable var7) {
++               try {
++                  var3.close();
++               } catch (Throwable var6) {
++                  var7.addSuppressed(var6);
+                }
+ 
++               throw var7;
+             }
+ 
+-            return var5;
+-         } catch (FileNotFoundException var18) {
++            var3.close();
++            return var4;
++         } catch (FileNotFoundException var8) {
+             return null;
+-         } catch (IOException var19) {
+-            LOGGER.error((String)"Couldn't load structure from {}", (Object)var2, (Object)var19);
++         } catch (IOException var9) {
++            LOGGER.error((String)"Couldn't load structure from {}", (Object)var2, (Object)var9);
+             return null;
+          }
+       }
+    }
+ 
+@@ -172,43 +161,35 @@
+          if (var4 == null) {
+             return false;
+          } else {
+             try {
+                Files.createDirectories(Files.exists(var4, new LinkOption[0]) ? var4.toRealPath() : var4);
+-            } catch (IOException var19) {
++            } catch (IOException var12) {
+                LOGGER.error((String)"Failed to create parent directory: {}", (Object)var4);
+                return false;
+             }
+ 
+             CompoundTag var5 = var2.save(new CompoundTag());
+ 
+             try {
+                FileOutputStream var6 = new FileOutputStream(var3.toFile());
+-               Throwable var7 = null;
+ 
+                try {
+                   NbtIo.writeCompressed(var5, (OutputStream)var6);
+-               } catch (Throwable var18) {
+-                  var7 = var18;
+-                  throw var18;
+-               } finally {
+-                  if (var6 != null) {
+-                     if (var7 != null) {
+-                        try {
+-                           var6.close();
+-                        } catch (Throwable var17) {
+-                           var7.addSuppressed(var17);
+-                        }
+-                     } else {
+-                        var6.close();
+-                     }
++               } catch (Throwable var10) {
++                  try {
++                     var6.close();
++                  } catch (Throwable var9) {
++                     var10.addSuppressed(var9);
+                   }
+ 
++                  throw var10;
+                }
+ 
++               var6.close();
+                return true;
+-            } catch (Throwable var21) {
++            } catch (Throwable var11) {
+                return false;
+             }
+          }
+       }
+    }

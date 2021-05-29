@@ -1,0 +1,31 @@
+--- net/minecraft/client/renderer/item/ItemProperties.java
++++ net/minecraft/client/renderer/item/ItemProperties.java
+@@ -279,23 +279,23 @@
+ 
+          return 15.0F;
+       });
+    }
+ 
+-   static class CompassWobble {
+-      private double rotation;
++   private static class CompassWobble {
++      double rotation;
+       private double deltaRotation;
+       private long lastUpdateTick;
+ 
+-      private CompassWobble() {
++      CompassWobble() {
+       }
+ 
+-      private boolean shouldUpdate(long var1) {
++      boolean shouldUpdate(long var1) {
+          return this.lastUpdateTick != var1;
+       }
+ 
+-      private void update(long var1, double var3) {
++      void update(long var1, double var3) {
+          this.lastUpdateTick = var1;
+          double var5 = var3 - this.rotation;
+          var5 = Mth.positiveModulo(var5 + 0.5D, 1.0D) - 0.5D;
+          this.deltaRotation += var5 * 0.1D;
+          this.deltaRotation *= 0.8D;

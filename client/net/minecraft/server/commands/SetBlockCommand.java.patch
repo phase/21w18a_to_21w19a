@@ -1,0 +1,26 @@
+--- net/minecraft/server/commands/SetBlockCommand.java
++++ net/minecraft/server/commands/SetBlockCommand.java
+@@ -65,18 +65,18 @@
+             return 1;
+          }
+       }
+    }
+ 
+-   public interface Filter {
+-      @Nullable
+-      BlockInput filter(BoundingBox var1, BlockPos var2, BlockInput var3, ServerLevel var4);
+-   }
+-
+    public static enum Mode {
+       REPLACE,
+       DESTROY;
+ 
+       private Mode() {
+       }
+    }
++
++   public interface Filter {
++      @Nullable
++      BlockInput filter(BoundingBox var1, BlockPos var2, BlockInput var3, ServerLevel var4);
++   }
+ }

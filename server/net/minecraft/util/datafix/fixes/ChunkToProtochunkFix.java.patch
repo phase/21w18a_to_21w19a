@@ -1,0 +1,27 @@
+--- net/minecraft/util/datafix/fixes/ChunkToProtochunkFix.java
++++ net/minecraft/util/datafix/fixes/ChunkToProtochunkFix.java
+@@ -13,10 +13,11 @@
+ import it.unimi.dsi.fastutil.shorts.ShortArrayList;
+ import it.unimi.dsi.fastutil.shorts.ShortList;
+ import java.nio.ByteBuffer;
+ import java.util.Arrays;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.stream.Collectors;
+ import java.util.stream.IntStream;
+ import java.util.stream.Stream;
+ 
+@@ -73,11 +74,11 @@
+                      short var5 = packOffsetCoordinates(var2, var3, var4);
+                      ((ShortList)var11.get(var3 >> 4)).add(var5);
+                   });
+                   var4x = var4x.set("ToBeTicked", var4x.createList(var11.stream().map((var1) -> {
+                      Stream var10001 = var1.stream();
+-                     var4x.getClass();
++                     Objects.requireNonNull(var4x);
+                      return var4x.createList(var10001.map(var4x::createShort));
+                   })));
+                }
+ 
+                var6 = (Dynamic)DataFixUtils.orElse(var2.set(DSL.remainderFinder(), (Object)var4x).write().result(), var4x);

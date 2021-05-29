@@ -1,0 +1,71 @@
+--- net/minecraft/world/entity/ai/behavior/ShufflingList.java
++++ net/minecraft/world/entity/ai/behavior/ShufflingList.java
+@@ -7,10 +7,11 @@
+ import com.mojang.serialization.Dynamic;
+ import com.mojang.serialization.DynamicOps;
+ import com.mojang.serialization.OptionalDynamic;
+ import java.util.Comparator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Random;
+ import java.util.stream.Stream;
+ 
+ public class ShufflingList<U> {
+    protected final List<ShufflingList.WeightedEntry<U>> entries;
+@@ -37,13 +38,11 @@
+ 
+    public ShufflingList<U> shuffle() {
+       this.entries.forEach((var1) -> {
+          var1.setRandom(this.random.nextFloat());
+       });
+-      this.entries.sort(Comparator.comparingDouble((var0) -> {
+-         return ((ShufflingList.WeightedEntry)var0).getRandWeight();
+-      }));
++      this.entries.sort(Comparator.comparingDouble(ShufflingList.WeightedEntry::getRandWeight));
+       return this;
+    }
+ 
+    public Stream<U> stream() {
+       return this.entries.stream().map(ShufflingList.WeightedEntry::getData);
+@@ -52,24 +51,24 @@
+    public String toString() {
+       return "ShufflingList[" + this.entries + "]";
+    }
+ 
+    public static class WeightedEntry<T> {
+-      private final T data;
+-      private final int weight;
++      final T data;
++      final int weight;
+       private double randWeight;
+ 
+-      private WeightedEntry(T var1, int var2) {
++      WeightedEntry(T var1, int var2) {
+          this.weight = var2;
+          this.data = var1;
+       }
+ 
+       private double getRandWeight() {
+          return this.randWeight;
+       }
+ 
+-      private void setRandom(float var1) {
++      void setRandom(float var1) {
+          this.randWeight = -Math.pow((double)var1, (double)(1.0F / (float)this.weight));
+       }
+ 
+       public T getData() {
+          return this.data;
+@@ -87,11 +86,11 @@
+          return new Codec<ShufflingList.WeightedEntry<E>>() {
+             public <T> DataResult<Pair<ShufflingList.WeightedEntry<E>, T>> decode(DynamicOps<T> var1, T var2) {
+                Dynamic var3 = new Dynamic(var1, var2);
+                OptionalDynamic var10000 = var3.get("data");
+                Codec var10001 = var0;
+-               var10001.getClass();
++               Objects.requireNonNull(var10001);
+                return var10000.flatMap(var10001::parse).map((var1x) -> {
+                   return new ShufflingList.WeightedEntry(var1x, var3.get("weight").asInt(1));
+                }).map((var1x) -> {
+                   return Pair.of(var1x, var1.empty());
+                });

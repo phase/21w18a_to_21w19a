@@ -1,0 +1,69 @@
+--- com/mojang/blaze3d/vertex/BufferBuilder.java
++++ com/mojang/blaze3d/vertex/BufferBuilder.java
+@@ -364,20 +364,39 @@
+ 
+    public boolean building() {
+       return this.building;
+    }
+ 
++   public static class SortState {
++      final VertexFormat.Mode mode;
++      final int vertices;
++      @Nullable
++      final Vector3f[] sortingPoints;
++      final float sortX;
++      final float sortY;
++      final float sortZ;
++
++      SortState(VertexFormat.Mode var1, int var2, @Nullable Vector3f[] var3, float var4, float var5, float var6) {
++         this.mode = var1;
++         this.vertices = var2;
++         this.sortingPoints = var3;
++         this.sortX = var4;
++         this.sortY = var5;
++         this.sortZ = var6;
++      }
++   }
++
+    public static final class DrawState {
+       private final VertexFormat format;
+       private final int vertexCount;
+       private final int indexCount;
+       private final VertexFormat.Mode mode;
+       private final VertexFormat.IndexType indexType;
+       private final boolean indexOnly;
+       private final boolean sequentialIndex;
+ 
+-      private DrawState(VertexFormat var1, int var2, int var3, VertexFormat.Mode var4, VertexFormat.IndexType var5, boolean var6, boolean var7) {
++      DrawState(VertexFormat var1, int var2, int var3, VertexFormat.Mode var4, VertexFormat.IndexType var5, boolean var6, boolean var7) {
+          this.format = var1;
+          this.vertexCount = var2;
+          this.indexCount = var3;
+          this.mode = var4;
+          this.indexType = var5;
+@@ -423,25 +442,6 @@
+ 
+       public boolean sequentialIndex() {
+          return this.sequentialIndex;
+       }
+    }
+-
+-   public static class SortState {
+-      private final VertexFormat.Mode mode;
+-      private final int vertices;
+-      @Nullable
+-      private final Vector3f[] sortingPoints;
+-      private final float sortX;
+-      private final float sortY;
+-      private final float sortZ;
+-
+-      private SortState(VertexFormat.Mode var1, int var2, @Nullable Vector3f[] var3, float var4, float var5, float var6) {
+-         this.mode = var1;
+-         this.vertices = var2;
+-         this.sortingPoints = var3;
+-         this.sortX = var4;
+-         this.sortY = var5;
+-         this.sortZ = var6;
+-      }
+-   }
+ }

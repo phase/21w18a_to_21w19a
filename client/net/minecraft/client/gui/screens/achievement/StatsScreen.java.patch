@@ -1,0 +1,353 @@
+--- net/minecraft/client/gui/screens/achievement/StatsScreen.java
++++ net/minecraft/client/gui/screens/achievement/StatsScreen.java
+@@ -8,10 +8,11 @@
+ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+ import it.unimi.dsi.fastutil.objects.ObjectListIterator;
+ import java.util.Comparator;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Set;
+ import javax.annotation.Nullable;
+ import net.minecraft.Util;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.Font;
+@@ -43,13 +44,13 @@
+ 
+ public class StatsScreen extends Screen implements StatsUpdateListener {
+    private static final Component PENDING_TEXT = new TranslatableComponent("multiplayer.downloadingStats");
+    protected final Screen lastScreen;
+    private StatsScreen.GeneralStatisticsList statsList;
+-   private StatsScreen.ItemStatisticsList itemStatsList;
++   StatsScreen.ItemStatisticsList itemStatsList;
+    private StatsScreen.MobsStatisticsList mobsStatsList;
+-   private final StatsCounter stats;
++   final StatsCounter stats;
+    @Nullable
+    private ObjectSelectionList<?> activeList;
+    private boolean isLoading = true;
+    private static final int SLOT_TEX_SIZE = 128;
+    private static final int SLOT_BG_SIZE = 18;
+@@ -110,11 +111,11 @@
+          drawCenteredString(var1, this.font, PENDING_TEXT, this.width / 2, this.height / 2, 16777215);
+          Font var10001 = this.font;
+          String var10002 = LOADING_SYMBOLS[(int)(Util.getMillis() / 150L % (long)LOADING_SYMBOLS.length)];
+          int var10003 = this.width / 2;
+          int var10004 = this.height / 2;
+-         this.font.getClass();
++         Objects.requireNonNull(this.font);
+          drawCenteredString(var1, var10001, var10002, var10003, var10004 + 9 * 2, 16777215);
+       } else {
+          this.getActiveList().render(var1, var2, var3, var4);
+          drawCenteredString(var1, this.font, this.title, this.width / 2, 20, 16777215);
+          super.render(var1, var2, var3, var4);
+@@ -150,107 +151,69 @@
+          this.activeList = var1;
+       }
+ 
+    }
+ 
+-   private static String getTranslationKey(Stat<ResourceLocation> var0) {
+-      return "stat." + ((ResourceLocation)var0.getValue()).toString().replace(':', '.');
++   static String getTranslationKey(Stat<ResourceLocation> var0) {
++      String var10000 = ((ResourceLocation)var0.getValue()).toString();
++      return "stat." + var10000.replace(':', '.');
+    }
+ 
+-   private int getColumnX(int var1) {
++   int getColumnX(int var1) {
+       return 115 + 40 * var1;
+    }
+ 
+-   private void blitSlot(PoseStack var1, int var2, int var3, Item var4) {
++   void blitSlot(PoseStack var1, int var2, int var3, Item var4) {
+       this.blitSlotIcon(var1, var2 + 1, var3 + 1, 0, 0);
+       this.itemRenderer.renderGuiItem(var4.getDefaultInstance(), var2 + 2, var3 + 2);
+    }
+ 
+-   private void blitSlotIcon(PoseStack var1, int var2, int var3, int var4, int var5) {
++   void blitSlotIcon(PoseStack var1, int var2, int var3, int var4, int var5) {
+       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+       RenderSystem.setShader(GameRenderer::getPositionTexShader);
+       RenderSystem.setShaderTexture(0, STATS_ICON_LOCATION);
+       blit(var1, var2, var3, this.getBlitOffset(), (float)var4, (float)var5, 18, 18, 128, 128);
+    }
+ 
+-   class MobsStatisticsList extends ObjectSelectionList<StatsScreen.MobsStatisticsList.MobRow> {
+-      public MobsStatisticsList(Minecraft var2) {
+-         int var10002 = StatsScreen.this.width;
+-         int var10003 = StatsScreen.this.height;
+-         int var10005 = StatsScreen.this.height - 64;
+-         StatsScreen.this.font.getClass();
+-         super(var2, var10002, var10003, 32, var10005, 9 * 4);
+-         Iterator var3 = Registry.ENTITY_TYPE.iterator();
++   class GeneralStatisticsList extends ObjectSelectionList<StatsScreen.GeneralStatisticsList.Entry> {
++      public GeneralStatisticsList(Minecraft var2) {
++         super(var2, StatsScreen.this.width, StatsScreen.this.height, 32, StatsScreen.this.height - 64, 10);
++         ObjectArrayList var3 = new ObjectArrayList(Stats.CUSTOM.iterator());
++         var3.sort(Comparator.comparing((var0) -> {
++            return I18n.get(StatsScreen.getTranslationKey(var0));
++         }));
++         ObjectListIterator var4 = var3.iterator();
+ 
+-         while(true) {
+-            EntityType var4;
+-            do {
+-               if (!var3.hasNext()) {
+-                  return;
+-               }
+-
+-               var4 = (EntityType)var3.next();
+-            } while(StatsScreen.this.stats.getValue(Stats.ENTITY_KILLED.get(var4)) <= 0 && StatsScreen.this.stats.getValue(Stats.ENTITY_KILLED_BY.get(var4)) <= 0);
+-
+-            this.addEntry(new StatsScreen.MobsStatisticsList.MobRow(var4));
++         while(var4.hasNext()) {
++            Stat var5 = (Stat)var4.next();
++            this.addEntry(new StatsScreen.GeneralStatisticsList.Entry(var5));
+          }
++
+       }
+ 
+       protected void renderBackground(PoseStack var1) {
+          StatsScreen.this.renderBackground(var1);
+       }
+ 
+-      class MobRow extends ObjectSelectionList.Entry<StatsScreen.MobsStatisticsList.MobRow> {
+-         private final EntityType<?> type;
+-         private final Component mobName;
+-         private final Component kills;
+-         private final boolean hasKills;
+-         private final Component killedBy;
+-         private final boolean wasKilledBy;
++      private class Entry extends ObjectSelectionList.Entry<StatsScreen.GeneralStatisticsList.Entry> {
++         private final Stat<ResourceLocation> stat;
++         private final Component statDisplay;
+ 
+-         public MobRow(EntityType<?> var2) {
+-            this.type = var2;
+-            this.mobName = var2.getDescription();
+-            int var3 = StatsScreen.this.stats.getValue(Stats.ENTITY_KILLED.get(var2));
+-            if (var3 == 0) {
+-               this.kills = new TranslatableComponent("stat_type.minecraft.killed.none", new Object[]{this.mobName});
+-               this.hasKills = false;
+-            } else {
+-               this.kills = new TranslatableComponent("stat_type.minecraft.killed", new Object[]{var3, this.mobName});
+-               this.hasKills = true;
+-            }
+-
+-            int var4 = StatsScreen.this.stats.getValue(Stats.ENTITY_KILLED_BY.get(var2));
+-            if (var4 == 0) {
+-               this.killedBy = new TranslatableComponent("stat_type.minecraft.killed_by.none", new Object[]{this.mobName});
+-               this.wasKilledBy = false;
+-            } else {
+-               this.killedBy = new TranslatableComponent("stat_type.minecraft.killed_by", new Object[]{this.mobName, var4});
+-               this.wasKilledBy = true;
+-            }
+-
++         Entry(Stat<ResourceLocation> var2) {
++            this.stat = var2;
++            this.statDisplay = new TranslatableComponent(StatsScreen.getTranslationKey(var2));
+          }
+ 
+          public void render(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10) {
+-            GuiComponent.drawString(var1, StatsScreen.this.font, this.mobName, var4 + 2, var3 + 1, 16777215);
+-            Font var10001 = StatsScreen.this.font;
+-            Component var10002 = this.kills;
+-            int var10003 = var4 + 2 + 10;
+-            int var10004 = var3 + 1;
+-            StatsScreen.this.font.getClass();
+-            GuiComponent.drawString(var1, var10001, var10002, var10003, var10004 + 9, this.hasKills ? 9474192 : 6316128);
+-            var10001 = StatsScreen.this.font;
+-            var10002 = this.killedBy;
+-            var10003 = var4 + 2 + 10;
+-            var10004 = var3 + 1;
+-            StatsScreen.this.font.getClass();
+-            GuiComponent.drawString(var1, var10001, var10002, var10003, var10004 + 9 * 2, this.wasKilledBy ? 9474192 : 6316128);
++            GuiComponent.drawString(var1, StatsScreen.this.font, this.statDisplay, var4 + 2, var3 + 1, var2 % 2 == 0 ? 16777215 : 9474192);
++            String var11 = this.stat.format(StatsScreen.this.stats.getValue(this.stat));
++            GuiComponent.drawString(var1, StatsScreen.this.font, var11, var4 + 2 + 213 - StatsScreen.this.font.width(var11), var3 + 1, var2 % 2 == 0 ? 16777215 : 9474192);
+          }
+       }
+    }
+ 
+-   class ItemStatisticsList extends ObjectSelectionList<StatsScreen.ItemStatisticsList.ItemRow> {
++   private class ItemStatisticsList extends ObjectSelectionList<StatsScreen.ItemStatisticsList.ItemRow> {
+       protected final List<StatType<Block>> blockColumns = Lists.newArrayList();
+       protected final List<StatType<Item>> itemColumns;
+       private final int[] iconOffsets = new int[]{3, 4, 1, 2, 5, 6};
+       protected int headerPressed = -1;
+       protected final List<Item> statItemList;
+@@ -441,14 +404,41 @@
+          }
+ 
+          this.statItemList.sort(this.itemStatSorter);
+       }
+ 
+-      class ItemRow extends ObjectSelectionList.Entry<StatsScreen.ItemStatisticsList.ItemRow> {
+-         private ItemRow() {
++      class ItemComparator implements Comparator<Item> {
++         ItemComparator() {
+          }
+ 
++         public int compare(Item var1, Item var2) {
++            int var3;
++            int var4;
++            if (ItemStatisticsList.this.sortColumn == null) {
++               var3 = 0;
++               var4 = 0;
++            } else {
++               StatType var5;
++               if (ItemStatisticsList.this.blockColumns.contains(ItemStatisticsList.this.sortColumn)) {
++                  var5 = ItemStatisticsList.this.sortColumn;
++                  var3 = var1 instanceof BlockItem ? StatsScreen.this.stats.getValue(var5, ((BlockItem)var1).getBlock()) : -1;
++                  var4 = var2 instanceof BlockItem ? StatsScreen.this.stats.getValue(var5, ((BlockItem)var2).getBlock()) : -1;
++               } else {
++                  var5 = ItemStatisticsList.this.sortColumn;
++                  var3 = StatsScreen.this.stats.getValue(var5, var1);
++                  var4 = StatsScreen.this.stats.getValue(var5, var2);
++               }
++            }
++
++            return var3 == var4 ? ItemStatisticsList.this.sortOrder * Integer.compare(Item.getId(var1), Item.getId(var2)) : ItemStatisticsList.this.sortOrder * Integer.compare(var3, var4);
++         }
++      }
++
++      private class ItemRow extends ObjectSelectionList.Entry<StatsScreen.ItemStatisticsList.ItemRow> {
++         ItemRow() {
++         }
++
+          public void render(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10) {
+             Item var11 = (Item)StatsScreen.this.itemStatsList.statItemList.get(var2);
+             StatsScreen.this.blitSlot(var1, var4 + 40, var3, var11);
+ 
+             int var12;
+@@ -472,71 +462,83 @@
+          protected void renderStat(PoseStack var1, @Nullable Stat<?> var2, int var3, int var4, boolean var5) {
+             String var6 = var2 == null ? "-" : var2.format(StatsScreen.this.stats.getValue(var2));
+             GuiComponent.drawString(var1, StatsScreen.this.font, var6, var3 - StatsScreen.this.font.width(var6), var4 + 5, var5 ? 16777215 : 9474192);
+          }
+       }
++   }
+ 
+-      class ItemComparator implements Comparator<Item> {
+-         private ItemComparator() {
+-         }
++   private class MobsStatisticsList extends ObjectSelectionList<StatsScreen.MobsStatisticsList.MobRow> {
++      public MobsStatisticsList(Minecraft var2) {
++         int var10002 = StatsScreen.this.width;
++         int var10003 = StatsScreen.this.height;
++         int var10005 = StatsScreen.this.height - 64;
++         Objects.requireNonNull(StatsScreen.this.font);
++         super(var2, var10002, var10003, 32, var10005, 9 * 4);
++         Iterator var3 = Registry.ENTITY_TYPE.iterator();
+ 
+-         public int compare(Item var1, Item var2) {
+-            int var3;
+-            int var4;
+-            if (ItemStatisticsList.this.sortColumn == null) {
+-               var3 = 0;
+-               var4 = 0;
+-            } else {
+-               StatType var5;
+-               if (ItemStatisticsList.this.blockColumns.contains(ItemStatisticsList.this.sortColumn)) {
+-                  var5 = ItemStatisticsList.this.sortColumn;
+-                  var3 = var1 instanceof BlockItem ? StatsScreen.this.stats.getValue(var5, ((BlockItem)var1).getBlock()) : -1;
+-                  var4 = var2 instanceof BlockItem ? StatsScreen.this.stats.getValue(var5, ((BlockItem)var2).getBlock()) : -1;
+-               } else {
+-                  var5 = ItemStatisticsList.this.sortColumn;
+-                  var3 = StatsScreen.this.stats.getValue(var5, var1);
+-                  var4 = StatsScreen.this.stats.getValue(var5, var2);
++         while(true) {
++            EntityType var4;
++            do {
++               if (!var3.hasNext()) {
++                  return;
+                }
+-            }
+ 
+-            return var3 == var4 ? ItemStatisticsList.this.sortOrder * Integer.compare(Item.getId(var1), Item.getId(var2)) : ItemStatisticsList.this.sortOrder * Integer.compare(var3, var4);
+-         }
+-      }
+-   }
++               var4 = (EntityType)var3.next();
++            } while(StatsScreen.this.stats.getValue(Stats.ENTITY_KILLED.get(var4)) <= 0 && StatsScreen.this.stats.getValue(Stats.ENTITY_KILLED_BY.get(var4)) <= 0);
+ 
+-   class GeneralStatisticsList extends ObjectSelectionList<StatsScreen.GeneralStatisticsList.Entry> {
+-      public GeneralStatisticsList(Minecraft var2) {
+-         super(var2, StatsScreen.this.width, StatsScreen.this.height, 32, StatsScreen.this.height - 64, 10);
+-         ObjectArrayList var3 = new ObjectArrayList(Stats.CUSTOM.iterator());
+-         var3.sort(Comparator.comparing((var0) -> {
+-            return I18n.get(StatsScreen.getTranslationKey(var0));
+-         }));
+-         ObjectListIterator var4 = var3.iterator();
+-
+-         while(var4.hasNext()) {
+-            Stat var5 = (Stat)var4.next();
+-            this.addEntry(new StatsScreen.GeneralStatisticsList.Entry(var5));
++            this.addEntry(new StatsScreen.MobsStatisticsList.MobRow(var4));
+          }
+-
+       }
+ 
+       protected void renderBackground(PoseStack var1) {
+          StatsScreen.this.renderBackground(var1);
+       }
+ 
+-      class Entry extends ObjectSelectionList.Entry<StatsScreen.GeneralStatisticsList.Entry> {
+-         private final Stat<ResourceLocation> stat;
+-         private final Component statDisplay;
++      class MobRow extends ObjectSelectionList.Entry<StatsScreen.MobsStatisticsList.MobRow> {
++         private final EntityType<?> type;
++         private final Component mobName;
++         private final Component kills;
++         private final boolean hasKills;
++         private final Component killedBy;
++         private final boolean wasKilledBy;
+ 
+-         private Entry(Stat<ResourceLocation> var2) {
+-            this.stat = var2;
+-            this.statDisplay = new TranslatableComponent(StatsScreen.getTranslationKey(var2));
++         public MobRow(EntityType<?> var2) {
++            this.type = var2;
++            this.mobName = var2.getDescription();
++            int var3 = StatsScreen.this.stats.getValue(Stats.ENTITY_KILLED.get(var2));
++            if (var3 == 0) {
++               this.kills = new TranslatableComponent("stat_type.minecraft.killed.none", new Object[]{this.mobName});
++               this.hasKills = false;
++            } else {
++               this.kills = new TranslatableComponent("stat_type.minecraft.killed", new Object[]{var3, this.mobName});
++               this.hasKills = true;
++            }
++
++            int var4 = StatsScreen.this.stats.getValue(Stats.ENTITY_KILLED_BY.get(var2));
++            if (var4 == 0) {
++               this.killedBy = new TranslatableComponent("stat_type.minecraft.killed_by.none", new Object[]{this.mobName});
++               this.wasKilledBy = false;
++            } else {
++               this.killedBy = new TranslatableComponent("stat_type.minecraft.killed_by", new Object[]{this.mobName, var4});
++               this.wasKilledBy = true;
++            }
++
+          }
+ 
+          public void render(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10) {
+-            GuiComponent.drawString(var1, StatsScreen.this.font, this.statDisplay, var4 + 2, var3 + 1, var2 % 2 == 0 ? 16777215 : 9474192);
+-            String var11 = this.stat.format(StatsScreen.this.stats.getValue(this.stat));
+-            GuiComponent.drawString(var1, StatsScreen.this.font, var11, var4 + 2 + 213 - StatsScreen.this.font.width(var11), var3 + 1, var2 % 2 == 0 ? 16777215 : 9474192);
++            GuiComponent.drawString(var1, StatsScreen.this.font, this.mobName, var4 + 2, var3 + 1, 16777215);
++            Font var10001 = StatsScreen.this.font;
++            Component var10002 = this.kills;
++            int var10003 = var4 + 2 + 10;
++            int var10004 = var3 + 1;
++            Objects.requireNonNull(StatsScreen.this.font);
++            GuiComponent.drawString(var1, var10001, var10002, var10003, var10004 + 9, this.hasKills ? 9474192 : 6316128);
++            var10001 = StatsScreen.this.font;
++            var10002 = this.killedBy;
++            var10003 = var4 + 2 + 10;
++            var10004 = var3 + 1;
++            Objects.requireNonNull(StatsScreen.this.font);
++            GuiComponent.drawString(var1, var10001, var10002, var10003, var10004 + 9 * 2, this.wasKilledBy ? 9474192 : 6316128);
+          }
+       }
+    }
+ }

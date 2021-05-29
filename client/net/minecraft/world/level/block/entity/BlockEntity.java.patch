@@ -1,0 +1,16 @@
+--- net/minecraft/world/level/block/entity/BlockEntity.java
++++ net/minecraft/world/level/block/entity/BlockEntity.java
+@@ -132,11 +132,12 @@
+       return false;
+    }
+ 
+    public void fillCrashReportCategory(CrashReportCategory var1) {
+       var1.setDetail("Name", () -> {
+-         return Registry.BLOCK_ENTITY_TYPE.getKey(this.getType()) + " // " + this.getClass().getCanonicalName();
++         ResourceLocation var10000 = Registry.BLOCK_ENTITY_TYPE.getKey(this.getType());
++         return var10000 + " // " + this.getClass().getCanonicalName();
+       });
+       if (this.level != null) {
+          CrashReportCategory.populateBlockDetails(var1, this.level, this.worldPosition, this.getBlockState());
+          CrashReportCategory.populateBlockDetails(var1, this.level, this.worldPosition, this.level.getBlockState(this.worldPosition));
+       }

@@ -1,0 +1,18 @@
+--- net/minecraft/world/level/storage/loot/functions/LimitCount.java
++++ net/minecraft/world/level/storage/loot/functions/LimitCount.java
+@@ -10,13 +10,13 @@
+ import net.minecraft.world.level.storage.loot.LootContext;
+ import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+ 
+ public class LimitCount extends LootItemConditionalFunction {
+-   private final IntRange limiter;
++   final IntRange limiter;
+ 
+-   private LimitCount(LootItemCondition[] var1, IntRange var2) {
++   LimitCount(LootItemCondition[] var1, IntRange var2) {
+       super(var1);
+       this.limiter = var2;
+    }
+ 
+    public LootItemFunctionType getType() {

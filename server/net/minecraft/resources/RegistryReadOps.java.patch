@@ -1,0 +1,150 @@
+--- net/minecraft/resources/RegistryReadOps.java
++++ net/minecraft/resources/RegistryReadOps.java
+@@ -37,11 +37,11 @@
+ import net.minecraft.server.packs.resources.ResourceManager;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class RegistryReadOps<T> extends DelegatingOps<T> {
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+    private static final String JSON = ".json";
+    private final RegistryReadOps.ResourceAccess resources;
+    private final RegistryAccess registryAccess;
+    private final Map<ResourceKey<? extends Registry<?>>, RegistryReadOps.ReadCache<?>> readCache;
+    private final RegistryReadOps<JsonElement> jsonOps;
+@@ -192,65 +192,57 @@
+                });
+             }
+ 
+             public <E> DataResult<Pair<E, OptionalInt>> parseElement(DynamicOps<JsonElement> var1, ResourceKey<? extends Registry<E>> var2, ResourceKey<E> var3, Decoder<E> var4) {
+                ResourceLocation var5 = var3.location();
+-               ResourceLocation var6 = new ResourceLocation(var5.getNamespace(), var2.location().getPath() + "/" + var5.getPath() + ".json");
++               String var10002 = var5.getNamespace();
++               String var10003 = var2.location().getPath();
++               ResourceLocation var6 = new ResourceLocation(var10002, var10003 + "/" + var5.getPath() + ".json");
+ 
+                try {
+                   Resource var7 = var0.getResource(var6);
+-                  Throwable var8 = null;
+ 
+-                  DataResult var13;
++                  DataResult var11;
+                   try {
+-                     InputStreamReader var9 = new InputStreamReader(var7.getInputStream(), StandardCharsets.UTF_8);
+-                     Throwable var10 = null;
++                     InputStreamReader var8 = new InputStreamReader(var7.getInputStream(), StandardCharsets.UTF_8);
+ 
+                      try {
+-                        JsonParser var11 = new JsonParser();
+-                        JsonElement var12 = var11.parse((Reader)var9);
+-                        var13 = var4.parse(var1, var12).map((var0x) -> {
++                        JsonParser var9 = new JsonParser();
++                        JsonElement var10 = var9.parse((Reader)var8);
++                        var11 = var4.parse(var1, var10).map((var0x) -> {
+                            return Pair.of(var0x, OptionalInt.empty());
+                         });
+-                     } catch (Throwable var38) {
+-                        var10 = var38;
+-                        throw var38;
+-                     } finally {
+-                        if (var9 != null) {
+-                           if (var10 != null) {
+-                              try {
+-                                 var9.close();
+-                              } catch (Throwable var37) {
+-                                 var10.addSuppressed(var37);
+-                              }
+-                           } else {
+-                              var9.close();
+-                           }
++                     } catch (Throwable var14) {
++                        try {
++                           var8.close();
++                        } catch (Throwable var13) {
++                           var14.addSuppressed(var13);
+                         }
+ 
++                        throw var14;
+                      }
+-                  } catch (Throwable var40) {
+-                     var8 = var40;
+-                     throw var40;
+-                  } finally {
++
++                     var8.close();
++                  } catch (Throwable var15) {
+                      if (var7 != null) {
+-                        if (var8 != null) {
+-                           try {
+-                              var7.close();
+-                           } catch (Throwable var36) {
+-                              var8.addSuppressed(var36);
+-                           }
+-                        } else {
++                        try {
+                            var7.close();
++                        } catch (Throwable var12) {
++                           var15.addSuppressed(var12);
+                         }
+                      }
+ 
++                     throw var15;
+                   }
+ 
+-                  return var13;
+-               } catch (JsonIOException | JsonSyntaxException | IOException var42) {
+-                  return DataResult.error("Failed to parse " + var6 + " file: " + var42.getMessage());
++                  if (var7 != null) {
++                     var7.close();
++                  }
++
++                  return var11;
++               } catch (JsonIOException | JsonSyntaxException | IOException var16) {
++                  return DataResult.error("Failed to parse " + var6 + " file: " + var16.getMessage());
+                }
+             }
+ 
+             public String toString() {
+                return "ResourceAccess[" + var0 + "]";
+@@ -270,21 +262,23 @@
+             DataResult var7 = var3.encodeStart(RegistryWriteOps.create(JsonOps.INSTANCE, var1), var5);
+             Optional var8 = var7.error();
+             if (var8.isPresent()) {
+                RegistryReadOps.LOGGER.error((String)"Error adding element: {}", (Object)((DataResult.PartialResult)var8.get()).message());
+             } else {
+-               this.data.put(var2, var7.result().get());
++               this.data.put(var2, (JsonElement)var7.result().get());
+                this.ids.put(var2, var4);
+                this.lifecycles.put(var2, var6);
+             }
+          }
+ 
+          public Collection<ResourceLocation> listResources(ResourceKey<? extends Registry<?>> var1) {
+             return (Collection)this.data.keySet().stream().filter((var1x) -> {
+                return var1x.isFor(var1);
+             }).map((var1x) -> {
+-               return new ResourceLocation(var1x.location().getNamespace(), var1.location().getPath() + "/" + var1x.location().getPath() + ".json");
++               String var10002 = var1x.location().getNamespace();
++               String var10003 = var1.location().getPath();
++               return new ResourceLocation(var10002, var10003 + "/" + var1x.location().getPath() + ".json");
+             }).collect(Collectors.toList());
+          }
+ 
+          public <E> DataResult<Pair<E, OptionalInt>> parseElement(DynamicOps<JsonElement> var1, ResourceKey<? extends Registry<E>> var2, ResourceKey<E> var3, Decoder<E> var4) {
+             JsonElement var5 = (JsonElement)this.data.get(var3);
+@@ -294,12 +288,11 @@
+          }
+       }
+    }
+ 
+    static final class ReadCache<E> {
+-      private final Map<ResourceKey<E>, DataResult<Supplier<E>>> values;
++      final Map<ResourceKey<E>, DataResult<Supplier<E>>> values = Maps.newIdentityHashMap();
+ 
+-      private ReadCache() {
+-         this.values = Maps.newIdentityHashMap();
++      ReadCache() {
+       }
+    }
+ }

@@ -1,0 +1,27 @@
+--- net/minecraft/client/gui/screens/recipebook/RecipeBookComponent.java
++++ net/minecraft/client/gui/screens/recipebook/RecipeBookComponent.java
+@@ -6,10 +6,11 @@
+ import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
+ import java.util.ArrayList;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Locale;
++import java.util.Objects;
+ import javax.annotation.Nullable;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.client.ClientRecipeBook;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.RecipeBookCategories;
+@@ -92,11 +93,11 @@
+       this.menu.fillCraftSlotsStackedContents(this.stackedContents);
+       String var4 = this.searchBox != null ? this.searchBox.getValue() : "";
+       Font var10003 = this.minecraft.font;
+       int var10004 = var2 + 25;
+       int var10005 = var3 + 14;
+-      this.minecraft.font.getClass();
++      Objects.requireNonNull(this.minecraft.font);
+       this.searchBox = new EditBox(var10003, var10004, var10005, 80, 9 + 5, new TranslatableComponent("itemGroup.search"));
+       this.searchBox.setMaxLength(50);
+       this.searchBox.setBordered(false);
+       this.searchBox.setVisible(true);
+       this.searchBox.setTextColor(16777215);

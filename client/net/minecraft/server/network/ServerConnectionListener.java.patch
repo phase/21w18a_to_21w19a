@@ -1,0 +1,32 @@
+--- net/minecraft/server/network/ServerConnectionListener.java
++++ net/minecraft/server/network/ServerConnectionListener.java
+@@ -53,14 +53,14 @@
+       return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Server IO #%d").setDaemon(true).build());
+    });
+    public static final LazyLoadedValue<EpollEventLoopGroup> SERVER_EPOLL_EVENT_GROUP = new LazyLoadedValue(() -> {
+       return new EpollEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Epoll Server IO #%d").setDaemon(true).build());
+    });
+-   private final MinecraftServer server;
++   final MinecraftServer server;
+    public volatile boolean running;
+    private final List<ChannelFuture> channels = Collections.synchronizedList(Lists.newArrayList());
+-   private final List<Connection> connections = Collections.synchronizedList(Lists.newArrayList());
++   final List<Connection> connections = Collections.synchronizedList(Lists.newArrayList());
+ 
+    public ServerConnectionListener(MinecraftServer var1) {
+       this.server = var1;
+       this.running = true;
+    }
+@@ -197,11 +197,11 @@
+       private void onTimeout(Timeout var1) {
+          ServerConnectionListener.LatencySimulator.DelayedMessage var2 = (ServerConnectionListener.LatencySimulator.DelayedMessage)this.queuedMessages.remove(0);
+          var2.ctx.fireChannelRead(var2.msg);
+       }
+ 
+-      static class DelayedMessage {
++      private static class DelayedMessage {
+          public final ChannelHandlerContext ctx;
+          public final Object msg;
+ 
+          public DelayedMessage(ChannelHandlerContext var1, Object var2) {
+             this.ctx = var1;

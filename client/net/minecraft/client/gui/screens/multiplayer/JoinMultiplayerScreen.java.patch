@@ -1,0 +1,27 @@
+--- net/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen.java
++++ net/minecraft/client/gui/screens/multiplayer/JoinMultiplayerScreen.java
+@@ -9,10 +9,11 @@
+ import net.minecraft.client.gui.screens.EditServerScreen;
+ import net.minecraft.client.gui.screens.Screen;
+ import net.minecraft.client.multiplayer.ServerData;
+ import net.minecraft.client.multiplayer.ServerList;
+ import net.minecraft.client.multiplayer.ServerStatusPinger;
++import net.minecraft.client.multiplayer.resolver.ServerAddress;
+ import net.minecraft.client.resources.language.I18n;
+ import net.minecraft.client.server.LanServer;
+ import net.minecraft.client.server.LanServerDetection;
+ import net.minecraft.network.chat.CommonComponents;
+ import net.minecraft.network.chat.Component;
+@@ -218,11 +219,11 @@
+       }
+ 
+    }
+ 
+    private void join(ServerData var1) {
+-      this.minecraft.setScreen(new ConnectScreen(this, this.minecraft, var1));
++      ConnectScreen.startConnecting(this, this.minecraft, ServerAddress.parseString(var1.ip), var1);
+    }
+ 
+    public void setSelected(ServerSelectionList.Entry var1) {
+       this.serverSelectionList.setSelected(var1);
+       this.onSelectedChange();

@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/animal/Parrot.java
++++ net/minecraft/world/entity/animal/Parrot.java
+@@ -66,11 +66,11 @@
+    private static final EntityDataAccessor<Integer> DATA_VARIANT_ID;
+    private static final Predicate<Mob> NOT_PARROT_PREDICATE;
+    private static final Item POISONOUS_FOOD;
+    private static final Set<Item> TAME_FOOD;
+    private static final int VARIANTS = 5;
+-   private static final Map<EntityType<?>, SoundEvent> MOB_SOUND_MAP;
++   static final Map<EntityType<?>, SoundEvent> MOB_SOUND_MAP;
+    public float flap;
+    public float flapSpeed;
+    public float oFlapSpeed;
+    public float oFlap;
+    private float flapping = 1.0F;

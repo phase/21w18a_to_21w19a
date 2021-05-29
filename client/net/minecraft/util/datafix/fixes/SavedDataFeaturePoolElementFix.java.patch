@@ -1,0 +1,40 @@
+--- net/minecraft/util/datafix/fixes/SavedDataFeaturePoolElementFix.java
++++ net/minecraft/util/datafix/fixes/SavedDataFeaturePoolElementFix.java
+@@ -7,10 +7,11 @@
+ import com.mojang.datafixers.schemas.Schema;
+ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.Dynamic;
+ import com.mojang.serialization.OptionalDynamic;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Set;
+ import java.util.function.Function;
+ import java.util.regex.Matcher;
+ import java.util.regex.Pattern;
+@@ -33,11 +34,11 @@
+       return var0.update("Children", SavedDataFeaturePoolElementFix::updateChildren);
+    }
+ 
+    private static <T> Dynamic<T> updateChildren(Dynamic<T> var0) {
+       DataResult var10000 = var0.asStreamOpt().map(SavedDataFeaturePoolElementFix::updateChildren);
+-      var0.getClass();
++      Objects.requireNonNull(var0);
+       return (Dynamic)var10000.map(var0::createList).result().orElse(var0);
+    }
+ 
+    private static Stream<? extends Dynamic<?>> updateChildren(Stream<? extends Dynamic<?>> var0) {
+       return var0.map((var0x) -> {
+@@ -68,11 +69,11 @@
+             Matcher var5 = INDEX_PATTERN.matcher(var4);
+             if (var5.matches()) {
+                int var6 = Integer.parseInt(var5.group(1));
+                List var7 = var2.asList(Function.identity());
+                if (var6 >= 0 && var6 < var7.size()) {
+-                  var2 = new OptionalDynamic(var0.getOps(), DataResult.success(var7.get(var6)));
++                  var2 = new OptionalDynamic(var0.getOps(), DataResult.success((Dynamic)var7.get(var6)));
+                } else {
+                   var2 = new OptionalDynamic(var0.getOps(), DataResult.error("Missing id:" + var6));
+                }
+             } else {
+                var2 = var2.get(var4);

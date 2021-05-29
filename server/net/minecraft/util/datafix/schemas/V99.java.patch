@@ -1,0 +1,15 @@
+--- net/minecraft/util/datafix/schemas/V99.java
++++ net/minecraft/util/datafix/schemas/V99.java
+@@ -16,11 +16,11 @@
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class V99 extends Schema {
+    private static final Logger LOGGER = LogManager.getLogger();
+-   private static final Map<String, String> ITEM_TO_BLOCKENTITY = (Map)DataFixUtils.make(Maps.newHashMap(), (var0) -> {
++   static final Map<String, String> ITEM_TO_BLOCKENTITY = (Map)DataFixUtils.make(Maps.newHashMap(), (var0) -> {
+       var0.put("minecraft:furnace", "Furnace");
+       var0.put("minecraft:lit_furnace", "Furnace");
+       var0.put("minecraft:chest", "Chest");
+       var0.put("minecraft:trapped_chest", "Chest");
+       var0.put("minecraft:ender_chest", "EnderChest");

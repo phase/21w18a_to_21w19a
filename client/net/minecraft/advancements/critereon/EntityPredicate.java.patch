@@ -1,0 +1,193 @@
+--- net/minecraft/advancements/critereon/EntityPredicate.java
++++ net/minecraft/advancements/critereon/EntityPredicate.java
+@@ -56,11 +56,11 @@
+       this.targetedEntity = this;
+       this.team = var10;
+       this.catType = var11;
+    }
+ 
+-   private EntityPredicate(EntityTypePredicate var1, DistancePredicate var2, LocationPredicate var3, MobEffectsPredicate var4, NbtPredicate var5, EntityFlagsPredicate var6, EntityEquipmentPredicate var7, PlayerPredicate var8, FishingHookPredicate var9, EntityPredicate var10, EntityPredicate var11, @Nullable String var12, @Nullable ResourceLocation var13) {
++   EntityPredicate(EntityTypePredicate var1, DistancePredicate var2, LocationPredicate var3, MobEffectsPredicate var4, NbtPredicate var5, EntityFlagsPredicate var6, EntityEquipmentPredicate var7, PlayerPredicate var8, FishingHookPredicate var9, EntityPredicate var10, EntityPredicate var11, @Nullable String var12, @Nullable ResourceLocation var13) {
+       this.entityType = var1;
+       this.distanceToPlayer = var2;
+       this.location = var3;
+       this.effects = var4;
+       this.nbt = var5;
+@@ -178,90 +178,10 @@
+ 
+    static {
+       ANY = new EntityPredicate(EntityTypePredicate.ANY, DistancePredicate.ANY, LocationPredicate.ANY, MobEffectsPredicate.ANY, NbtPredicate.ANY, EntityFlagsPredicate.ANY, EntityEquipmentPredicate.ANY, PlayerPredicate.ANY, FishingHookPredicate.ANY, (String)null, (ResourceLocation)null);
+    }
+ 
+-   public static class Composite {
+-      public static final EntityPredicate.Composite ANY = new EntityPredicate.Composite(new LootItemCondition[0]);
+-      private final LootItemCondition[] conditions;
+-      private final Predicate<LootContext> compositePredicates;
+-
+-      private Composite(LootItemCondition[] var1) {
+-         this.conditions = var1;
+-         this.compositePredicates = LootItemConditions.andConditions(var1);
+-      }
+-
+-      public static EntityPredicate.Composite create(LootItemCondition... var0) {
+-         return new EntityPredicate.Composite(var0);
+-      }
+-
+-      public static EntityPredicate.Composite fromJson(JsonObject var0, String var1, DeserializationContext var2) {
+-         JsonElement var3 = var0.get(var1);
+-         return fromElement(var1, var2, var3);
+-      }
+-
+-      public static EntityPredicate.Composite[] fromJsonArray(JsonObject var0, String var1, DeserializationContext var2) {
+-         JsonElement var3 = var0.get(var1);
+-         if (var3 != null && !var3.isJsonNull()) {
+-            JsonArray var4 = GsonHelper.convertToJsonArray(var3, var1);
+-            EntityPredicate.Composite[] var5 = new EntityPredicate.Composite[var4.size()];
+-
+-            for(int var6 = 0; var6 < var4.size(); ++var6) {
+-               var5[var6] = fromElement(var1 + "[" + var6 + "]", var2, var4.get(var6));
+-            }
+-
+-            return var5;
+-         } else {
+-            return new EntityPredicate.Composite[0];
+-         }
+-      }
+-
+-      private static EntityPredicate.Composite fromElement(String var0, DeserializationContext var1, @Nullable JsonElement var2) {
+-         if (var2 != null && var2.isJsonArray()) {
+-            LootItemCondition[] var4 = var1.deserializeConditions(var2.getAsJsonArray(), var1.getAdvancementId() + "/" + var0, LootContextParamSets.ADVANCEMENT_ENTITY);
+-            return new EntityPredicate.Composite(var4);
+-         } else {
+-            EntityPredicate var3 = EntityPredicate.fromJson(var2);
+-            return wrap(var3);
+-         }
+-      }
+-
+-      public static EntityPredicate.Composite wrap(EntityPredicate var0) {
+-         if (var0 == EntityPredicate.ANY) {
+-            return ANY;
+-         } else {
+-            LootItemCondition var1 = LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, var0).build();
+-            return new EntityPredicate.Composite(new LootItemCondition[]{var1});
+-         }
+-      }
+-
+-      public boolean matches(LootContext var1) {
+-         return this.compositePredicates.test(var1);
+-      }
+-
+-      public JsonElement toJson(SerializationContext var1) {
+-         return (JsonElement)(this.conditions.length == 0 ? JsonNull.INSTANCE : var1.serializeConditions(this.conditions));
+-      }
+-
+-      public static JsonElement toJson(EntityPredicate.Composite[] var0, SerializationContext var1) {
+-         if (var0.length == 0) {
+-            return JsonNull.INSTANCE;
+-         } else {
+-            JsonArray var2 = new JsonArray();
+-            EntityPredicate.Composite[] var3 = var0;
+-            int var4 = var0.length;
+-
+-            for(int var5 = 0; var5 < var4; ++var5) {
+-               EntityPredicate.Composite var6 = var3[var5];
+-               var2.add(var6.toJson(var1));
+-            }
+-
+-            return var2;
+-         }
+-      }
+-   }
+-
+    public static class Builder {
+       private EntityTypePredicate entityType;
+       private DistancePredicate distanceToPlayer;
+       private LocationPredicate location;
+       private MobEffectsPredicate effects;
+@@ -375,6 +295,86 @@
+ 
+       public EntityPredicate build() {
+          return new EntityPredicate(this.entityType, this.distanceToPlayer, this.location, this.effects, this.nbt, this.flags, this.equipment, this.player, this.fishingHook, this.vehicle, this.targetedEntity, this.team, this.catType);
+       }
+    }
++
++   public static class Composite {
++      public static final EntityPredicate.Composite ANY = new EntityPredicate.Composite(new LootItemCondition[0]);
++      private final LootItemCondition[] conditions;
++      private final Predicate<LootContext> compositePredicates;
++
++      private Composite(LootItemCondition[] var1) {
++         this.conditions = var1;
++         this.compositePredicates = LootItemConditions.andConditions(var1);
++      }
++
++      public static EntityPredicate.Composite create(LootItemCondition... var0) {
++         return new EntityPredicate.Composite(var0);
++      }
++
++      public static EntityPredicate.Composite fromJson(JsonObject var0, String var1, DeserializationContext var2) {
++         JsonElement var3 = var0.get(var1);
++         return fromElement(var1, var2, var3);
++      }
++
++      public static EntityPredicate.Composite[] fromJsonArray(JsonObject var0, String var1, DeserializationContext var2) {
++         JsonElement var3 = var0.get(var1);
++         if (var3 != null && !var3.isJsonNull()) {
++            JsonArray var4 = GsonHelper.convertToJsonArray(var3, var1);
++            EntityPredicate.Composite[] var5 = new EntityPredicate.Composite[var4.size()];
++
++            for(int var6 = 0; var6 < var4.size(); ++var6) {
++               var5[var6] = fromElement(var1 + "[" + var6 + "]", var2, var4.get(var6));
++            }
++
++            return var5;
++         } else {
++            return new EntityPredicate.Composite[0];
++         }
++      }
++
++      private static EntityPredicate.Composite fromElement(String var0, DeserializationContext var1, @Nullable JsonElement var2) {
++         if (var2 != null && var2.isJsonArray()) {
++            LootItemCondition[] var4 = var1.deserializeConditions(var2.getAsJsonArray(), var1.getAdvancementId() + "/" + var0, LootContextParamSets.ADVANCEMENT_ENTITY);
++            return new EntityPredicate.Composite(var4);
++         } else {
++            EntityPredicate var3 = EntityPredicate.fromJson(var2);
++            return wrap(var3);
++         }
++      }
++
++      public static EntityPredicate.Composite wrap(EntityPredicate var0) {
++         if (var0 == EntityPredicate.ANY) {
++            return ANY;
++         } else {
++            LootItemCondition var1 = LootItemEntityPropertyCondition.hasProperties(LootContext.EntityTarget.THIS, var0).build();
++            return new EntityPredicate.Composite(new LootItemCondition[]{var1});
++         }
++      }
++
++      public boolean matches(LootContext var1) {
++         return this.compositePredicates.test(var1);
++      }
++
++      public JsonElement toJson(SerializationContext var1) {
++         return (JsonElement)(this.conditions.length == 0 ? JsonNull.INSTANCE : var1.serializeConditions(this.conditions));
++      }
++
++      public static JsonElement toJson(EntityPredicate.Composite[] var0, SerializationContext var1) {
++         if (var0.length == 0) {
++            return JsonNull.INSTANCE;
++         } else {
++            JsonArray var2 = new JsonArray();
++            EntityPredicate.Composite[] var3 = var0;
++            int var4 = var0.length;
++
++            for(int var5 = 0; var5 < var4; ++var5) {
++               EntityPredicate.Composite var6 = var3[var5];
++               var2.add(var6.toJson(var1));
++            }
++
++            return var2;
++         }
++      }
++   }
+ }

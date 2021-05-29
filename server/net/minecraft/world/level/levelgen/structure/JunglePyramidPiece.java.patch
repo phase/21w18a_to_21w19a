@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/levelgen/structure/JunglePyramidPiece.java
++++ net/minecraft/world/level/levelgen/structure/JunglePyramidPiece.java
+@@ -232,11 +232,11 @@
+          return true;
+       }
+    }
+ 
+    static class MossStoneSelector extends StructurePiece.BlockSelector {
+-      private MossStoneSelector() {
++      MossStoneSelector() {
+       }
+ 
+       public void next(Random var1, int var2, int var3, int var4, boolean var5) {
+          if (var1.nextFloat() < 0.4F) {
+             this.next = Blocks.COBBLESTONE.defaultBlockState();

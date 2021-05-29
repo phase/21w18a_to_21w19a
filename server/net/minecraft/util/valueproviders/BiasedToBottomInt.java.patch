@@ -1,0 +1,12 @@
+--- net/minecraft/util/valueproviders/BiasedToBottomInt.java
++++ net/minecraft/util/valueproviders/BiasedToBottomInt.java
+@@ -44,8 +44,8 @@
+    public IntProviderType<?> getType() {
+       return IntProviderType.BIASED_TO_BOTTOM;
+    }
+ 
+    public String toString() {
+-      return "[" + this.minInclusive + '-' + this.maxInclusive + ']';
++      return "[" + this.minInclusive + "-" + this.maxInclusive + "]";
+    }
+ }

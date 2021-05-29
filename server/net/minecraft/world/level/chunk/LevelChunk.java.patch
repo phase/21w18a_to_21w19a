@@ -1,0 +1,154 @@
+--- net/minecraft/world/level/chunk/LevelChunk.java
++++ net/minecraft/world/level/chunk/LevelChunk.java
+@@ -14,10 +14,11 @@
+ import java.util.Collection;
+ import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Iterator;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.Map.Entry;
+ import java.util.function.Consumer;
+ import java.util.function.Supplier;
+ import java.util.stream.Stream;
+@@ -25,10 +26,11 @@
+ import javax.annotation.Nullable;
+ import net.minecraft.CrashReport;
+ import net.minecraft.CrashReportCategory;
+ import net.minecraft.ReportedException;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.DefaultedRegistry;
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.SectionPos;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.server.level.ChunkHolder;
+@@ -60,11 +62,11 @@
+ import net.minecraft.world.level.material.Fluids;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class LevelChunk implements ChunkAccess {
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+    private static final TickingBlockEntity NULL_TICKER = new TickingBlockEntity() {
+       public void tick() {
+       }
+ 
+       public boolean isRemoved() {
+@@ -84,11 +86,11 @@
+    private final LevelChunkSection[] sections;
+    private ChunkBiomeContainer biomes;
+    private final Map<BlockPos, CompoundTag> pendingBlockEntities;
+    private final Map<BlockPos, LevelChunk.RebindableTickingBlockEntityWrapper> tickersInLevel;
+    private boolean loaded;
+-   private final Level level;
++   final Level level;
+    private final Map<Heightmap.Types, Heightmap> heightmaps;
+    private final UpgradeData upgradeData;
+    private final Map<BlockPos, BlockEntity> blockEntities;
+    private final Map<StructureFeature<?>, StructureStart<?>> structureStarts;
+    private final Map<StructureFeature<?>, LongSet> structuresRefences;
+@@ -406,11 +408,11 @@
+ 
+    private boolean isInLevel() {
+       return this.loaded || this.level.isClientSide();
+    }
+ 
+-   private boolean isTicking(BlockPos var1) {
++   boolean isTicking(BlockPos var1) {
+       return (this.level.isClientSide() || this.getFullStatus().isOrAfter(ChunkHolder.FullChunkStatus.TICKING)) && this.level.getWorldBorder().isWithinBounds(var1);
+    }
+ 
+    public void setBlockEntity(BlockEntity var1) {
+       BlockPos var2 = var1.getBlockPos();
+@@ -740,17 +742,22 @@
+       }
+ 
+    }
+ 
+    public void packTicks(ServerLevel var1) {
++      DefaultedRegistry var10003;
+       if (this.blockTicks == EmptyTickList.empty()) {
+-         this.blockTicks = new ChunkTickList(Registry.BLOCK::getKey, var1.getBlockTicks().fetchTicksInChunk(this.chunkPos, true, false), var1.getGameTime());
++         var10003 = Registry.BLOCK;
++         Objects.requireNonNull(var10003);
++         this.blockTicks = new ChunkTickList(var10003::getKey, var1.getBlockTicks().fetchTicksInChunk(this.chunkPos, true, false), var1.getGameTime());
+          this.setUnsaved(true);
+       }
+ 
+       if (this.liquidTicks == EmptyTickList.empty()) {
+-         this.liquidTicks = new ChunkTickList(Registry.FLUID::getKey, var1.getLiquidTicks().fetchTicksInChunk(this.chunkPos, true, false), var1.getGameTime());
++         var10003 = Registry.FLUID;
++         Objects.requireNonNull(var10003);
++         this.liquidTicks = new ChunkTickList(var10003::getKey, var1.getLiquidTicks().fetchTicksInChunk(this.chunkPos, true, false), var1.getGameTime());
+          this.setUnsaved(true);
+       }
+ 
+    }
+ 
+@@ -833,18 +840,27 @@
+ 
+    private <T extends BlockEntity> TickingBlockEntity createTicker(T var1, BlockEntityTicker<T> var2) {
+       return new LevelChunk.BoundTickingBlockEntity(var1, var2);
+    }
+ 
++   public static enum EntityCreationType {
++      IMMEDIATE,
++      QUEUED,
++      CHECK;
++
++      private EntityCreationType() {
++      }
++   }
++
+    class RebindableTickingBlockEntityWrapper implements TickingBlockEntity {
+       private TickingBlockEntity ticker;
+ 
+-      private RebindableTickingBlockEntityWrapper(TickingBlockEntity var2) {
++      RebindableTickingBlockEntityWrapper(TickingBlockEntity var2) {
+          this.ticker = var2;
+       }
+ 
+-      private void rebind(TickingBlockEntity var1) {
++      void rebind(TickingBlockEntity var1) {
+          this.ticker = var1;
+       }
+ 
+       public void tick() {
+          this.ticker.tick();
+@@ -870,11 +886,11 @@
+    class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
+       private final T blockEntity;
+       private final BlockEntityTicker<T> ticker;
+       private boolean loggedInvalidBlockState;
+ 
+-      private BoundTickingBlockEntity(T var2, BlockEntityTicker<T> var3) {
++      BoundTickingBlockEntity(T var2, BlockEntityTicker<T> var3) {
+          this.blockEntity = var2;
+          this.ticker = var3;
+       }
+ 
+       public void tick() {
+@@ -918,18 +934,10 @@
+       public String getType() {
+          return BlockEntityType.getKey(this.blockEntity.getType()).toString();
+       }
+ 
+       public String toString() {
+-         return "Level ticker for " + this.getType() + "@" + this.getPos();
++         String var10000 = this.getType();
++         return "Level ticker for " + var10000 + "@" + this.getPos();
+       }
+    }
+-
+-   public static enum EntityCreationType {
+-      IMMEDIATE,
+-      QUEUED,
+-      CHECK;
+-
+-      private EntityCreationType() {
+-      }
+-   }
+ }

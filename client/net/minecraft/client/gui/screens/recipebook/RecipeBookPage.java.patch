@@ -1,0 +1,16 @@
+--- net/minecraft/client/gui/screens/recipebook/RecipeBookPage.java
++++ net/minecraft/client/gui/screens/recipebook/RecipeBookPage.java
+@@ -84,11 +84,12 @@
+       this.backButton.visible = this.totalPages > 1 && this.currentPage > 0;
+    }
+ 
+    public void render(PoseStack var1, int var2, int var3, int var4, int var5, float var6) {
+       if (this.totalPages > 1) {
+-         String var7 = this.currentPage + 1 + "/" + this.totalPages;
++         int var10000 = this.currentPage + 1;
++         String var7 = var10000 + "/" + this.totalPages;
+          int var8 = this.minecraft.font.width(var7);
+          this.minecraft.font.draw(var1, (String)var7, (float)(var2 - var8 / 2 + 73), (float)(var3 + 141), -1);
+       }
+ 
+       this.hoveredButton = null;

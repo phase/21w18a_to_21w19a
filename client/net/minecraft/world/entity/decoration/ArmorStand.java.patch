@@ -1,0 +1,17 @@
+--- net/minecraft/world/entity/decoration/ArmorStand.java
++++ net/minecraft/world/entity/decoration/ArmorStand.java
+@@ -792,10 +792,14 @@
+ 
+    public ItemStack getPickResult() {
+       return new ItemStack(Items.ARMOR_STAND);
+    }
+ 
++   public boolean canBeSeenByAnyone() {
++      return !this.isInvisible() && !this.isMarker();
++   }
++
+    static {
+       BABY_DIMENSIONS = EntityType.ARMOR_STAND.getDimensions().scale(0.5F);
+       DATA_CLIENT_FLAGS = SynchedEntityData.defineId(ArmorStand.class, EntityDataSerializers.BYTE);
+       DATA_HEAD_POSE = SynchedEntityData.defineId(ArmorStand.class, EntityDataSerializers.ROTATIONS);
+       DATA_BODY_POSE = SynchedEntityData.defineId(ArmorStand.class, EntityDataSerializers.ROTATIONS);

@@ -1,0 +1,47 @@
+--- net/minecraft/network/syncher/SynchedEntityData.java
++++ net/minecraft/network/syncher/SynchedEntityData.java
+@@ -67,25 +67,26 @@
+ 
+          var6 = var3;
+       }
+ 
+       if (var6 > 254) {
+-         throw new IllegalArgumentException("Data value id is too big with " + var6 + "! (Max is " + 254 + ")");
++         throw new IllegalArgumentException("Data value id is too big with " + var6 + "! (Max is 254)");
+       } else {
+          ENTITY_ID_POOL.put(var0, var6);
+          return var1.createAccessor(var6);
+       }
+    }
+ 
+    public <T> void define(EntityDataAccessor<T> var1, T var2) {
+       int var3 = var1.getId();
+       if (var3 > 254) {
+-         throw new IllegalArgumentException("Data value id is too big with " + var3 + "! (Max is " + 254 + ")");
++         throw new IllegalArgumentException("Data value id is too big with " + var3 + "! (Max is 254)");
+       } else if (this.itemsById.containsKey(var3)) {
+          throw new IllegalArgumentException("Duplicate id value for " + var3 + "!");
+       } else if (EntityDataSerializers.getSerializedId(var1.getSerializer()) < 0) {
+-         throw new IllegalArgumentException("Unregistered serializer " + var1.getSerializer() + " for " + var3 + "!");
++         EntityDataSerializer var10002 = var1.getSerializer();
++         throw new IllegalArgumentException("Unregistered serializer " + var10002 + " for " + var3 + "!");
+       } else {
+          this.createDataItem(var1, var2);
+       }
+    }
+ 
+@@ -269,12 +270,12 @@
+ 
+       this.lock.readLock().unlock();
+    }
+ 
+    public static class DataItem<T> {
+-      private final EntityDataAccessor<T> accessor;
+-      private T value;
++      final EntityDataAccessor<T> accessor;
++      T value;
+       private boolean dirty;
+ 
+       public DataItem(EntityDataAccessor<T> var1, T var2) {
+          this.accessor = var1;
+          this.value = var2;

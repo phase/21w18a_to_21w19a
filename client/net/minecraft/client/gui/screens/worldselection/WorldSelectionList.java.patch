@@ -1,0 +1,369 @@
+--- net/minecraft/client/gui/screens/worldselection/WorldSelectionList.java
++++ net/minecraft/client/gui/screens/worldselection/WorldSelectionList.java
+@@ -15,10 +15,11 @@
+ import java.util.Collections;
+ import java.util.Date;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Locale;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.function.Supplier;
+ import javax.annotation.Nullable;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.SharedConstants;
+@@ -60,20 +61,20 @@
+ import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class WorldSelectionList extends ObjectSelectionList<WorldSelectionList.WorldListEntry> {
+-   private static final Logger LOGGER = LogManager.getLogger();
+-   private static final DateFormat DATE_FORMAT = new SimpleDateFormat();
+-   private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
+-   private static final ResourceLocation ICON_OVERLAY_LOCATION = new ResourceLocation("textures/gui/world_selection.png");
+-   private static final Component FROM_NEWER_TOOLTIP_1;
+-   private static final Component FROM_NEWER_TOOLTIP_2;
+-   private static final Component SNAPSHOT_TOOLTIP_1;
+-   private static final Component SNAPSHOT_TOOLTIP_2;
+-   private static final Component WORLD_LOCKED_TOOLTIP;
+-   private static final Component WORLD_PRE_WORLDHEIGHT_TOOLTIP;
++   static final Logger LOGGER = LogManager.getLogger();
++   static final DateFormat DATE_FORMAT = new SimpleDateFormat();
++   static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
++   static final ResourceLocation ICON_OVERLAY_LOCATION = new ResourceLocation("textures/gui/world_selection.png");
++   static final Component FROM_NEWER_TOOLTIP_1;
++   static final Component FROM_NEWER_TOOLTIP_2;
++   static final Component SNAPSHOT_TOOLTIP_1;
++   static final Component SNAPSHOT_TOOLTIP_2;
++   static final Component WORLD_LOCKED_TOOLTIP;
++   static final Component WORLD_PRE_WORLDHEIGHT_TOOLTIP;
+    private final SelectWorldScreen screen;
+    @Nullable
+    private List<LevelSummary> cachedList;
+ 
+    public WorldSelectionList(SelectWorldScreen var1, Minecraft var2, int var3, int var4, int var5, int var6, int var7, Supplier<String> var8, @Nullable WorldSelectionList var9) {
+@@ -149,11 +150,11 @@
+          return !var0.summary.isDisabled();
+       });
+    }
+ 
+    public Optional<WorldSelectionList.WorldListEntry> getSelectedOpt() {
+-      return Optional.ofNullable(this.getSelected());
++      return Optional.ofNullable((WorldSelectionList.WorldListEntry)this.getSelected());
+    }
+ 
+    public SelectWorldScreen getScreen() {
+       return this.screen;
+    }
+@@ -176,11 +177,11 @@
+       private static final int ICON_OVERLAY_X_ERROR = 96;
+       private static final int ICON_OVERLAY_Y_UNSELECTED = 0;
+       private static final int ICON_OVERLAY_Y_SELECTED = 32;
+       private final Minecraft minecraft;
+       private final SelectWorldScreen screen;
+-      private final LevelSummary summary;
++      final LevelSummary summary;
+       private final ResourceLocation iconLocation;
+       private File iconFile;
+       @Nullable
+       private final DynamicTexture icon;
+       private long lastClickTime;
+@@ -188,38 +189,41 @@
+       public WorldListEntry(WorldSelectionList var2, LevelSummary var3) {
+          this.screen = var2.getScreen();
+          this.summary = var3;
+          this.minecraft = Minecraft.getInstance();
+          String var4 = var3.getLevelId();
+-         this.iconLocation = new ResourceLocation("minecraft", "worlds/" + Util.sanitizeName(var4, ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(var4) + "/icon");
++         String var10004 = Util.sanitizeName(var4, ResourceLocation::validPathChar);
++         this.iconLocation = new ResourceLocation("minecraft", "worlds/" + var10004 + "/" + Hashing.sha1().hashUnencodedChars(var4) + "/icon");
+          this.iconFile = var3.getIcon();
+          if (!this.iconFile.isFile()) {
+             this.iconFile = null;
+          }
+ 
+          this.icon = this.loadServerIcon();
+       }
+ 
+       public void render(PoseStack var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10) {
+          String var11 = this.summary.getLevelName();
+-         String var12 = this.summary.getLevelId() + " (" + WorldSelectionList.DATE_FORMAT.format(new Date(this.summary.getLastPlayed())) + ")";
++         String var10000 = this.summary.getLevelId();
++         String var12 = var10000 + " (" + WorldSelectionList.DATE_FORMAT.format(new Date(this.summary.getLastPlayed())) + ")";
+          if (StringUtils.isEmpty(var11)) {
+-            var11 = I18n.get("selectWorld.world") + " " + (var2 + 1);
++            var10000 = I18n.get("selectWorld.world");
++            var11 = var10000 + " " + (var2 + 1);
+          }
+ 
+          Component var13 = this.summary.getInfo();
+          this.minecraft.font.draw(var1, var11, (float)(var4 + 32 + 3), (float)(var3 + 1), 16777215);
+-         Font var10000 = this.minecraft.font;
++         Font var17 = this.minecraft.font;
+          float var10003 = (float)(var4 + 32 + 3);
+-         this.minecraft.font.getClass();
+-         var10000.draw(var1, var12, var10003, (float)(var3 + 9 + 3), 8421504);
+-         var10000 = this.minecraft.font;
++         Objects.requireNonNull(this.minecraft.font);
++         var17.draw(var1, var12, var10003, (float)(var3 + 9 + 3), 8421504);
++         var17 = this.minecraft.font;
+          var10003 = (float)(var4 + 32 + 3);
+-         this.minecraft.font.getClass();
++         Objects.requireNonNull(this.minecraft.font);
+          int var10004 = var3 + 9;
+-         this.minecraft.font.getClass();
+-         var10000.draw(var1, var13, var10003, (float)(var10004 + 9 + 3), 8421504);
++         Objects.requireNonNull(this.minecraft.font);
++         var17.draw(var1, var13, var10003, (float)(var10004 + 9 + 3), 8421504);
+          RenderSystem.setShader(GameRenderer::getPositionTexShader);
+          RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+          RenderSystem.setShaderTexture(0, this.icon != null ? this.iconLocation : WorldSelectionList.ICON_MISSING);
+          RenderSystem.enableBlend();
+          GuiComponent.blit(var1, var4, var3, 0.0F, 0.0F, 32, 32, 32, 32);
+@@ -297,34 +301,31 @@
+                   if (var1x) {
+                      String var3 = this.summary.getLevelId();
+ 
+                      try {
+                         LevelStorageSource.LevelStorageAccess var4 = this.minecraft.getLevelSource().createAccess(var3);
+-                        Throwable var5 = null;
+ 
+                         try {
+                            EditWorldScreen.makeBackupAndShowToast(var4);
+-                        } catch (Throwable var15) {
+-                           var5 = var15;
+-                           throw var15;
+-                        } finally {
++                        } catch (Throwable var8) {
+                            if (var4 != null) {
+-                              if (var5 != null) {
+-                                 try {
+-                                    var4.close();
+-                                 } catch (Throwable var14) {
+-                                    var5.addSuppressed(var14);
+-                                 }
+-                              } else {
++                              try {
+                                  var4.close();
++                              } catch (Throwable var7) {
++                                 var8.addSuppressed(var7);
+                               }
+                            }
+ 
++                           throw var8;
+                         }
+-                     } catch (IOException var17) {
++
++                        if (var4 != null) {
++                           var4.close();
++                        }
++                     } catch (IOException var9) {
+                         SystemToast.onWorldAccessFailure(this.minecraft, var3);
+-                        WorldSelectionList.LOGGER.error("Failed to backup level {}", var3, var17);
++                        WorldSelectionList.LOGGER.error("Failed to backup level {}", var3, var9);
+                      }
+                   }
+ 
+                   this.loadWorld();
+                }, var4, var5, false));
+@@ -366,34 +367,31 @@
+          LevelStorageSource var1 = this.minecraft.getLevelSource();
+          String var2 = this.summary.getLevelId();
+ 
+          try {
+             LevelStorageSource.LevelStorageAccess var3 = var1.createAccess(var2);
+-            Throwable var4 = null;
+ 
+             try {
+                var3.deleteLevel();
+-            } catch (Throwable var14) {
+-               var4 = var14;
+-               throw var14;
+-            } finally {
++            } catch (Throwable var7) {
+                if (var3 != null) {
+-                  if (var4 != null) {
+-                     try {
+-                        var3.close();
+-                     } catch (Throwable var13) {
+-                        var4.addSuppressed(var13);
+-                     }
+-                  } else {
++                  try {
+                      var3.close();
++                  } catch (Throwable var6) {
++                     var7.addSuppressed(var6);
+                   }
+                }
+ 
++               throw var7;
+             }
+-         } catch (IOException var16) {
++
++            if (var3 != null) {
++               var3.close();
++            }
++         } catch (IOException var8) {
+             SystemToast.onWorldDeleteFailure(this.minecraft, var2);
+-            WorldSelectionList.LOGGER.error("Failed to delete world {}", var2, var16);
++            WorldSelectionList.LOGGER.error("Failed to delete world {}", var2, var8);
+          }
+ 
+          WorldSelectionList.this.refreshList(() -> {
+             return this.screen.searchBox.getValue();
+          }, true);
+@@ -433,64 +431,58 @@
+          this.queueLoadScreen();
+          RegistryAccess.RegistryHolder var1 = RegistryAccess.builtin();
+ 
+          try {
+             LevelStorageSource.LevelStorageAccess var2 = this.minecraft.getLevelSource().createAccess(this.summary.getLevelId());
+-            Throwable var3 = null;
+ 
+             try {
+-               Minecraft.ServerStem var4 = this.minecraft.makeServerStem(var1, Minecraft::loadDataPacks, Minecraft::loadWorldData, false, var2);
+-               Throwable var5 = null;
++               Minecraft.ServerStem var3 = this.minecraft.makeServerStem(var1, Minecraft::loadDataPacks, Minecraft::loadWorldData, false, var2);
+ 
+                try {
+-                  LevelSettings var6 = var4.worldData().getLevelSettings();
+-                  DataPackConfig var7 = var6.getDataPackConfig();
+-                  WorldGenSettings var8 = var4.worldData().worldGenSettings();
+-                  Path var9 = CreateWorldScreen.createTempDataPackDirFromExistingWorld(var2.getLevelPath(LevelResource.DATAPACK_DIR), this.minecraft);
+-                  if (var8.isOldCustomizedWorld()) {
++                  LevelSettings var4 = var3.worldData().getLevelSettings();
++                  DataPackConfig var5 = var4.getDataPackConfig();
++                  WorldGenSettings var6 = var3.worldData().worldGenSettings();
++                  Path var7 = CreateWorldScreen.createTempDataPackDirFromExistingWorld(var2.getLevelPath(LevelResource.DATAPACK_DIR), this.minecraft);
++                  if (var6.isOldCustomizedWorld()) {
+                      this.minecraft.setScreen(new ConfirmScreen((var6x) -> {
+-                        this.minecraft.setScreen((Screen)(var6x ? new CreateWorldScreen(this.screen, var6, var8, var9, var7, var1) : this.screen));
++                        this.minecraft.setScreen((Screen)(var6x ? new CreateWorldScreen(this.screen, var4, var6, var7, var5, var1) : this.screen));
+                      }, new TranslatableComponent("selectWorld.recreate.customized.title"), new TranslatableComponent("selectWorld.recreate.customized.text"), CommonComponents.GUI_PROCEED, CommonComponents.GUI_CANCEL));
+                   } else {
+-                     this.minecraft.setScreen(new CreateWorldScreen(this.screen, var6, var8, var9, var7, var1));
++                     this.minecraft.setScreen(new CreateWorldScreen(this.screen, var4, var6, var7, var5, var1));
+                   }
+-               } catch (Throwable var33) {
+-                  var5 = var33;
+-                  throw var33;
+-               } finally {
+-                  if (var4 != null) {
+-                     if (var5 != null) {
+-                        try {
+-                           var4.close();
+-                        } catch (Throwable var32) {
+-                           var5.addSuppressed(var32);
+-                        }
+-                     } else {
+-                        var4.close();
++               } catch (Throwable var10) {
++                  if (var3 != null) {
++                     try {
++                        var3.close();
++                     } catch (Throwable var9) {
++                        var10.addSuppressed(var9);
+                      }
+                   }
+ 
++                  throw var10;
+                }
+-            } catch (Throwable var35) {
+-               var3 = var35;
+-               throw var35;
+-            } finally {
++
++               if (var3 != null) {
++                  var3.close();
++               }
++            } catch (Throwable var11) {
+                if (var2 != null) {
+-                  if (var3 != null) {
+-                     try {
+-                        var2.close();
+-                     } catch (Throwable var31) {
+-                        var3.addSuppressed(var31);
+-                     }
+-                  } else {
++                  try {
+                      var2.close();
++                  } catch (Throwable var8) {
++                     var11.addSuppressed(var8);
+                   }
+                }
+ 
++               throw var11;
+             }
+-         } catch (Exception var37) {
+-            WorldSelectionList.LOGGER.error("Unable to recreate world", var37);
++
++            if (var2 != null) {
++               var2.close();
++            }
++         } catch (Exception var12) {
++            WorldSelectionList.LOGGER.error("Unable to recreate world", var12);
+             this.minecraft.setScreen(new AlertScreen(() -> {
+                this.minecraft.setScreen(this.screen);
+             }, new TranslatableComponent("selectWorld.recreate.error.title"), new TranslatableComponent("selectWorld.recreate.error.text")));
+          }
+ 
+@@ -513,41 +505,33 @@
+       private DynamicTexture loadServerIcon() {
+          boolean var1 = this.iconFile != null && this.iconFile.isFile();
+          if (var1) {
+             try {
+                FileInputStream var2 = new FileInputStream(this.iconFile);
+-               Throwable var3 = null;
+ 
+-               DynamicTexture var6;
++               DynamicTexture var5;
+                try {
+-                  NativeImage var4 = NativeImage.read((InputStream)var2);
+-                  Validate.validState(var4.getWidth() == 64, "Must be 64 pixels wide", new Object[0]);
+-                  Validate.validState(var4.getHeight() == 64, "Must be 64 pixels high", new Object[0]);
+-                  DynamicTexture var5 = new DynamicTexture(var4);
+-                  this.minecraft.getTextureManager().register((ResourceLocation)this.iconLocation, (AbstractTexture)var5);
+-                  var6 = var5;
+-               } catch (Throwable var16) {
+-                  var3 = var16;
+-                  throw var16;
+-               } finally {
+-                  if (var2 != null) {
+-                     if (var3 != null) {
+-                        try {
+-                           var2.close();
+-                        } catch (Throwable var15) {
+-                           var3.addSuppressed(var15);
+-                        }
+-                     } else {
+-                        var2.close();
+-                     }
++                  NativeImage var3 = NativeImage.read((InputStream)var2);
++                  Validate.validState(var3.getWidth() == 64, "Must be 64 pixels wide", new Object[0]);
++                  Validate.validState(var3.getHeight() == 64, "Must be 64 pixels high", new Object[0]);
++                  DynamicTexture var4 = new DynamicTexture(var3);
++                  this.minecraft.getTextureManager().register((ResourceLocation)this.iconLocation, (AbstractTexture)var4);
++                  var5 = var4;
++               } catch (Throwable var7) {
++                  try {
++                     var2.close();
++                  } catch (Throwable var6) {
++                     var7.addSuppressed(var6);
+                   }
+ 
++                  throw var7;
+                }
+ 
+-               return var6;
+-            } catch (Throwable var18) {
+-               WorldSelectionList.LOGGER.error("Invalid icon for world {}", this.summary.getLevelId(), var18);
++               var2.close();
++               return var5;
++            } catch (Throwable var8) {
++               WorldSelectionList.LOGGER.error("Invalid icon for world {}", this.summary.getLevelId(), var8);
+                this.iconFile = null;
+                return null;
+             }
+          } else {
+             this.minecraft.getTextureManager().release(this.iconLocation);

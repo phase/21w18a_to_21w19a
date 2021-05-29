@@ -1,0 +1,154 @@
+--- net/minecraft/client/multiplayer/ClientPacketListener.java
++++ net/minecraft/client/multiplayer/ClientPacketListener.java
+@@ -16,11 +16,13 @@
+ import java.util.ArrayList;
+ import java.util.BitSet;
+ import java.util.Collection;
+ import java.util.Collections;
+ import java.util.Iterator;
++import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Random;
+ import java.util.Set;
+ import java.util.UUID;
+ import java.util.Map.Entry;
+@@ -131,10 +133,11 @@
+ import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
+ import net.minecraft.network.protocol.game.ClientboundMoveVehiclePacket;
+ import net.minecraft.network.protocol.game.ClientboundOpenBookPacket;
+ import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
+ import net.minecraft.network.protocol.game.ClientboundOpenSignEditorPacket;
++import net.minecraft.network.protocol.game.ClientboundPingPacket;
+ import net.minecraft.network.protocol.game.ClientboundPlaceGhostRecipePacket;
+ import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
+ import net.minecraft.network.protocol.game.ClientboundPlayerCombatEndPacket;
+ import net.minecraft.network.protocol.game.ClientboundPlayerCombatEnterPacket;
+ import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
+@@ -191,10 +194,11 @@
+ import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
+ import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
+ import net.minecraft.network.protocol.game.ServerboundKeepAlivePacket;
+ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+ import net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket;
++import net.minecraft.network.protocol.game.ServerboundPongPacket;
+ import net.minecraft.network.protocol.game.ServerboundResourcePackPacket;
+ import net.minecraft.realms.DisconnectedRealmsScreen;
+ import net.minecraft.realms.RealmsScreen;
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.resources.ResourceLocation;
+@@ -350,11 +354,14 @@
+       this.serverChunkRadius = var1.getChunkRadius();
+       boolean var5 = var1.isDebug();
+       boolean var6 = var1.isFlat();
+       ClientLevel.ClientLevelData var7 = new ClientLevel.ClientLevelData(Difficulty.NORMAL, var1.isHardcore(), var6);
+       this.levelData = var7;
+-      this.level = new ClientLevel(this, var7, var3, var4, this.serverChunkRadius, this.minecraft::getProfiler, this.minecraft.levelRenderer, var5, var1.getSeed());
++      int var10007 = this.serverChunkRadius;
++      Minecraft var10008 = this.minecraft;
++      Objects.requireNonNull(var10008);
++      this.level = new ClientLevel(this, var7, var3, var4, var10007, var10008::getProfiler, this.minecraft.levelRenderer, var5, var1.getSeed());
+       this.minecraft.setLevel(this.level);
+       if (this.minecraft.player == null) {
+          this.minecraft.player = this.minecraft.gameMode.createPlayer(this.level, new StatsCounter(), new ClientRecipeBook());
+          this.minecraft.player.setYRot(-180.0F);
+          if (this.minecraft.getSingleplayerServer() != null) {
+@@ -856,11 +863,14 @@
+          Map var7 = this.level.getAllMapData();
+          boolean var8 = var1.isDebug();
+          boolean var9 = var1.isFlat();
+          ClientLevel.ClientLevelData var10 = new ClientLevel.ClientLevelData(this.levelData.getDifficulty(), this.levelData.isHardcore(), var9);
+          this.levelData = var10;
+-         this.level = new ClientLevel(this, var10, var2, var3, this.serverChunkRadius, this.minecraft::getProfiler, this.minecraft.levelRenderer, var8, var1.getSeed());
++         int var10007 = this.serverChunkRadius;
++         Minecraft var10008 = this.minecraft;
++         Objects.requireNonNull(var10008);
++         this.level = new ClientLevel(this, var10, var2, var3, var10007, var10008::getProfiler, this.minecraft.levelRenderer, var8, var1.getSeed());
+          this.level.setScoreboard(var6);
+          this.level.addMapData(var7);
+          this.minecraft.setLevel(this.level);
+          this.minecraft.setScreen(new ReceivingLevelScreen());
+       }
+@@ -1150,11 +1160,13 @@
+       this.recipeManager.replaceRecipes(var1.getRecipes());
+       MutableSearchTree var2 = this.minecraft.getSearchTree(SearchRegistry.RECIPE_COLLECTIONS);
+       var2.clear();
+       ClientRecipeBook var3 = this.minecraft.player.getRecipeBook();
+       var3.setupCollections(this.recipeManager.getRecipes());
+-      var3.getCollections().forEach(var2::add);
++      List var10000 = var3.getCollections();
++      Objects.requireNonNull(var2);
++      var10000.forEach(var2::add);
+       var2.refresh();
+    }
+ 
+    public void handleLookAt(ClientboundPlayerLookAtPacket var1) {
+       PacketUtils.ensureRunningOnSameThread(var1, this, (BlockableEventLoop)this.minecraft);
+@@ -1194,10 +1206,11 @@
+       ClientRecipeBook var2;
+       PacketUtils.ensureRunningOnSameThread(var1, this, (BlockableEventLoop)this.minecraft);
+       var2 = this.minecraft.player.getRecipeBook();
+       var2.setBookSettings(var1.getBookSettings());
+       ClientboundRecipePacket.State var3 = var1.getState();
++      Optional var10000;
+       Iterator var4;
+       ResourceLocation var5;
+       label45:
+       switch(var3) {
+       case REMOVE:
+@@ -1207,29 +1220,35 @@
+             if (!var4.hasNext()) {
+                break label45;
+             }
+ 
+             var5 = (ResourceLocation)var4.next();
+-            this.recipeManager.byKey(var5).ifPresent(var2::remove);
++            var10000 = this.recipeManager.byKey(var5);
++            Objects.requireNonNull(var2);
++            var10000.ifPresent(var2::remove);
+          }
+       case INIT:
+          var4 = var1.getRecipes().iterator();
+ 
+          while(var4.hasNext()) {
+             var5 = (ResourceLocation)var4.next();
+-            this.recipeManager.byKey(var5).ifPresent(var2::add);
++            var10000 = this.recipeManager.byKey(var5);
++            Objects.requireNonNull(var2);
++            var10000.ifPresent(var2::add);
+          }
+ 
+          var4 = var1.getHighlights().iterator();
+ 
+          while(true) {
+             if (!var4.hasNext()) {
+                break label45;
+             }
+ 
+             var5 = (ResourceLocation)var4.next();
+-            this.recipeManager.byKey(var5).ifPresent(var2::addHighlight);
++            var10000 = this.recipeManager.byKey(var5);
++            Objects.requireNonNull(var2);
++            var10000.ifPresent(var2::addHighlight);
+          }
+       case ADD:
+          var4 = var1.getRecipes().iterator();
+ 
+          while(var4.hasNext()) {
+@@ -1985,10 +2004,15 @@
+          }
+       }
+ 
+    }
+ 
++   public void handlePing(ClientboundPingPacket var1) {
++      PacketUtils.ensureRunningOnSameThread(var1, this, (BlockableEventLoop)this.minecraft);
++      this.send((Packet)(new ServerboundPongPacket(var1.getId())));
++   }
++
+    public void handleUpdateAttributes(ClientboundUpdateAttributesPacket var1) {
+       PacketUtils.ensureRunningOnSameThread(var1, this, (BlockableEventLoop)this.minecraft);
+       Entity var2 = this.level.getEntity(var1.getEntityId());
+       if (var2 != null) {
+          if (!(var2 instanceof LivingEntity)) {

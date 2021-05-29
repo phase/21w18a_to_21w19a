@@ -1,0 +1,28 @@
+--- net/minecraft/client/renderer/block/model/BlockElement.java
++++ net/minecraft/client/renderer/block/model/BlockElement.java
+@@ -65,11 +65,11 @@
+       case EAST:
+          return new float[]{16.0F - this.to.z(), 16.0F - this.to.y(), 16.0F - this.from.z(), 16.0F - this.from.y()};
+       }
+    }
+ 
+-   public static class Deserializer implements JsonDeserializer<BlockElement> {
++   protected static class Deserializer implements JsonDeserializer<BlockElement> {
+       private static final boolean DEFAULT_SHADE = true;
+ 
+       protected Deserializer() {
+       }
+ 
+@@ -137,11 +137,11 @@
+          Iterator var5 = var4.entrySet().iterator();
+ 
+          while(var5.hasNext()) {
+             Entry var6 = (Entry)var5.next();
+             Direction var7 = this.getFacing((String)var6.getKey());
+-            var3.put(var7, var1.deserialize((JsonElement)var6.getValue(), BlockElementFace.class));
++            var3.put(var7, (BlockElementFace)var1.deserialize((JsonElement)var6.getValue(), BlockElementFace.class));
+          }
+ 
+          return var3;
+       }
+ 

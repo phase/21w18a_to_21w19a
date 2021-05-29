@@ -1,0 +1,34 @@
+--- net/minecraft/util/CrudeIncrementalIntIdentityHashBiMap.java
++++ net/minecraft/util/CrudeIncrementalIntIdentityHashBiMap.java
+@@ -17,13 +17,13 @@
+    private int nextId;
+    private int size;
+ 
+    public CrudeIncrementalIntIdentityHashBiMap(int var1) {
+       var1 = (int)((float)var1 / 0.8F);
+-      this.keys = (Object[])(new Object[var1]);
++      this.keys = new Object[var1];
+       this.values = new int[var1];
+-      this.byId = (Object[])(new Object[var1]);
++      this.byId = new Object[var1];
+    }
+ 
+    public int getId(@Nullable K var1) {
+       return this.getValue(this.indexOf(var1, this.hash(var1)));
+    }
+@@ -60,13 +60,13 @@
+    }
+ 
+    private void grow(int var1) {
+       Object[] var2 = this.keys;
+       int[] var3 = this.values;
+-      this.keys = (Object[])(new Object[var1]);
++      this.keys = new Object[var1];
+       this.values = new int[var1];
+-      this.byId = (Object[])(new Object[var1]);
++      this.byId = new Object[var1];
+       this.nextId = 0;
+       this.size = 0;
+ 
+       for(int var4 = 0; var4 < var2.length; ++var4) {
+          if (var2[var4] != null) {

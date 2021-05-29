@@ -1,0 +1,47 @@
+--- net/minecraft/world/entity/animal/Pufferfish.java
++++ net/minecraft/world/entity/animal/Pufferfish.java
+@@ -27,14 +27,14 @@
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.Level;
+ 
+ public class Pufferfish extends AbstractFish {
+    private static final EntityDataAccessor<Integer> PUFF_STATE;
+-   private int inflateCounter;
+-   private int deflateTimer;
+-   private static final Predicate<LivingEntity> NO_CREATIVE_OR_WATER_MOB;
+-   private static final TargetingConditions targetingConditions;
++   int inflateCounter;
++   int deflateTimer;
++   private static final Predicate<LivingEntity> SCARY_MOB;
++   static final TargetingConditions targetingConditions;
+    public static final int STATE_SMALL = 0;
+    public static final int STATE_MID = 1;
+    public static final int STATE_FULL = 2;
+ 
+    public Pufferfish(EntityType<? extends Pufferfish> var1, Level var2) {
+@@ -180,21 +180,21 @@
+       }
+    }
+ 
+    static {
+       PUFF_STATE = SynchedEntityData.defineId(Pufferfish.class, EntityDataSerializers.INT);
+-      NO_CREATIVE_OR_WATER_MOB = (var0) -> {
++      SCARY_MOB = (var0) -> {
+          if (var0 instanceof Player && ((Player)var0).isCreative()) {
+             return false;
+          } else {
+-            return var0.getMobType() != MobType.WATER;
++            return var0.getType() == EntityType.AXOLOTL || var0.getMobType() != MobType.WATER;
+          }
+       };
+-      targetingConditions = (new TargetingConditions()).allowInvulnerable().ignoreInvisibilityTesting().allowNonAttackable().allowSameTeam().allowUnseeable().selector(NO_CREATIVE_OR_WATER_MOB);
++      targetingConditions = TargetingConditions.forNonCombat().ignoreInvisibilityTesting().ignoreLineOfSight().selector(SCARY_MOB);
+    }
+ 
+-   static class PufferfishPuffGoal extends Goal {
++   private static class PufferfishPuffGoal extends Goal {
+       private final Pufferfish fish;
+ 
+       public PufferfishPuffGoal(Pufferfish var1) {
+          this.fish = var1;
+       }

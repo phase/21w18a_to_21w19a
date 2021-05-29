@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/material/Material.java
++++ net/minecraft/world/level/material/Material.java
+@@ -181,11 +181,11 @@
+       public Material.Builder noCollider() {
+          this.blocksMotion = false;
+          return this;
+       }
+ 
+-      private Material.Builder notSolidBlocking() {
++      Material.Builder notSolidBlocking() {
+          this.solidBlocking = false;
+          return this;
+       }
+ 
+       protected Material.Builder flammable() {

@@ -1,0 +1,25 @@
+--- net/minecraft/client/gui/font/FontTexture.java
++++ net/minecraft/client/gui/font/FontTexture.java
+@@ -56,19 +56,19 @@
+    public ResourceLocation getName() {
+       return this.name;
+    }
+ 
+    static class Node {
+-      private final int x;
+-      private final int y;
++      final int x;
++      final int y;
+       private final int width;
+       private final int height;
+       private FontTexture.Node left;
+       private FontTexture.Node right;
+       private boolean occupied;
+ 
+-      private Node(int var1, int var2, int var3, int var4) {
++      Node(int var1, int var2, int var3, int var4) {
+          this.x = var1;
+          this.y = var2;
+          this.width = var3;
+          this.height = var4;
+       }

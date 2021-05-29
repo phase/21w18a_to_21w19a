@@ -1,0 +1,28 @@
+--- net/minecraft/world/entity/ai/goal/RangedCrossbowAttackGoal.java
++++ net/minecraft/world/entity/ai/goal/RangedCrossbowAttackGoal.java
+@@ -61,11 +61,11 @@
+    }
+ 
+    public void tick() {
+       LivingEntity var1 = this.mob.getTarget();
+       if (var1 != null) {
+-         boolean var2 = this.mob.getSensing().canSee(var1);
++         boolean var2 = this.mob.getSensing().hasLineOfSight(var1);
+          boolean var3 = this.seeTime > 0;
+          if (var2 != var3) {
+             this.seeTime = 0;
+          }
+ 
+@@ -125,11 +125,11 @@
+ 
+    private boolean canRun() {
+       return this.crossbowState == RangedCrossbowAttackGoal.CrossbowState.UNCHARGED;
+    }
+ 
+-   static enum CrossbowState {
++   private static enum CrossbowState {
+       UNCHARGED,
+       CHARGING,
+       CHARGED,
+       READY_TO_ATTACK;
+ 

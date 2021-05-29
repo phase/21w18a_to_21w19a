@@ -1,0 +1,16 @@
+--- net/minecraft/core/Vec3i.java
++++ net/minecraft/core/Vec3i.java
+@@ -218,11 +218,12 @@
+    public String toString() {
+       return MoreObjects.toStringHelper((Object)this).add("x", this.getX()).add("y", this.getY()).add("z", this.getZ()).toString();
+    }
+ 
+    public String toShortString() {
+-      return "" + this.getX() + ", " + this.getY() + ", " + this.getZ();
++      int var10000 = this.getX();
++      return var10000 + ", " + this.getY() + ", " + this.getZ();
+    }
+ 
+    static {
+       CODEC = Codec.INT_STREAM.comapFlatMap((var0) -> {
+          return Util.fixedSize((IntStream)var0, 3).map((var0x) -> {

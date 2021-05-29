@@ -1,0 +1,15 @@
+--- net/minecraft/client/particle/SpellParticle.java
++++ net/minecraft/client/particle/SpellParticle.java
+@@ -6,11 +6,11 @@
+ 
+ public class SpellParticle extends TextureSheetParticle {
+    private static final Random RANDOM = new Random();
+    private final SpriteSet sprites;
+ 
+-   private SpellParticle(ClientLevel var1, double var2, double var4, double var6, double var8, double var10, double var12, SpriteSet var14) {
++   SpellParticle(ClientLevel var1, double var2, double var4, double var6, double var8, double var10, double var12, SpriteSet var14) {
+       super(var1, var2, var4, var6, 0.5D - RANDOM.nextDouble(), var10, 0.5D - RANDOM.nextDouble());
+       this.friction = 0.96F;
+       this.gravity = -0.1F;
+       this.speedUpWhenYMotionIsBlocked = true;
+       this.sprites = var14;

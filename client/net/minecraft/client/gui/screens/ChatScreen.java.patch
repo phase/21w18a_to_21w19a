@@ -1,0 +1,15 @@
+--- net/minecraft/client/gui/screens/ChatScreen.java
++++ net/minecraft/client/gui/screens/ChatScreen.java
+@@ -15,11 +15,11 @@
+    public static final int MOUSE_SCROLL_SPEED = 7;
+    private String historyBuffer = "";
+    private int historyPos = -1;
+    protected EditBox input;
+    private String initial = "";
+-   private CommandSuggestions commandSuggestions;
++   CommandSuggestions commandSuggestions;
+ 
+    public ChatScreen(String var1) {
+       super(NarratorChatListener.NO_TITLE);
+       this.initial = var1;
+    }

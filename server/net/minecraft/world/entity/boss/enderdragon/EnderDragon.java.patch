@@ -1,0 +1,12 @@
+--- net/minecraft/world/entity/boss/enderdragon/EnderDragon.java
++++ net/minecraft/world/entity/boss/enderdragon/EnderDragon.java
+@@ -863,8 +863,8 @@
+ 
+    }
+ 
+    static {
+       DATA_PHASE = SynchedEntityData.defineId(EnderDragon.class, EntityDataSerializers.INT);
+-      CRYSTAL_DESTROY_TARGETING = (new TargetingConditions()).range(64.0D);
++      CRYSTAL_DESTROY_TARGETING = TargetingConditions.forCombat().range(64.0D);
+    }
+ }

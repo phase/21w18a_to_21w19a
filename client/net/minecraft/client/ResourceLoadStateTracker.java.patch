@@ -1,0 +1,64 @@
+--- net/minecraft/client/ResourceLoadStateTracker.java
++++ net/minecraft/client/ResourceLoadStateTracker.java
+@@ -54,30 +54,18 @@
+          this.reloadState.fillCrashInfo(var2);
+       }
+ 
+    }
+ 
+-   public static enum ReloadReason {
+-      INITIAL("initial"),
+-      MANUAL("manual"),
+-      UNKNOWN("unknown");
+-
+-      private final String name;
+-
+-      private ReloadReason(String var3) {
+-         this.name = var3;
+-      }
+-   }
+-
+    static class ReloadState {
+       private final ResourceLoadStateTracker.ReloadReason reloadReason;
+       private final List<String> packs;
+       @Nullable
+-      private ResourceLoadStateTracker.RecoveryInfo recoveryReloadInfo;
+-      private boolean finished;
++      ResourceLoadStateTracker.RecoveryInfo recoveryReloadInfo;
++      boolean finished;
+ 
+-      private ReloadState(ResourceLoadStateTracker.ReloadReason var1, List<String> var2) {
++      ReloadState(ResourceLoadStateTracker.ReloadReason var1, List<String> var2) {
+          this.reloadReason = var1;
+          this.packs = var2;
+       }
+ 
+       public void fillCrashInfo(CrashReportCategory var1) {
+@@ -91,14 +79,26 @@
+          }
+ 
+       }
+    }
+ 
++   public static enum ReloadReason {
++      INITIAL("initial"),
++      MANUAL("manual"),
++      UNKNOWN("unknown");
++
++      final String name;
++
++      private ReloadReason(String var3) {
++         this.name = var3;
++      }
++   }
++
+    static class RecoveryInfo {
+       private final Throwable error;
+ 
+-      private RecoveryInfo(Throwable var1) {
++      RecoveryInfo(Throwable var1) {
+          this.error = var1;
+       }
+ 
+       public void fillCrashInfo(CrashReportCategory var1) {
+          var1.setDetail("Recovery", (Object)"Yes");

@@ -1,0 +1,89 @@
+--- net/minecraft/world/level/entity/TransientEntitySectionManager.java
++++ net/minecraft/world/level/entity/TransientEntitySectionManager.java
+@@ -1,23 +1,24 @@
+ package net.minecraft.world.level.entity;
+ 
+ import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+ import it.unimi.dsi.fastutil.longs.LongSet;
++import java.util.Objects;
+ import java.util.stream.Stream;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.SectionPos;
+ import net.minecraft.util.VisibleForDebug;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.level.ChunkPos;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class TransientEntitySectionManager<T extends EntityAccess> {
+-   private static final Logger LOGGER = LogManager.getLogger();
+-   private final LevelCallback<T> callbacks;
+-   private final EntityLookup<T> entityStorage = new EntityLookup();
+-   private final EntitySectionStorage<T> sectionStorage;
++   static final Logger LOGGER = LogManager.getLogger();
++   final LevelCallback<T> callbacks;
++   final EntityLookup<T> entityStorage = new EntityLookup();
++   final EntitySectionStorage<T> sectionStorage;
+    private final LongSet tickingChunks = new LongOpenHashSet();
+    private final LevelEntityGetter<T> entityGetter;
+ 
+    public TransientEntitySectionManager(Class<T> var1, LevelCallback<T> var2) {
+       this.sectionStorage = new EntitySectionStorage(var1, (var1x) -> {
+@@ -35,10 +36,11 @@
+          if (!var2.isTicking()) {
+             Stream var10000 = var1x.getEntities().filter((var0) -> {
+                return !var0.isAlwaysTicking();
+             });
+             LevelCallback var10001 = this.callbacks;
++            Objects.requireNonNull(var10001);
+             var10000.forEach(var10001::onTickingStart);
+          }
+ 
+       });
+    }
+@@ -51,10 +53,11 @@
+          if (var2.isTicking()) {
+             Stream var10000 = var1x.getEntities().filter((var0) -> {
+                return !var0.isAlwaysTicking();
+             });
+             LevelCallback var10001 = this.callbacks;
++            Objects.requireNonNull(var10001);
+             var10000.forEach(var10001::onTickingEnd);
+          }
+ 
+       });
+    }
+@@ -80,28 +83,29 @@
+    @VisibleForDebug
+    public int count() {
+       return this.entityStorage.count();
+    }
+ 
+-   private void removeSectionIfEmpty(long var1, EntitySection<T> var3) {
++   void removeSectionIfEmpty(long var1, EntitySection<T> var3) {
+       if (var3.isEmpty()) {
+          this.sectionStorage.remove(var1);
+       }
+ 
+    }
+ 
+    @VisibleForDebug
+    public String gatherStats() {
+-      return this.entityStorage.count() + "," + this.sectionStorage.count() + "," + this.tickingChunks.size();
++      int var10000 = this.entityStorage.count();
++      return var10000 + "," + this.sectionStorage.count() + "," + this.tickingChunks.size();
+    }
+ 
+-   class Callback implements EntityInLevelCallback {
++   private class Callback implements EntityInLevelCallback {
+       private final T entity;
+       private long currentSectionKey;
+       private EntitySection<T> currentSection;
+ 
+-      private Callback(T var2, long var3, EntitySection<T> var5) {
++      Callback(T var2, long var3, EntitySection<T> var5) {
+          this.entity = var2;
+          this.currentSectionKey = var3;
+          this.currentSection = var5;
+       }
+ 

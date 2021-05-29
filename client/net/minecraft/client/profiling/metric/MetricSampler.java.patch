@@ -1,0 +1,41 @@
+--- net/minecraft/client/profiling/metric/MetricSampler.java
++++ net/minecraft/client/profiling/metric/MetricSampler.java
+@@ -18,11 +18,11 @@
+    @Nullable
+    private final Runnable beforeTick;
+    @Nullable
+    private final MetricSampler.ThresholdAlerter thresholdAlerter;
+ 
+-   private <T> MetricSampler(Metric var1, DoubleSupplier var2, @Nullable Runnable var3, @Nullable MetricSampler.ThresholdAlerter var4) {
++   <T> MetricSampler(Metric var1, DoubleSupplier var2, @Nullable Runnable var3, @Nullable MetricSampler.ThresholdAlerter var4) {
+       this.metric = var1;
+       this.beforeTick = var3;
+       this.sampler = var2;
+       this.thresholdAlerter = var4;
+       this.values = new FriendlyByteBuf(Unpooled.directBuffer());
+@@ -92,10 +92,14 @@
+ 
+    public double readNextValue() {
+       return this.values.readDouble();
+    }
+ 
++   public interface ThresholdAlerter {
++      void test(double var1);
++   }
++
+    public static class MetricSamplerBuilder<T> {
+       private final Metric metric;
+       private final DoubleSupplier sampler;
+       private final T context;
+       @Nullable
+@@ -145,10 +149,6 @@
+          }
+ 
+          this.previousValue = var1;
+       }
+    }
+-
+-   public interface ThresholdAlerter {
+-      void test(double var1);
+-   }
+ }

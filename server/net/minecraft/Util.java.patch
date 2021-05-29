@@ -1,0 +1,110 @@
+--- net/minecraft/Util.java
++++ net/minecraft/Util.java
+@@ -68,11 +68,11 @@
+    private static final ExecutorService BOOTSTRAP_EXECUTOR = makeExecutor("Bootstrap");
+    private static final ExecutorService BACKGROUND_EXECUTOR = makeExecutor("Main");
+    private static final ExecutorService IO_POOL = makeIoExecutor();
+    public static LongSupplier timeSource = System::nanoTime;
+    public static final UUID NIL_UUID = new UUID(0L, 0L);
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+ 
+    public Util() {
+    }
+ 
+    public static <K, V> Collector<Entry<? extends K, ? extends V>, ?, Map<K, V>> toMap() {
+@@ -82,11 +82,11 @@
+    public static <T extends Comparable<T>> String getPropertyName(Property<T> var0, Object var1) {
+       return var0.getName((Comparable)var1);
+    }
+ 
+    public static String makeDescriptionId(String var0, @Nullable ResourceLocation var1) {
+-      return var1 == null ? var0 + ".unregistered_sadface" : var0 + '.' + var1.getNamespace() + '.' + var1.getPath().replace('/', '.');
++      return var1 == null ? var0 + ".unregistered_sadface" : var0 + "." + var1.getNamespace() + "." + var1.getPath().replace('/', '.');
+    }
+ 
+    public static long getMillis() {
+       return getNanos() / 1000000L;
+    }
+@@ -598,11 +598,12 @@
+          public R apply(T var1) {
+             return this.cache.computeIfAbsent(var1, var0);
+          }
+ 
+          public String toString() {
+-            return "memoize/1[function=" + var0 + ", size=" + this.cache.size() + "]";
++            Function var10000 = var0;
++            return "memoize/1[function=" + var10000 + ", size=" + this.cache.size() + "]";
+          }
+       };
+    }
+ 
+    public static <T, U, R> BiFunction<T, U, R> memoize(final BiFunction<T, U, R> var0) {
+@@ -614,30 +615,16 @@
+                return var0.apply(var1x.getFirst(), var1x.getSecond());
+             });
+          }
+ 
+          public String toString() {
+-            return "memoize/2[function=" + var0 + ", size=" + this.cache.size() + "]";
++            BiFunction var10000 = var0;
++            return "memoize/2[function=" + var10000 + ", size=" + this.cache.size() + "]";
+          }
+       };
+    }
+ 
+-   static enum IdentityStrategy implements Hash.Strategy<Object> {
+-      INSTANCE;
+-
+-      private IdentityStrategy() {
+-      }
+-
+-      public int hashCode(Object var1) {
+-         return System.identityHashCode(var1);
+-      }
+-
+-      public boolean equals(Object var1, Object var2) {
+-         return var1 == var2;
+-      }
+-   }
+-
+    public static enum OS {
+       LINUX,
+       SOLARIS,
+       WINDOWS {
+          protected String[] getOpenUrlArguments(URL var1) {
+@@ -649,11 +636,11 @@
+             return new String[]{"open", var1.toString()};
+          }
+       },
+       UNKNOWN;
+ 
+-      private OS() {
++      OS() {
+       }
+ 
+       public void openUrl(URL var1) {
+          try {
+             Process var2 = (Process)AccessController.doPrivileged(() -> {
+@@ -709,6 +696,21 @@
+             Util.LOGGER.error((String)"Couldn't open uri '{}'", (Object)var1, (Object)var3);
+          }
+ 
+       }
+    }
++
++   static enum IdentityStrategy implements Hash.Strategy<Object> {
++      INSTANCE;
++
++      private IdentityStrategy() {
++      }
++
++      public int hashCode(Object var1) {
++         return System.identityHashCode(var1);
++      }
++
++      public boolean equals(Object var1, Object var2) {
++         return var1 == var2;
++      }
++   }
+ }

@@ -1,0 +1,47 @@
+--- net/minecraft/BlockUtil.java
++++ net/minecraft/BlockUtil.java
+@@ -125,31 +125,31 @@
+       } while(var6.is(var2));
+ 
+       return var6.is(var4) ? Optional.of(var5) : Optional.empty();
+    }
+ 
+-   public static class FoundRectangle {
+-      public final BlockPos minCorner;
+-      public final int axis1Size;
+-      public final int axis2Size;
+-
+-      public FoundRectangle(BlockPos var1, int var2, int var3) {
+-         this.minCorner = var1;
+-         this.axis1Size = var2;
+-         this.axis2Size = var3;
+-      }
+-   }
+-
+    public static class IntBounds {
+       public final int min;
+       public final int max;
+ 
+       public IntBounds(int var1, int var2) {
+          this.min = var1;
+          this.max = var2;
+       }
+ 
+       public String toString() {
+-         return "IntBounds{min=" + this.min + ", max=" + this.max + '}';
++         return "IntBounds{min=" + this.min + ", max=" + this.max + "}";
+       }
+    }
++
++   public static class FoundRectangle {
++      public final BlockPos minCorner;
++      public final int axis1Size;
++      public final int axis2Size;
++
++      public FoundRectangle(BlockPos var1, int var2, int var3) {
++         this.minCorner = var1;
++         this.axis1Size = var2;
++         this.axis2Size = var3;
++      }
++   }
+ }

@@ -1,0 +1,58 @@
+--- net/minecraft/server/network/ServerLoginPacketListenerImpl.java
++++ net/minecraft/server/network/ServerLoginPacketListenerImpl.java
+@@ -36,20 +36,20 @@
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class ServerLoginPacketListenerImpl implements ServerLoginPacketListener {
+    private static final AtomicInteger UNIQUE_THREAD_ID = new AtomicInteger(0);
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Logger LOGGER = LogManager.getLogger();
+    private static final int MAX_TICKS_BEFORE_LOGIN = 600;
+    private static final Random RANDOM = new Random();
+    private final byte[] nonce = new byte[4];
+-   private final MinecraftServer server;
++   final MinecraftServer server;
+    public final Connection connection;
+-   private ServerLoginPacketListenerImpl.State state;
++   ServerLoginPacketListenerImpl.State state;
+    private int tick;
+    @Nullable
+-   private GameProfile gameProfile;
++   GameProfile gameProfile;
+    private final String serverId;
+    @Nullable
+    private ServerPlayer delayedAcceptPlayer;
+ 
+    public ServerLoginPacketListenerImpl(MinecraftServer var1, Connection var2) {
+@@ -136,11 +136,16 @@
+    public void onDisconnect(Component var1) {
+       LOGGER.info((String)"{} lost connection: {}", (Object)this.getUserName(), (Object)var1.getString());
+    }
+ 
+    public String getUserName() {
+-      return this.gameProfile != null ? this.gameProfile + " (" + this.connection.getRemoteAddress() + ")" : String.valueOf(this.connection.getRemoteAddress());
++      if (this.gameProfile != null) {
++         GameProfile var10000 = this.gameProfile;
++         return var10000 + " (" + this.connection.getRemoteAddress() + ")";
++      } else {
++         return String.valueOf(this.connection.getRemoteAddress());
++      }
+    }
+ 
+    public void handleHello(ServerboundHelloPacket var1) {
+       Validate.validState(this.state == ServerLoginPacketListenerImpl.State.HELLO, "Unexpected hello packet");
+       this.gameProfile = var1.getGameProfile();
+@@ -220,11 +225,11 @@
+    protected GameProfile createFakeProfile(GameProfile var1) {
+       UUID var2 = Player.createPlayerUUID(var1.getName());
+       return new GameProfile(var2, var1.getName());
+    }
+ 
+-   static enum State {
++   private static enum State {
+       HELLO,
+       KEY,
+       AUTHENTICATING,
+       NEGOTIATING,
+       READY_TO_ACCEPT,

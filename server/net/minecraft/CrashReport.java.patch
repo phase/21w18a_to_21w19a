@@ -1,0 +1,26 @@
+--- net/minecraft/CrashReport.java
++++ net/minecraft/CrashReport.java
+@@ -41,17 +41,20 @@
+       });
+       this.systemDetails.setDetail("Minecraft Version ID", () -> {
+          return SharedConstants.getCurrentVersion().getId();
+       });
+       this.systemDetails.setDetail("Operating System", () -> {
+-         return System.getProperty("os.name") + " (" + System.getProperty("os.arch") + ") version " + System.getProperty("os.version");
++         String var10000 = System.getProperty("os.name");
++         return var10000 + " (" + System.getProperty("os.arch") + ") version " + System.getProperty("os.version");
+       });
+       this.systemDetails.setDetail("Java Version", () -> {
+-         return System.getProperty("java.version") + ", " + System.getProperty("java.vendor");
++         String var10000 = System.getProperty("java.version");
++         return var10000 + ", " + System.getProperty("java.vendor");
+       });
+       this.systemDetails.setDetail("Java VM Version", () -> {
+-         return System.getProperty("java.vm.name") + " (" + System.getProperty("java.vm.info") + "), " + System.getProperty("java.vm.vendor");
++         String var10000 = System.getProperty("java.vm.name");
++         return var10000 + " (" + System.getProperty("java.vm.info") + "), " + System.getProperty("java.vm.vendor");
+       });
+       this.systemDetails.setDetail("Memory", () -> {
+          Runtime var0 = Runtime.getRuntime();
+          long var1 = var0.maxMemory();
+          long var3 = var0.totalMemory();

@@ -1,0 +1,139 @@
+--- net/minecraft/world/level/levelgen/Column.java
++++ net/minecraft/world/level/levelgen/Column.java
+@@ -84,95 +84,95 @@
+       }
+ 
+       return var0.isStateAtPosition(var4, var3) ? OptionalInt.of(var4.getY()) : OptionalInt.empty();
+    }
+ 
+-   public static final class Ray extends Column {
+-      private final int edge;
+-      private final boolean pointingUp;
++   public static final class Range extends Column {
++      private final int floor;
++      private final int ceiling;
+ 
+-      public Ray(int var1, boolean var2) {
+-         this.edge = var1;
+-         this.pointingUp = var2;
++      protected Range(int var1, int var2) {
++         this.floor = var1;
++         this.ceiling = var2;
++         if (this.height() < 0) {
++            throw new IllegalArgumentException("Column of negative height: " + this);
++         }
+       }
+ 
+       public OptionalInt getCeiling() {
+-         return this.pointingUp ? OptionalInt.empty() : OptionalInt.of(this.edge);
++         return OptionalInt.of(this.ceiling);
+       }
+ 
+       public OptionalInt getFloor() {
+-         return this.pointingUp ? OptionalInt.of(this.edge) : OptionalInt.empty();
++         return OptionalInt.of(this.floor);
+       }
+ 
+       public OptionalInt getHeight() {
+-         return OptionalInt.empty();
++         return OptionalInt.of(this.height());
+       }
+ 
++      public int ceiling() {
++         return this.ceiling;
++      }
++
++      public int floor() {
++         return this.floor;
++      }
++
++      public int height() {
++         return this.ceiling - this.floor - 1;
++      }
++
+       public String toString() {
+-         return this.pointingUp ? "C(" + this.edge + "-)" : "C(-" + this.edge + ")";
++         return "C(" + this.ceiling + "-" + this.floor + ")";
+       }
+    }
+ 
+-   public static final class Line extends Column {
+-      private static final Column.Line INSTANCE = new Column.Line();
++   public static final class Ray extends Column {
++      private final int edge;
++      private final boolean pointingUp;
+ 
+-      private Line() {
++      public Ray(int var1, boolean var2) {
++         this.edge = var1;
++         this.pointingUp = var2;
+       }
+ 
+       public OptionalInt getCeiling() {
+-         return OptionalInt.empty();
++         return this.pointingUp ? OptionalInt.empty() : OptionalInt.of(this.edge);
+       }
+ 
+       public OptionalInt getFloor() {
+-         return OptionalInt.empty();
++         return this.pointingUp ? OptionalInt.of(this.edge) : OptionalInt.empty();
+       }
+ 
+       public OptionalInt getHeight() {
+          return OptionalInt.empty();
+       }
+ 
+       public String toString() {
+-         return "C(-)";
++         return this.pointingUp ? "C(" + this.edge + "-)" : "C(-" + this.edge + ")";
+       }
+    }
+ 
+-   public static final class Range extends Column {
+-      private final int floor;
+-      private final int ceiling;
++   public static final class Line extends Column {
++      static final Column.Line INSTANCE = new Column.Line();
+ 
+-      protected Range(int var1, int var2) {
+-         this.floor = var1;
+-         this.ceiling = var2;
+-         if (this.height() < 0) {
+-            throw new IllegalArgumentException("Column of negative height: " + this);
+-         }
++      private Line() {
+       }
+ 
+       public OptionalInt getCeiling() {
+-         return OptionalInt.of(this.ceiling);
++         return OptionalInt.empty();
+       }
+ 
+       public OptionalInt getFloor() {
+-         return OptionalInt.of(this.floor);
++         return OptionalInt.empty();
+       }
+ 
+       public OptionalInt getHeight() {
+-         return OptionalInt.of(this.height());
++         return OptionalInt.empty();
+       }
+ 
+-      public int ceiling() {
+-         return this.ceiling;
+-      }
+-
+-      public int floor() {
+-         return this.floor;
+-      }
+-
+-      public int height() {
+-         return this.ceiling - this.floor - 1;
+-      }
+-
+       public String toString() {
+-         return "C(" + this.ceiling + "-" + this.floor + ')';
++         return "C(-)";
+       }
+    }
+ }

@@ -1,0 +1,53 @@
+--- net/minecraft/world/level/levelgen/feature/structures/StructureTemplatePool.java
++++ net/minecraft/world/level/levelgen/feature/structures/StructureTemplatePool.java
+@@ -8,10 +8,11 @@
+ import it.unimi.dsi.fastutil.objects.ObjectArrays;
+ import java.util.Arrays;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Random;
+ import java.util.function.Function;
+ import java.util.function.Supplier;
+ import java.util.stream.Collectors;
+ import net.minecraft.Util;
+@@ -34,11 +35,11 @@
+    public static final Codec<StructureTemplatePool> DIRECT_CODEC = RecordCodecBuilder.create((var0) -> {
+       RecordCodecBuilder var10001 = ResourceLocation.CODEC.fieldOf("name").forGetter(StructureTemplatePool::getName);
+       RecordCodecBuilder var10002 = ResourceLocation.CODEC.fieldOf("fallback").forGetter(StructureTemplatePool::getFallback);
+       Codec var10003 = Codec.mapPair(StructurePoolElement.CODEC.fieldOf("element"), Codec.INT.fieldOf("weight")).codec().listOf();
+       Logger var10005 = LOGGER;
+-      var10005.getClass();
++      Objects.requireNonNull(var10005);
+       return var0.group(var10001, var10002, var10003.promotePartial(Util.prefix("Pool element: ", var10005::error)).fieldOf("elements").forGetter((var0x) -> {
+          return var0x.rawTemplates;
+       })).apply(var0, StructureTemplatePool::new);
+    });
+    public static final Codec<Supplier<StructureTemplatePool>> CODEC;
+@@ -73,11 +74,11 @@
+       Iterator var5 = var3.iterator();
+ 
+       while(var5.hasNext()) {
+          Pair var6 = (Pair)var5.next();
+          StructurePoolElement var7 = (StructurePoolElement)((Function)var6.getFirst()).apply(var4);
+-         this.rawTemplates.add(Pair.of(var7, var6.getSecond()));
++         this.rawTemplates.add(Pair.of(var7, (Integer)var6.getSecond()));
+ 
+          for(int var8 = 0; var8 < (Integer)var6.getSecond(); ++var8) {
+             this.templates.add(var7);
+          }
+       }
+@@ -104,11 +105,11 @@
+    public StructurePoolElement getRandomTemplate(Random var1) {
+       return (StructurePoolElement)this.templates.get(var1.nextInt(this.templates.size()));
+    }
+ 
+    public List<StructurePoolElement> getShuffledTemplates(Random var1) {
+-      return ImmutableList.copyOf(ObjectArrays.shuffle(this.templates.toArray(new StructurePoolElement[0]), var1));
++      return ImmutableList.copyOf((StructurePoolElement[])ObjectArrays.shuffle((StructurePoolElement[])this.templates.toArray(new StructurePoolElement[0]), var1));
+    }
+ 
+    public ResourceLocation getName() {
+       return this.name;
+    }

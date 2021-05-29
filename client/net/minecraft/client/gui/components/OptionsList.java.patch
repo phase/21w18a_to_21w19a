@@ -1,0 +1,19 @@
+--- net/minecraft/client/gui/components/OptionsList.java
++++ net/minecraft/client/gui/components/OptionsList.java
+@@ -75,13 +75,13 @@
+       }
+ 
+       return Optional.empty();
+    }
+ 
+-   public static class Entry extends ContainerObjectSelectionList.Entry<OptionsList.Entry> {
+-      private final Map<Option, AbstractWidget> options;
+-      private final List<AbstractWidget> children;
++   protected static class Entry extends ContainerObjectSelectionList.Entry<OptionsList.Entry> {
++      final Map<Option, AbstractWidget> options;
++      final List<AbstractWidget> children;
+ 
+       private Entry(Map<Option, AbstractWidget> var1) {
+          this.options = var1;
+          this.children = ImmutableList.copyOf(var1.values());
+       }

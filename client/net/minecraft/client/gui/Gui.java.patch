@@ -1,0 +1,103 @@
+--- net/minecraft/client/gui/Gui.java
++++ net/minecraft/client/gui/Gui.java
+@@ -16,10 +16,11 @@
+ import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Random;
+ import java.util.UUID;
+ import java.util.stream.Collectors;
+ import javax.annotation.Nullable;
+ import net.minecraft.ChatFormatting;
+@@ -380,11 +381,11 @@
+       if (var6 != 0) {
+          int var7 = -var4 / 2;
+          int var10001 = var7 - 2;
+          int var10002 = var3 - 2;
+          int var10003 = var7 + var4 + 2;
+-         var2.getClass();
++         Objects.requireNonNull(var2);
+          fill(var1, var10001, var10002, var10003, var3 + 9 + 2, FastColor.ARGB32.multiply(var6, var5));
+       }
+ 
+    }
+ 
+@@ -601,11 +602,11 @@
+       }
+ 
+       this.minecraft.getProfiler().pop();
+       if (this.minecraft.player.experienceLevel > 0) {
+          this.minecraft.getProfiler().push("expLevel");
+-         String var7 = "" + this.minecraft.player.experienceLevel;
++         String var7 = this.minecraft.player.experienceLevel.makeConcatWithConstants<invokedynamic>(this.minecraft.player.experienceLevel);
+          var5 = (this.screenWidth - this.getFont().width(var7)) / 2;
+          var6 = this.screenHeight - 31 - 4;
+          this.getFont().draw(var1, (String)var7, (float)(var5 + 1), (float)var6, 0);
+          this.getFont().draw(var1, (String)var7, (float)(var5 - 1), (float)var6, 0);
+          this.getFont().draw(var1, (String)var7, (float)var5, (float)(var6 + 1), 0);
+@@ -640,11 +641,11 @@
+             RenderSystem.enableBlend();
+             RenderSystem.defaultBlendFunc();
+             int var10001 = var4 - 2;
+             int var10002 = var5 - 2;
+             int var10003 = var4 + var3 + 2;
+-            this.getFont().getClass();
++            Objects.requireNonNull(this.getFont());
+             fill(var1, var10001, var10002, var10003, var5 + 9 + 2, this.minecraft.options.getBackgroundColor(0));
+             this.getFont().drawShadow(var1, (Component)var2, (float)var4, (float)var5, 16777215 + (var6 << 24));
+             RenderSystem.disableBlend();
+          }
+       }
+@@ -693,11 +694,11 @@
+          var14 = PlayerTeam.formatNameForTeam(var13, new TextComponent(var12.getOwner()));
+          var6.add(Pair.of(var12, var14));
+       }
+ 
+       int var10000 = ((Collection)var26).size();
+-      this.getFont().getClass();
++      Objects.requireNonNull(this.getFont());
+       int var27 = var10000 * 9;
+       int var28 = this.screenHeight / 2 + var27 / 3;
+       boolean var29 = true;
+       int var30 = this.screenWidth - var9 - 3;
+       int var15 = 0;
+@@ -708,28 +709,29 @@
+       while(var18.hasNext()) {
+          Pair var19 = (Pair)var18.next();
+          ++var15;
+          Score var20 = (Score)var19.getFirst();
+          Component var21 = (Component)var19.getSecond();
+-         String var22 = ChatFormatting.RED + "" + var20.getScore();
+-         this.getFont().getClass();
++         ChatFormatting var31 = ChatFormatting.RED;
++         String var22 = var31 + var20.getScore();
++         Objects.requireNonNull(this.getFont());
+          int var24 = var28 - var15 * 9;
+          int var25 = this.screenWidth - 3 + 2;
+          int var10001 = var30 - 2;
+-         this.getFont().getClass();
++         Objects.requireNonNull(this.getFont());
+          fill(var1, var10001, var24, var25, var24 + 9, var16);
+          this.getFont().draw(var1, (Component)var21, (float)var30, (float)var24, -1);
+          this.getFont().draw(var1, (String)var22, (float)(var25 - this.getFont().width(var22)), (float)var24, -1);
+          if (var15 == ((Collection)var26).size()) {
+             var10001 = var30 - 2;
+-            this.getFont().getClass();
++            Objects.requireNonNull(this.getFont());
+             fill(var1, var10001, var24 - 9 - 1, var25, var24 - 1, var17);
+             fill(var1, var30 - 2, var24 - 1, var25, var24, var16);
+-            Font var31 = this.getFont();
++            Font var32 = this.getFont();
+             float var10003 = (float)(var30 + var9 / 2 - var8 / 2);
+-            this.getFont().getClass();
+-            var31.draw(var1, (Component)var7, var10003, (float)(var24 - 9), -1);
++            Objects.requireNonNull(this.getFont());
++            var32.draw(var1, (Component)var7, var10003, (float)(var24 - 9), -1);
+          }
+       }
+ 
+    }
+ 

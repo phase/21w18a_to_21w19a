@@ -1,0 +1,32 @@
+--- net/minecraft/server/commands/LootCommand.java
++++ net/minecraft/server/commands/LootCommand.java
+@@ -61,11 +61,11 @@
+ 
+    public LootCommand() {
+    }
+ 
+    public static void register(CommandDispatcher<CommandSourceStack> var0) {
+-      var0.register((LiteralArgumentBuilder)addTargets(Commands.literal("loot").requires((var0x) -> {
++      var0.register((LiteralArgumentBuilder)addTargets((LiteralArgumentBuilder)Commands.literal("loot").requires((var0x) -> {
+          return var0x.hasPermission(2);
+       }), (var0x, var1) -> {
+          return var0x.then(Commands.literal("fish").then(Commands.argument("loot_table", ResourceLocationArgument.id()).suggests(SUGGEST_LOOT_TABLE).then(((RequiredArgumentBuilder)((RequiredArgumentBuilder)((RequiredArgumentBuilder)Commands.argument("pos", BlockPosArgument.blockPos()).executes((var1x) -> {
+             return dropFishingLoot(var1x, ResourceLocationArgument.getId(var1x, "loot_table"), BlockPosArgument.getLoadedBlockPos(var1x, "pos"), ItemStack.EMPTY, var1);
+          })).then(Commands.argument("tool", ItemArgument.item()).executes((var1x) -> {
+@@ -337,14 +337,14 @@
+    interface TailProvider {
+       ArgumentBuilder<CommandSourceStack, ?> construct(ArgumentBuilder<CommandSourceStack, ?> var1, LootCommand.DropConsumer var2);
+    }
+ 
+    @FunctionalInterface
+-   interface DropConsumer {
++   private interface DropConsumer {
+       int accept(CommandContext<CommandSourceStack> var1, List<ItemStack> var2, LootCommand.Callback var3) throws CommandSyntaxException;
+    }
+ 
+    @FunctionalInterface
+-   interface Callback {
++   private interface Callback {
+       void accept(List<ItemStack> var1) throws CommandSyntaxException;
+    }
+ }

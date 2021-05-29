@@ -1,0 +1,32 @@
+--- net/minecraft/nbt/SnbtPrinterTagVisitor.java
++++ net/minecraft/nbt/SnbtPrinterTagVisitor.java
+@@ -8,12 +8,14 @@
+ import java.util.Collections;
+ import java.util.HashSet;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.regex.Pattern;
++import java.util.stream.Stream;
+ import net.minecraft.Util;
+ 
+ public class SnbtPrinterTagVisitor implements TagVisitor {
+    private static final Map<String, List<String>> KEY_ORDER = (Map)Util.make(Maps.newHashMap(), (var0) -> {
+       var0.put("{}", Lists.newArrayList((Object[])("DataVersion", "author", "size", "data", "entities", "palette", "palettes")));
+@@ -210,11 +212,13 @@
+                var3.add(var6);
+             }
+          }
+ 
+          if (!var2.isEmpty()) {
+-            var2.stream().sorted().forEach(var3::add);
++            Stream var10000 = var2.stream().sorted();
++            Objects.requireNonNull(var3);
++            var10000.forEach(var3::add);
+          }
+       } else {
+          var3.addAll(var2);
+          Collections.sort(var3);
+       }

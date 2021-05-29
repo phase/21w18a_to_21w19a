@@ -1,0 +1,15 @@
+--- net/minecraft/server/network/TextFilter.java
++++ net/minecraft/server/network/TextFilter.java
+@@ -15,11 +15,11 @@
+       public CompletableFuture<TextFilter.FilteredText> processStreamMessage(String var1) {
+          return CompletableFuture.completedFuture(TextFilter.FilteredText.passThrough(var1));
+       }
+ 
+       public CompletableFuture<List<TextFilter.FilteredText>> processMessageBundle(List<String> var1) {
+-         return CompletableFuture.completedFuture(var1.stream().map(TextFilter.FilteredText::passThrough).collect(ImmutableList.toImmutableList()));
++         return CompletableFuture.completedFuture((List)var1.stream().map(TextFilter.FilteredText::passThrough).collect(ImmutableList.toImmutableList()));
+       }
+    };
+ 
+    void join();
+ 

@@ -1,0 +1,27 @@
+--- net/minecraft/client/renderer/blockentity/PistonHeadRenderer.java
++++ net/minecraft/client/renderer/blockentity/PistonHeadRenderer.java
+@@ -7,10 +7,11 @@
+ import net.minecraft.client.renderer.MultiBufferSource;
+ import net.minecraft.client.renderer.RenderType;
+ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+ import net.minecraft.client.renderer.block.ModelBlockRenderer;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.Direction;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.piston.PistonBaseBlock;
+ import net.minecraft.world.level.block.piston.PistonHeadBlock;
+ import net.minecraft.world.level.block.piston.PistonMovingBlockEntity;
+@@ -36,11 +37,11 @@
+             if (var9.is(Blocks.PISTON_HEAD) && var1.getProgress(var2) <= 4.0F) {
+                var9 = (BlockState)var9.setValue(PistonHeadBlock.SHORT, var1.getProgress(var2) <= 0.5F);
+                this.renderBlock(var8, var9, var3, var4, var7, false, var6);
+             } else if (var1.isSourcePiston() && !var1.isExtending()) {
+                PistonType var10 = var9.is(Blocks.STICKY_PISTON) ? PistonType.STICKY : PistonType.DEFAULT;
+-               BlockState var11 = (BlockState)((BlockState)Blocks.PISTON_HEAD.defaultBlockState().setValue(PistonHeadBlock.TYPE, var10)).setValue(PistonHeadBlock.FACING, var9.getValue(PistonBaseBlock.FACING));
++               BlockState var11 = (BlockState)((BlockState)Blocks.PISTON_HEAD.defaultBlockState().setValue(PistonHeadBlock.TYPE, var10)).setValue(PistonHeadBlock.FACING, (Direction)var9.getValue(PistonBaseBlock.FACING));
+                var11 = (BlockState)var11.setValue(PistonHeadBlock.SHORT, var1.getProgress(var2) >= 0.5F);
+                this.renderBlock(var8, var11, var3, var4, var7, false, var6);
+                BlockPos var12 = var8.relative(var1.getMovementDirection());
+                var3.popPose();
+                var3.pushPose();

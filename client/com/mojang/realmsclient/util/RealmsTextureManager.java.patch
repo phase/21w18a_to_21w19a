@@ -1,0 +1,89 @@
+--- com/mojang/realmsclient/util/RealmsTextureManager.java
++++ com/mojang/realmsclient/util/RealmsTextureManager.java
+@@ -28,13 +28,13 @@
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class RealmsTextureManager {
+    private static final Map<String, RealmsTextureManager.RealmsTexture> TEXTURES = Maps.newHashMap();
+-   private static final Map<String, Boolean> SKIN_FETCH_STATUS = Maps.newHashMap();
+-   private static final Map<String, String> FETCHED_SKINS = Maps.newHashMap();
+-   private static final Logger LOGGER = LogManager.getLogger();
++   static final Map<String, Boolean> SKIN_FETCH_STATUS = Maps.newHashMap();
++   static final Map<String, String> FETCHED_SKINS = Maps.newHashMap();
++   static final Logger LOGGER = LogManager.getLogger();
+    private static final ResourceLocation TEMPLATE_ICON_LOCATION = new ResourceLocation("textures/gui/presets/isles.png");
+ 
+    public RealmsTextureManager() {
+    }
+ 
+@@ -83,20 +83,15 @@
+                   String var3 = var2.getUrl();
+                   HttpURLConnection var4 = null;
+                   RealmsTextureManager.LOGGER.debug("Downloading http texture from {}", var3);
+ 
+                   try {
+-                     try {
+-                        var4 = (HttpURLConnection)(new URL(var3)).openConnection(Minecraft.getInstance().getProxy());
+-                        var4.setDoInput(true);
+-                        var4.setDoOutput(false);
+-                        var4.connect();
+-                        if (var4.getResponseCode() / 100 != 2) {
+-                           RealmsTextureManager.SKIN_FETCH_STATUS.remove(var0);
+-                           return;
+-                        }
+-
++                     var4 = (HttpURLConnection)(new URL(var3)).openConnection(Minecraft.getInstance().getProxy());
++                     var4.setDoInput(true);
++                     var4.setDoOutput(false);
++                     var4.connect();
++                     if (var4.getResponseCode() / 100 == 2) {
+                         BufferedImage var5;
+                         try {
+                            var5 = ImageIO.read(var4.getInputStream());
+                         } catch (Exception var17) {
+                            RealmsTextureManager.SKIN_FETCH_STATUS.remove(var0);
+@@ -108,21 +103,25 @@
+                         var5 = (new SkinProcessor()).process(var5);
+                         ByteArrayOutputStream var6 = new ByteArrayOutputStream();
+                         ImageIO.write(var5, "png", var6);
+                         RealmsTextureManager.FETCHED_SKINS.put(var0, (new Base64()).encodeToString(var6.toByteArray()));
+                         RealmsTextureManager.SKIN_FETCH_STATUS.put(var0, true);
+-                     } catch (Exception var19) {
+-                        RealmsTextureManager.LOGGER.error("Couldn't download http texture", var19);
+-                        RealmsTextureManager.SKIN_FETCH_STATUS.remove(var0);
++                        return;
+                      }
+ 
++                     RealmsTextureManager.SKIN_FETCH_STATUS.remove(var0);
++                  } catch (Exception var19) {
++                     RealmsTextureManager.LOGGER.error("Couldn't download http texture", var19);
++                     RealmsTextureManager.SKIN_FETCH_STATUS.remove(var0);
++                     return;
+                   } finally {
+                      if (var4 != null) {
+                         var4.disconnect();
+                      }
+ 
+                   }
++
+                } else {
+                   RealmsTextureManager.SKIN_FETCH_STATUS.put(var0, true);
+                }
+             }
+          };
+@@ -175,12 +174,12 @@
+          return var3;
+       }
+    }
+ 
+    public static class RealmsTexture {
+-      private final String image;
+-      private final int textureId;
++      final String image;
++      final int textureId;
+ 
+       public RealmsTexture(String var1, int var2) {
+          this.image = var1;
+          this.textureId = var2;
+       }

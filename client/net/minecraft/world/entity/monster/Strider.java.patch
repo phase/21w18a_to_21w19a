@@ -1,0 +1,19 @@
+--- net/minecraft/world/entity/monster/Strider.java
++++ net/minecraft/world/entity/monster/Strider.java
+@@ -441,14 +441,14 @@
+       DATA_BOOST_TIME = SynchedEntityData.defineId(Strider.class, EntityDataSerializers.INT);
+       DATA_SUFFOCATING = SynchedEntityData.defineId(Strider.class, EntityDataSerializers.BOOLEAN);
+       DATA_SADDLE_ID = SynchedEntityData.defineId(Strider.class, EntityDataSerializers.BOOLEAN);
+    }
+ 
+-   static class StriderGoToLavaGoal extends MoveToBlockGoal {
++   private static class StriderGoToLavaGoal extends MoveToBlockGoal {
+       private final Strider strider;
+ 
+-      private StriderGoToLavaGoal(Strider var1, double var2) {
++      StriderGoToLavaGoal(Strider var1, double var2) {
+          super(var1, var2, 8, 2);
+          this.strider = var1;
+       }
+ 
+       public BlockPos getMoveToTarget() {

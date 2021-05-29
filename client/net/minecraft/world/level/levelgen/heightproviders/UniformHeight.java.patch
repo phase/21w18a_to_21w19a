@@ -1,0 +1,12 @@
+--- net/minecraft/world/level/levelgen/heightproviders/UniformHeight.java
++++ net/minecraft/world/level/levelgen/heightproviders/UniformHeight.java
+@@ -44,8 +44,8 @@
+    public HeightProviderType<?> getType() {
+       return HeightProviderType.UNIFORM;
+    }
+ 
+    public String toString() {
+-      return "[" + this.minInclusive + '-' + this.maxInclusive + ']';
++      return "[" + this.minInclusive + "-" + this.maxInclusive + "]";
+    }
+ }

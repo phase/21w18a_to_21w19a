@@ -1,0 +1,148 @@
+--- net/minecraft/world/entity/animal/axolotl/Axolotl.java
++++ net/minecraft/world/entity/animal/axolotl/Axolotl.java
+@@ -172,11 +172,11 @@
+ 
+    private void setVariant(Axolotl.Variant var1) {
+       this.entityData.set(DATA_VARIANT, var1.getId());
+    }
+ 
+-   private static boolean useRareVariant(Random var0) {
++   static boolean useRareVariant(Random var0) {
+       return var0.nextInt(1200) == 0;
+    }
+ 
+    public boolean checkSpawnObstruction(LevelReader var1) {
+       return var1.isUnobstructed(this);
+@@ -322,12 +322,12 @@
+ 
+    public SoundEvent getPickupSound() {
+       return SoundEvents.BUCKET_FILL_AXOLOTL;
+    }
+ 
+-   public boolean canBeTargeted() {
+-      return !this.isPlayingDead() && super.canBeTargeted();
++   public boolean canBeSeenAsEnemy() {
++      return !this.isPlayingDead() && super.canBeSeenAsEnemy();
+    }
+ 
+    public static void onStopAttacking(Axolotl var0) {
+       Optional var1 = var0.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET);
+       if (var1.isPresent()) {
+@@ -430,42 +430,26 @@
+       DATA_VARIANT = SynchedEntityData.defineId(Axolotl.class, EntityDataSerializers.INT);
+       DATA_PLAYING_DEAD = SynchedEntityData.defineId(Axolotl.class, EntityDataSerializers.BOOLEAN);
+       FROM_BUCKET = SynchedEntityData.defineId(Axolotl.class, EntityDataSerializers.BOOLEAN);
+    }
+ 
+-   static class AxolotlPathNavigation extends WaterBoundPathNavigation {
+-      AxolotlPathNavigation(Axolotl var1, Level var2) {
+-         super(var1, var2);
+-      }
++   static class AxolotlMoveControl extends SmoothSwimmingMoveControl {
++      private final Axolotl axolotl;
+ 
+-      protected boolean canUpdatePath() {
+-         return true;
++      public AxolotlMoveControl(Axolotl var1) {
++         super(var1, 85, 10, 0.1F, 0.5F, false);
++         this.axolotl = var1;
+       }
+ 
+-      protected PathFinder createPathFinder(int var1) {
+-         this.nodeEvaluator = new AmphibiousNodeEvaluator(false);
+-         return new PathFinder(this.nodeEvaluator, var1);
+-      }
++      public void tick() {
++         if (!this.axolotl.isPlayingDead()) {
++            super.tick();
++         }
+ 
+-      public boolean isStableDestination(BlockPos var1) {
+-         return !this.level.getBlockState(var1.below()).isAir();
+       }
+    }
+ 
+-   public static class AxolotlGroupData extends AgeableMob.AgeableMobGroupData {
+-      public final Axolotl.Variant[] types;
+-
+-      public AxolotlGroupData(Axolotl.Variant... var1) {
+-         super(false);
+-         this.types = var1;
+-      }
+-
+-      public Axolotl.Variant getVariant(Random var1) {
+-         return Axolotl.useRareVariant(var1) ? Axolotl.Variant.getRareSpawnVariant(var1) : this.types[var1.nextInt(this.types.length)];
+-      }
+-   }
+-
+    class AxolotlLookControl extends SmoothSwimmingLookControl {
+       public AxolotlLookControl(Axolotl var2, int var3) {
+          super(var2, var3);
+       }
+ 
+@@ -475,26 +459,10 @@
+          }
+ 
+       }
+    }
+ 
+-   static class AxolotlMoveControl extends SmoothSwimmingMoveControl {
+-      private final Axolotl axolotl;
+-
+-      public AxolotlMoveControl(Axolotl var1) {
+-         super(var1, 85, 10, 0.1F, 0.5F, false);
+-         this.axolotl = var1;
+-      }
+-
+-      public void tick() {
+-         if (!this.axolotl.isPlayingDead()) {
+-            super.tick();
+-         }
+-
+-      }
+-   }
+-
+    public static enum Variant {
+       LUCY(0, "lucy", true),
+       WILD(1, "wild", true),
+       GOLD(2, "gold", true),
+       CYAN(3, "cyan", true),
+@@ -536,6 +504,38 @@
+             return new Axolotl.Variant[var0x];
+          });
+          return (Axolotl.Variant)Util.getRandom((Object[])var2, var0);
+       }
+    }
++
++   public static class AxolotlGroupData extends AgeableMob.AgeableMobGroupData {
++      public final Axolotl.Variant[] types;
++
++      public AxolotlGroupData(Axolotl.Variant... var1) {
++         super(false);
++         this.types = var1;
++      }
++
++      public Axolotl.Variant getVariant(Random var1) {
++         return Axolotl.useRareVariant(var1) ? Axolotl.Variant.getRareSpawnVariant(var1) : this.types[var1.nextInt(this.types.length)];
++      }
++   }
++
++   static class AxolotlPathNavigation extends WaterBoundPathNavigation {
++      AxolotlPathNavigation(Axolotl var1, Level var2) {
++         super(var1, var2);
++      }
++
++      protected boolean canUpdatePath() {
++         return true;
++      }
++
++      protected PathFinder createPathFinder(int var1) {
++         this.nodeEvaluator = new AmphibiousNodeEvaluator(false);
++         return new PathFinder(this.nodeEvaluator, var1);
++      }
++
++      public boolean isStableDestination(BlockPos var1) {
++         return !this.level.getBlockState(var1.below()).isAir();
++      }
++   }
+ }

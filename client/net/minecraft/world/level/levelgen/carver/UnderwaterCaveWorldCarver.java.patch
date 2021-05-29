@@ -1,0 +1,66 @@
+--- net/minecraft/world/level/levelgen/carver/UnderwaterCaveWorldCarver.java
++++ net/minecraft/world/level/levelgen/carver/UnderwaterCaveWorldCarver.java
+@@ -1,13 +1,16 @@
+ package net.minecraft.world.level.levelgen.carver;
+ 
+ import com.google.common.collect.ImmutableSet;
+ import com.mojang.serialization.Codec;
+ import java.util.BitSet;
++import java.util.Iterator;
+ import java.util.Random;
+ import java.util.function.Function;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.Direction;
++import net.minecraft.core.SectionPos;
+ import net.minecraft.world.level.biome.Biome;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.chunk.ChunkAccess;
+@@ -34,12 +37,12 @@
+       } else {
+          BlockState var6 = var1.getBlockState(var3);
+          if (!var0.canReplaceBlock(var6)) {
+             return false;
+          } else if (var3.getY() == 10) {
+-            float var7 = var2.nextFloat();
+-            if ((double)var7 < 0.25D) {
++            float var12 = var2.nextFloat();
++            if ((double)var12 < 0.25D) {
+                var1.setBlockState(var3, Blocks.MAGMA_BLOCK.defaultBlockState(), false);
+                var1.getBlockTicks().scheduleTick(var3, Blocks.MAGMA_BLOCK, 0);
+             } else {
+                var1.setBlockState(var3, Blocks.OBSIDIAN.defaultBlockState(), false);
+             }
+@@ -47,11 +50,30 @@
+             return true;
+          } else if (var3.getY() < 10) {
+             var1.setBlockState(var3, Blocks.LAVA.defaultBlockState(), false);
+             return false;
+          } else {
+-            var1.setBlockState(var3, WATER.createLegacyBlock(), false);
++            int var7 = var1.getPos().x;
++            int var8 = var1.getPos().z;
++            boolean var9 = false;
++            Iterator var10 = Direction.Plane.HORIZONTAL.iterator();
++
++            while(var10.hasNext()) {
++               Direction var11 = (Direction)var10.next();
++               var4.setWithOffset(var3, (Direction)var11);
++               if (SectionPos.blockToSectionCoord(var4.getX()) != var7 || SectionPos.blockToSectionCoord(var4.getZ()) != var8 || var1.getBlockState(var4).isAir()) {
++                  var1.setBlockState(var4, WATER.createLegacyBlock(), false);
++                  var1.getLiquidTicks().scheduleTick(var4, WATER.getType(), 0);
++                  var9 = true;
++                  break;
++               }
++            }
++
++            if (!var9) {
++               var1.setBlockState(var3, WATER.createLegacyBlock(), false);
++            }
++
+             return true;
+          }
+       }
+    }
+ }

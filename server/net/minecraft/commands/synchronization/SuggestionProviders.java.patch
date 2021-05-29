@@ -1,0 +1,18 @@
+--- net/minecraft/commands/synchronization/SuggestionProviders.java
++++ net/minecraft/commands/synchronization/SuggestionProviders.java
+@@ -67,13 +67,13 @@
+             return new TranslatableComponent(Util.makeDescriptionId("entity", EntityType.getKey(var0x)));
+          });
+       });
+    }
+ 
+-   public static class Wrapper implements SuggestionProvider<SharedSuggestionProvider> {
++   protected static class Wrapper implements SuggestionProvider<SharedSuggestionProvider> {
+       private final SuggestionProvider<SharedSuggestionProvider> delegate;
+-      private final ResourceLocation name;
++      final ResourceLocation name;
+ 
+       public Wrapper(ResourceLocation var1, SuggestionProvider<SharedSuggestionProvider> var2) {
+          this.delegate = var2;
+          this.name = var1;
+       }

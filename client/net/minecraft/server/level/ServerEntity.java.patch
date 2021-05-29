@@ -1,0 +1,26 @@
+--- net/minecraft/server/level/ServerEntity.java
++++ net/minecraft/server/level/ServerEntity.java
+@@ -5,10 +5,11 @@
+ import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.Collections;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.function.Consumer;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ClientboundAddMobPacket;
+ import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
+@@ -200,10 +201,11 @@
+       var1.connection.send(new ClientboundRemoveEntityPacket(this.entity.getId()));
+    }
+ 
+    public void addPairing(ServerPlayer var1) {
+       ServerGamePacketListenerImpl var10001 = var1.connection;
++      Objects.requireNonNull(var10001);
+       this.sendPairingData(var10001::send);
+       this.entity.startSeenByPlayer(var1);
+    }
+ 
+    public void sendPairingData(Consumer<Packet<?>> var1) {

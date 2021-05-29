@@ -1,0 +1,143 @@
+--- net/minecraft/network/protocol/game/ServerboundInteractPacket.java
++++ net/minecraft/network/protocol/game/ServerboundInteractPacket.java
+@@ -11,11 +11,11 @@
+ 
+ public class ServerboundInteractPacket implements Packet<ServerGamePacketListener> {
+    private final int entityId;
+    private final ServerboundInteractPacket.Action action;
+    private final boolean usingSecondaryAction;
+-   private static final ServerboundInteractPacket.Action ATTACK_ACTION = new ServerboundInteractPacket.Action() {
++   static final ServerboundInteractPacket.Action ATTACK_ACTION = new ServerboundInteractPacket.Action() {
+       public ServerboundInteractPacket.ActionType getType() {
+          return ServerboundInteractPacket.ActionType.ATTACK;
+       }
+ 
+       public void dispatch(ServerboundInteractPacket.Handler var1) {
+@@ -73,93 +73,89 @@
+ 
+    public void dispatch(ServerboundInteractPacket.Handler var1) {
+       this.action.dispatch(var1);
+    }
+ 
+-   static class InteractionAtLocationAction implements ServerboundInteractPacket.Action {
++   private interface Action {
++      ServerboundInteractPacket.ActionType getType();
++
++      void dispatch(ServerboundInteractPacket.Handler var1);
++
++      void write(FriendlyByteBuf var1);
++   }
++
++   private static class InteractionAction implements ServerboundInteractPacket.Action {
+       private final InteractionHand hand;
+-      private final Vec3 location;
+ 
+-      private InteractionAtLocationAction(InteractionHand var1, Vec3 var2) {
++      InteractionAction(InteractionHand var1) {
+          this.hand = var1;
+-         this.location = var2;
+       }
+ 
+-      private InteractionAtLocationAction(FriendlyByteBuf var1) {
+-         this.location = new Vec3((double)var1.readFloat(), (double)var1.readFloat(), (double)var1.readFloat());
++      private InteractionAction(FriendlyByteBuf var1) {
+          this.hand = (InteractionHand)var1.readEnum(InteractionHand.class);
+       }
+ 
+       public ServerboundInteractPacket.ActionType getType() {
+-         return ServerboundInteractPacket.ActionType.INTERACT_AT;
++         return ServerboundInteractPacket.ActionType.INTERACT;
+       }
+ 
+       public void dispatch(ServerboundInteractPacket.Handler var1) {
+-         var1.onInteraction(this.hand, this.location);
++         var1.onInteraction(this.hand);
+       }
+ 
+       public void write(FriendlyByteBuf var1) {
+-         var1.writeFloat((float)this.location.x);
+-         var1.writeFloat((float)this.location.y);
+-         var1.writeFloat((float)this.location.z);
+          var1.writeEnum(this.hand);
+       }
+    }
+ 
+-   static class InteractionAction implements ServerboundInteractPacket.Action {
++   private static class InteractionAtLocationAction implements ServerboundInteractPacket.Action {
+       private final InteractionHand hand;
++      private final Vec3 location;
+ 
+-      private InteractionAction(InteractionHand var1) {
++      InteractionAtLocationAction(InteractionHand var1, Vec3 var2) {
+          this.hand = var1;
++         this.location = var2;
+       }
+ 
+-      private InteractionAction(FriendlyByteBuf var1) {
++      private InteractionAtLocationAction(FriendlyByteBuf var1) {
++         this.location = new Vec3((double)var1.readFloat(), (double)var1.readFloat(), (double)var1.readFloat());
+          this.hand = (InteractionHand)var1.readEnum(InteractionHand.class);
+       }
+ 
+       public ServerboundInteractPacket.ActionType getType() {
+-         return ServerboundInteractPacket.ActionType.INTERACT;
++         return ServerboundInteractPacket.ActionType.INTERACT_AT;
+       }
+ 
+       public void dispatch(ServerboundInteractPacket.Handler var1) {
+-         var1.onInteraction(this.hand);
++         var1.onInteraction(this.hand, this.location);
+       }
+ 
+       public void write(FriendlyByteBuf var1) {
++         var1.writeFloat((float)this.location.x);
++         var1.writeFloat((float)this.location.y);
++         var1.writeFloat((float)this.location.z);
+          var1.writeEnum(this.hand);
+       }
+    }
+ 
+-   interface Action {
+-      ServerboundInteractPacket.ActionType getType();
++   private static enum ActionType {
++      INTERACT(ServerboundInteractPacket.InteractionAction::new),
++      ATTACK((var0) -> {
++         return ServerboundInteractPacket.ATTACK_ACTION;
++      }),
++      INTERACT_AT(ServerboundInteractPacket.InteractionAtLocationAction::new);
+ 
+-      void dispatch(ServerboundInteractPacket.Handler var1);
++      final Function<FriendlyByteBuf, ServerboundInteractPacket.Action> reader;
+ 
+-      void write(FriendlyByteBuf var1);
++      private ActionType(Function<FriendlyByteBuf, ServerboundInteractPacket.Action> var3) {
++         this.reader = var3;
++      }
+    }
+ 
+    public interface Handler {
+       void onInteraction(InteractionHand var1);
+ 
+       void onInteraction(InteractionHand var1, Vec3 var2);
+ 
+       void onAttack();
+    }
+-
+-   static enum ActionType {
+-      INTERACT((var0) -> {
+-         return new ServerboundInteractPacket.InteractionAction(var0);
+-      }),
+-      ATTACK((var0) -> {
+-         return ServerboundInteractPacket.ATTACK_ACTION;
+-      }),
+-      INTERACT_AT((var0) -> {
+-         return new ServerboundInteractPacket.InteractionAtLocationAction(var0);
+-      });
+-
+-      private final Function<FriendlyByteBuf, ServerboundInteractPacket.Action> reader;
+-
+-      private ActionType(Function<FriendlyByteBuf, ServerboundInteractPacket.Action> var3) {
+-         this.reader = var3;
+-      }
+-   }
+ }

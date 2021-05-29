@@ -1,0 +1,389 @@
+--- net/minecraft/client/Minecraft.java
++++ net/minecraft/client/Minecraft.java
+@@ -10,11 +10,13 @@
+ import com.mojang.authlib.minecraft.MinecraftSessionService;
+ import com.mojang.authlib.minecraft.OfflineSocialInteractions;
+ import com.mojang.authlib.minecraft.SocialInteractionsService;
+ import com.mojang.authlib.properties.PropertyMap;
+ import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
++import com.mojang.blaze3d.pipeline.MainTarget;
+ import com.mojang.blaze3d.pipeline.RenderTarget;
++import com.mojang.blaze3d.pipeline.TextureTarget;
+ import com.mojang.blaze3d.platform.DisplayData;
+ import com.mojang.blaze3d.platform.GlDebug;
+ import com.mojang.blaze3d.platform.GlUtil;
+ import com.mojang.blaze3d.platform.Window;
+ import com.mojang.blaze3d.platform.WindowEventHandler;
+@@ -45,10 +47,11 @@
+ import java.util.Collections;
+ import java.util.Date;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Locale;
++import java.util.Objects;
+ import java.util.Queue;
+ import java.util.UUID;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.concurrent.ExecutionException;
+ import java.util.concurrent.atomic.AtomicReference;
+@@ -101,10 +104,11 @@
+ import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
+ import net.minecraft.client.multiplayer.ClientLevel;
+ import net.minecraft.client.multiplayer.ClientPacketListener;
+ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+ import net.minecraft.client.multiplayer.ServerData;
++import net.minecraft.client.multiplayer.resolver.ServerAddress;
+ import net.minecraft.client.particle.ParticleEngine;
+ import net.minecraft.client.player.LocalPlayer;
+ import net.minecraft.client.profiling.ActiveClientMetricsLogger;
+ import net.minecraft.client.profiling.ClientMetricsLogger;
+ import net.minecraft.client.profiling.InactiveClientMetricsLogger;
+@@ -238,10 +242,11 @@
+ import net.minecraft.world.phys.EntityHitResult;
+ import net.minecraft.world.phys.HitResult;
+ import org.apache.commons.io.Charsets;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
++import org.lwjgl.util.tinyfd.TinyFileDialogs;
+ 
+ public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements SnooperPopulator, WindowEventHandler {
+    private static Minecraft instance;
+    private static final Logger LOGGER = LogManager.getLogger();
+    public static final boolean ON_OSX;
+@@ -249,10 +254,11 @@
+    public static final ResourceLocation DEFAULT_FONT;
+    public static final ResourceLocation UNIFORM_FONT;
+    public static final ResourceLocation ALT_FONT;
+    private static final CompletableFuture<Unit> RESOURCE_RELOAD_INITIAL_TASK;
+    private static final Component SOCIAL_INTERACTIONS_NOT_AVAILABLE;
++   public static final String UPDATE_DRIVERS_ADVICE = "Please make sure you have up-to-date drivers (see aka.ms/mcdriver for instructions).";
+    private final File resourcePackDirectory;
+    private final PropertyMap profileProperties;
+    private final TextureManager textureManager;
+    private final DataFixer fixerUpper;
+    private final VirtualScreen virtualScreen;
+@@ -441,12 +447,13 @@
+       this.mouseHandler = new MouseHandler(this);
+       this.mouseHandler.setup(this.window.getWindow());
+       this.keyboardHandler = new KeyboardHandler(this);
+       this.keyboardHandler.setup(this.window.getWindow());
+       RenderSystem.initRenderer(this.options.glDebugVerbosity, false);
+-      this.mainRenderTarget = new RenderTarget(this.window.getWidth(), this.window.getHeight(), true, ON_OSX);
++      this.mainRenderTarget = new MainTarget(this.window.getWidth(), this.window.getHeight());
+       this.mainRenderTarget.setClearColor(0.0F, 0.0F, 0.0F, 0.0F);
++      this.mainRenderTarget.clear(ON_OSX);
+       this.resourceManager = new SimpleReloadableResourceManager(PackType.CLIENT_RESOURCES);
+       this.resourcePackRepository.reload();
+       this.options.loadSelectedResourcePacks(this.resourcePackRepository);
+       this.languageManager = new LanguageManager(this.options.languageCode);
+       this.resourceManager.registerReloadListener(this.languageManager);
+@@ -502,30 +509,41 @@
+       this.gpuWarnlistManager = new GpuWarnlistManager();
+       this.resourceManager.registerReloadListener(this.gpuWarnlistManager);
+       this.gui = new Gui(this);
+       this.debugRenderer = new DebugRenderer(this);
+       RenderSystem.setErrorCallback(this::onFullscreenError);
+-      if (this.options.fullscreen && !this.window.isFullscreen()) {
+-         this.window.toggleFullScreen();
+-         this.options.fullscreen = this.window.isFullscreen();
++      if (this.mainRenderTarget.width == this.window.getWidth() && this.mainRenderTarget.height == this.window.getHeight()) {
++         if (this.options.fullscreen && !this.window.isFullscreen()) {
++            this.window.toggleFullScreen();
++            this.options.fullscreen = this.window.isFullscreen();
++         }
++      } else {
++         int var10002 = this.window.getWidth();
++         StringBuilder var11 = new StringBuilder("Recovering from unsupported resolution (" + var10002 + "x" + this.window.getHeight() + ").\nPlease make sure you have up-to-date drivers (see aka.ms/mcdriver for instructions).");
++         if (GlDebug.isDebugEnabled()) {
++            var11.append("\n\nReported GL debug messages:\n").append(String.join("\n", GlDebug.getLastOpenGlDebugMessages()));
++         }
++
++         this.window.setWindowed(this.mainRenderTarget.width, this.mainRenderTarget.height);
++         TinyFileDialogs.tinyfd_messageBox("Minecraft", var11.toString(), "ok", "error", false);
+       }
+ 
+       this.window.updateVsync(this.options.enableVsync);
+       this.window.updateRawMouseInput(this.options.rawMouseInput);
+       this.window.setDefaultErrorCallback();
+       this.resizeDisplay();
+       if (var4 != null) {
+-         this.setScreen(new ConnectScreen(new TitleScreen(), this, var4, var5));
++         ConnectScreen.startConnecting(new TitleScreen(), this, new ServerAddress(var4, var5), (ServerData)null);
+       } else {
+          this.setScreen(new TitleScreen(true));
+       }
+ 
+       this.gameRenderer.preloadUiShader(this.getClientPackSource().getVanillaPack());
+       LoadingOverlay.registerTextures(this);
+-      List var11 = this.resourcePackRepository.openAllSelected();
+-      this.reloadStateTracker.startReload(ResourceLoadStateTracker.ReloadReason.INITIAL, var11);
+-      this.setOverlay(new LoadingOverlay(this, this.resourceManager.createReload(Util.backgroundExecutor(), this, RESOURCE_RELOAD_INITIAL_TASK, var11), (var1x) -> {
++      List var12 = this.resourcePackRepository.openAllSelected();
++      this.reloadStateTracker.startReload(ResourceLoadStateTracker.ReloadReason.INITIAL, var12);
++      this.setOverlay(new LoadingOverlay(this, this.resourceManager.createReload(Util.backgroundExecutor(), this, RESOURCE_RELOAD_INITIAL_TASK, var12), (var1x) -> {
+          Util.ifElse(var1x, this::rollbackResourcePacks, () -> {
+             if (SharedConstants.IS_RUNNING_IN_IDE) {
+                this.selfTest();
+             }
+ 
+@@ -737,11 +755,13 @@
+       this.delayedCrash = var1;
+    }
+ 
+    public static void crash(CrashReport var0) {
+       File var1 = new File(getInstance().gameDirectory, "crash-reports");
+-      File var2 = new File(var1, "crash-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + "-client.txt");
++      SimpleDateFormat var10003 = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
++      Date var10004 = new Date();
++      File var2 = new File(var1, "crash-" + var10003.format(var10004) + "-client.txt");
+       Bootstrap.realStdoutPrintln(var0.getFriendlyReport());
+       if (var0.getSaveFile() != null) {
+          Bootstrap.realStdoutPrintln("#@!@# Game crashed! Crash report saved to: #@!@# " + var0.getSaveFile());
+          System.exit(-1);
+       } else if (var0.saveToFile(var2)) {
+@@ -1182,14 +1202,15 @@
+                }
+             } else {
+                --var1;
+                if (var1 < var2.size() && !"unspecified".equals(((ResultField)var2.get(var1)).name)) {
+                   if (!this.debugPath.isEmpty()) {
+-                     this.debugPath = this.debugPath + '\u001e';
++                     this.debugPath = this.debugPath + "\u001e";
+                   }
+ 
+-                  this.debugPath = this.debugPath + ((ResultField)var2.get(var1)).name;
++                  String var10001 = this.debugPath;
++                  this.debugPath = var10001 + ((ResultField)var2.get(var1)).name;
+                }
+             }
+ 
+          }
+       }
+@@ -1272,16 +1293,17 @@
+       }
+ 
+       if (var26.isEmpty()) {
+          var28 = var28 + "ROOT ";
+       } else {
+-         var28 = var28 + var26 + ' ';
++         var28 = var28 + var26 + " ";
+       }
+ 
+       var17 = 16777215;
+       this.font.drawShadow(var1, var28, (float)(var10 - 160), (float)(var11 - 80 - 16), 16777215);
+-      var28 = var25.format(var4.globalPercentage) + "%";
++      String var10000 = var25.format(var4.globalPercentage);
++      var28 = var10000 + "%";
+       this.font.drawShadow(var1, var28, (float)(var10 + 160 - this.font.width(var28)), (float)(var11 - 80 - 16), 16777215);
+ 
+       for(int var27 = 0; var27 < var3.size(); ++var27) {
+          ResultField var31 = (ResultField)var3.get(var27);
+          StringBuilder var29 = new StringBuilder();
+@@ -1291,13 +1313,15 @@
+             var29.append("[").append(var27 + 1).append("] ");
+          }
+ 
+          String var30 = var29.append(var31.name).toString();
+          this.font.drawShadow(var1, var30, (float)(var10 - 160), (float)(var11 + 80 + var27 * 8 + 20), var31.getColor());
+-         var30 = var25.format(var31.percentage) + "%";
++         var10000 = var25.format(var31.percentage);
++         var30 = var10000 + "%";
+          this.font.drawShadow(var1, var30, (float)(var10 + 160 - 50 - this.font.width(var30)), (float)(var11 + 80 + var27 * 8 + 20), var31.getColor());
+-         var30 = var25.format(var31.globalPercentage) + "%";
++         var10000 = var25.format(var31.globalPercentage);
++         var30 = var10000 + "%";
+          this.font.drawShadow(var1, var30, (float)(var10 + 160 - this.font.width(var30)), (float)(var11 + 80 + var27 * 8 + 20), var31.getColor());
+       }
+ 
+    }
+ 
+@@ -1734,11 +1758,11 @@
+          RegistryReadOps var8 = RegistryReadOps.createAndLoad(JsonOps.INSTANCE, (ResourceManager)var5, var3);
+          DataResult var9 = WorldGenSettings.CODEC.encodeStart(var7, var4).setLifecycle(Lifecycle.stable()).flatMap((var1) -> {
+             return WorldGenSettings.CODEC.parse(var8, var1);
+          });
+          Logger var10002 = LOGGER;
+-         var10002.getClass();
++         Objects.requireNonNull(var10002);
+          WorldGenSettings var10 = (WorldGenSettings)var9.resultOrPartial(Util.prefix("Error reading worldgen settings after loading data packs: ", var10002::error)).orElse(var4);
+          return new PrimaryLevelData(var2, var10, var9.lifecycle());
+       }, false, Minecraft.ExperimentalDialogType.CREATE);
+    }
+ 
+@@ -1791,11 +1815,11 @@
+             this.singleplayerServer = (IntegratedServer)MinecraftServer.spin((var8x) -> {
+                return new IntegratedServer(var8x, this, var2, var7, var8.packRepository(), var8.serverResources(), var9, var23, var25, var15, (var1) -> {
+                   StoringChunkProgressListener var2 = new StoringChunkProgressListener(var1 + 0);
+                   this.progressListener.set(var2);
+                   Queue var10001 = this.progressTasks;
+-                  var10001.getClass();
++                  Objects.requireNonNull(var10001);
+                   return ProcessorChunkProgressListener.createStarted(var2, var10001::add);
+                });
+             });
+             this.isLocalServer = true;
+          } catch (Throwable var19) {
+@@ -1878,34 +1902,31 @@
+             } else {
+                this.setScreen((Screen)null);
+ 
+                try {
+                   LevelStorageSource.LevelStorageAccess var4x = this.levelSource.createAccess(var2);
+-                  Throwable var5 = null;
+ 
+                   try {
+                      var4x.deleteLevel();
+-                  } catch (Throwable var15) {
+-                     var5 = var15;
+-                     throw var15;
+-                  } finally {
++                  } catch (Throwable var8) {
+                      if (var4x != null) {
+-                        if (var5 != null) {
+-                           try {
+-                              var4x.close();
+-                           } catch (Throwable var14) {
+-                              var5.addSuppressed(var14);
+-                           }
+-                        } else {
++                        try {
+                            var4x.close();
++                        } catch (Throwable var7) {
++                           var8.addSuppressed(var7);
+                         }
+                      }
+ 
++                     throw var8;
+                   }
+-               } catch (IOException var17) {
++
++                  if (var4x != null) {
++                     var4x.close();
++                  }
++               } catch (IOException var9) {
+                   SystemToast.onWorldDeleteFailure(this, var2);
+-                  LOGGER.error("Failed to delete world {}", var2, var17);
++                  LOGGER.error("Failed to delete world {}", var2, var9);
+                }
+             }
+ 
+          }, new TranslatableComponent("selectWorld.backupQuestion.experimental"), new TranslatableComponent("selectWorld.backupWarning.experimental"), CommonComponents.GUI_PROCEED, CommonComponents.GUI_CANCEL));
+       }
+@@ -1917,10 +1938,11 @@
+       PackRepository var7 = new PackRepository(PackType.SERVER_DATA, new RepositorySource[]{new ServerPacksSource(), new FolderRepositorySource(var5.getLevelPath(LevelResource.DATAPACK_DIR).toFile(), PackSource.WORLD)});
+ 
+       try {
+          DataPackConfig var8 = MinecraftServer.configurePackRepository(var7, var6, var4);
+          CompletableFuture var9 = ServerResources.loadResources(var7.openAllSelected(), var1, Commands.CommandSelection.INTEGRATED, 2, Util.backgroundExecutor(), this);
++         Objects.requireNonNull(var9);
+          this.managedBlock(var9::isDone);
+          ServerResources var10 = (ServerResources)var9.get();
+          WorldData var11 = (WorldData)var3.apply(var5, var1, var10.getResourceManager(), var8);
+          return new Minecraft.ServerStem(var7, var10, var11);
+       } catch (ExecutionException | InterruptedException var12) {
+@@ -2249,11 +2271,12 @@
+       Iterator var4 = this.resourcePackRepository.getSelectedPacks().iterator();
+ 
+       while(var4.hasNext()) {
+          Pack var5 = (Pack)var4.next();
+          if (!var5.isRequired() && !var5.isFixedPosition()) {
+-            var1.setDynamicData("resource_pack[" + var3++ + "]", var5.getId());
++            int var10001 = var3++;
++            var1.setDynamicData("resource_pack[" + var10001 + "]", var5.getId());
+          }
+       }
+ 
+       var1.setDynamicData("resource_packs", var3);
+       if (this.singleplayerServer != null) {
+@@ -2283,10 +2306,11 @@
+       }
+ 
+    }
+ 
+    private static void populateSnooperWithOpenGL(Snooper var0) {
++      Objects.requireNonNull(var0);
+       GlUtil.populateSnooperWithOpenGL(var0::setFixedData);
+    }
+ 
+    public boolean isSnooperEnabled() {
+       return this.options.snooperEnabled;
+@@ -2359,10 +2383,11 @@
+       return this.languageManager;
+    }
+ 
+    public Function<ResourceLocation, TextureAtlasSprite> getTextureAtlas(ResourceLocation var1) {
+       TextureAtlas var10000 = this.modelManager.getAtlas(var1);
++      Objects.requireNonNull(var10000);
+       return var10000::getSprite;
+    }
+ 
+    public boolean is64Bit() {
+       return this.is64bit;
+@@ -2526,11 +2551,11 @@
+    }
+ 
+    public Component grabPanoramixScreenshot(File var1, int var2, int var3) {
+       int var4 = this.window.getWidth();
+       int var5 = this.window.getHeight();
+-      RenderTarget var6 = new RenderTarget(var2, var3, true, ON_OSX);
++      TextureTarget var6 = new TextureTarget(var2, var3, true, ON_OSX);
+       float var7 = this.player.getXRot();
+       float var8 = this.player.getYRot();
+       float var9 = this.player.xRotO;
+       float var10 = this.player.yRotO;
+       this.gameRenderer.setRenderBlockOutline(false);
+@@ -2755,27 +2780,36 @@
+          }
+       };
+ 
+       private final Component message;
+ 
+-      private ChatStatus(Component var3) {
++      ChatStatus(Component var3) {
+          this.message = var3;
+       }
+ 
+       public Component getMessage() {
+          return this.message;
+       }
+ 
+       public abstract boolean isChatAllowed(boolean var1);
+    }
+ 
++   static enum ExperimentalDialogType {
++      NONE,
++      CREATE,
++      BACKUP;
++
++      private ExperimentalDialogType() {
++      }
++   }
++
+    public static final class ServerStem implements AutoCloseable {
+       private final PackRepository packRepository;
+       private final ServerResources serverResources;
+       private final WorldData worldData;
+ 
+-      private ServerStem(PackRepository var1, ServerResources var2, WorldData var3) {
++      ServerStem(PackRepository var1, ServerResources var2, WorldData var3) {
+          this.packRepository = var1;
+          this.serverResources = var2;
+          this.worldData = var3;
+       }
+ 
+@@ -2794,15 +2828,6 @@
+       public void close() {
+          this.packRepository.close();
+          this.serverResources.close();
+       }
+    }
+-
+-   static enum ExperimentalDialogType {
+-      NONE,
+-      CREATE,
+-      BACKUP;
+-
+-      private ExperimentalDialogType() {
+-      }
+-   }
+ }

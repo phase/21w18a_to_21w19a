@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/block/entity/BannerPattern.java
++++ net/minecraft/world/level/block/entity/BannerPattern.java
+@@ -60,11 +60,11 @@
+       return var0.hasPatternItem;
+    }).count();
+    public static final int AVAILABLE_PATTERNS = COUNT - PATTERN_ITEM_COUNT - 1;
+    private final boolean hasPatternItem;
+    private final String filename;
+-   private final String hashname;
++   final String hashname;
+ 
+    private BannerPattern(String var3, String var4) {
+       this(var3, var4, false);
+    }
+ 

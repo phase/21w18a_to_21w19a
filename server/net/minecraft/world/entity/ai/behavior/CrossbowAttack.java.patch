@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/ai/behavior/CrossbowAttack.java
++++ net/minecraft/world/entity/ai/behavior/CrossbowAttack.java
+@@ -88,11 +88,11 @@
+ 
+    private static LivingEntity getAttackTarget(LivingEntity var0) {
+       return (LivingEntity)var0.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).get();
+    }
+ 
+-   static enum CrossbowState {
++   private static enum CrossbowState {
+       UNCHARGED,
+       CHARGING,
+       CHARGED,
+       READY_TO_ATTACK;
+ 

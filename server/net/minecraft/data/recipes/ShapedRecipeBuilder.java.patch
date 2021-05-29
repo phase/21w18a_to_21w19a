@@ -1,0 +1,23 @@
+--- net/minecraft/data/recipes/ShapedRecipeBuilder.java
++++ net/minecraft/data/recipes/ShapedRecipeBuilder.java
+@@ -90,11 +90,19 @@
+    }
+ 
+    public void save(Consumer<FinishedRecipe> var1, ResourceLocation var2) {
+       this.ensureValid(var2);
+       this.advancement.parent(new ResourceLocation("recipes/root")).addCriterion("has_the_recipe", (CriterionTriggerInstance)RecipeUnlockedTrigger.unlocked(var2)).rewards(AdvancementRewards.Builder.recipe(var2)).requirements(RequirementsStrategy.OR);
+-      var1.accept(new ShapedRecipeBuilder.Result(var2, this.result, this.count, this.group == null ? "" : this.group, this.rows, this.key, this.advancement, new ResourceLocation(var2.getNamespace(), "recipes/" + this.result.getItemCategory().getRecipeFolderName() + "/" + var2.getPath())));
++      Item var10004 = this.result;
++      int var10005 = this.count;
++      String var10006 = this.group == null ? "" : this.group;
++      List var10007 = this.rows;
++      Map var10008 = this.key;
++      Advancement.Builder var10009 = this.advancement;
++      String var10012 = var2.getNamespace();
++      String var10013 = this.result.getItemCategory().getRecipeFolderName();
++      var1.accept(new ShapedRecipeBuilder.Result(var2, var10004, var10005, var10006, var10007, var10008, var10009, new ResourceLocation(var10012, "recipes/" + var10013 + "/" + var2.getPath())));
+    }
+ 
+    private void ensureValid(ResourceLocation var1) {
+       if (this.rows.isEmpty()) {
+          throw new IllegalStateException("No pattern is defined for shaped recipe " + var1 + "!");

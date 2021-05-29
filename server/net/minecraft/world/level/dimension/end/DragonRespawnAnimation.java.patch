@@ -1,0 +1,14 @@
+--- net/minecraft/world/level/dimension/end/DragonRespawnAnimation.java
++++ net/minecraft/world/level/dimension/end/DragonRespawnAnimation.java
+@@ -109,10 +109,10 @@
+    END {
+       public void tick(ServerLevel var1, EndDragonFight var2, List<EndCrystal> var3, int var4, BlockPos var5) {
+       }
+    };
+ 
+-   private DragonRespawnAnimation() {
++   DragonRespawnAnimation() {
+    }
+ 
+    public abstract void tick(ServerLevel var1, EndDragonFight var2, List<EndCrystal> var3, int var4, BlockPos var5);
+ }

@@ -1,0 +1,16 @@
+--- net/minecraft/gametest/framework/GameTestAssertPosException.java
++++ net/minecraft/gametest/framework/GameTestAssertPosException.java
+@@ -14,11 +14,12 @@
+       this.relativePos = var3;
+       this.tick = var4;
+    }
+ 
+    public String getMessage() {
+-      String var1 = "" + this.absolutePos.getX() + "," + this.absolutePos.getY() + "," + this.absolutePos.getZ() + " (relative: " + this.relativePos.getX() + "," + this.relativePos.getY() + "," + this.relativePos.getZ() + ")";
++      int var10000 = this.absolutePos.getX();
++      String var1 = var10000 + "," + this.absolutePos.getY() + "," + this.absolutePos.getZ() + " (relative: " + this.relativePos.getX() + "," + this.relativePos.getY() + "," + this.relativePos.getZ() + ")";
+       return super.getMessage() + " at " + var1 + " (t=" + this.tick + ")";
+    }
+ 
+    @Nullable
+    public String getMessageToShowAtBlock() {

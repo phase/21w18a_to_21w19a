@@ -1,0 +1,15 @@
+--- net/minecraft/advancements/critereon/EffectsChangedTrigger.java
++++ net/minecraft/advancements/critereon/EffectsChangedTrigger.java
+@@ -4,11 +4,11 @@
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.world.entity.LivingEntity;
+ 
+ public class EffectsChangedTrigger extends SimpleCriterionTrigger<EffectsChangedTrigger.TriggerInstance> {
+-   private static final ResourceLocation ID = new ResourceLocation("effects_changed");
++   static final ResourceLocation ID = new ResourceLocation("effects_changed");
+ 
+    public EffectsChangedTrigger() {
+    }
+ 
+    public ResourceLocation getId() {

@@ -1,0 +1,75 @@
+--- net/minecraft/world/level/block/MultifaceBlock.java
++++ net/minecraft/world/level/block/MultifaceBlock.java
+@@ -76,14 +76,14 @@
+       }
+ 
+    }
+ 
+    public BlockState updateShape(BlockState var1, Direction var2, BlockState var3, LevelAccessor var4, BlockPos var5, BlockPos var6) {
+-      if (hasAnyFace(var1)) {
+-         return hasFace(var1, var2) && !canAttachTo(var4, var2, var6, var3) ? removeFace(var1, getFaceProperty(var2)) : var1;
++      if (!hasAnyFace(var1)) {
++         return Blocks.AIR.defaultBlockState();
+       } else {
+-         return var1.hasProperty(BlockStateProperties.WATERLOGGED) && (Boolean)var1.getValue(BlockStateProperties.WATERLOGGED) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
++         return hasFace(var1, var2) && !canAttachTo(var4, var2, var6, var3) ? removeFace(var1, getFaceProperty(var2)) : var1;
+       }
+    }
+ 
+    public VoxelShape getShape(BlockState var1, BlockGetter var2, BlockPos var3, CollisionContext var4) {
+       return (VoxelShape)this.shapesCache.get(var1);
+@@ -148,22 +148,22 @@
+ 
+    public BlockState rotate(BlockState var1, Rotation var2) {
+       if (!this.canRotate) {
+          return var1;
+       } else {
+-         var2.getClass();
++         Objects.requireNonNull(var2);
+          return this.mapDirections(var1, var2::rotate);
+       }
+    }
+ 
+    public BlockState mirror(BlockState var1, Mirror var2) {
+       if (var2 == Mirror.FRONT_BACK && !this.canMirrorX) {
+          return var1;
+       } else if (var2 == Mirror.LEFT_RIGHT && !this.canMirrorZ) {
+          return var1;
+       } else {
+-         var2.getClass();
++         Objects.requireNonNull(var2);
+          return this.mapDirections(var1, var2::mirror);
+       }
+    }
+ 
+    private BlockState mapDirections(BlockState var1, Function<Direction, Direction> var2) {
+@@ -172,11 +172,11 @@
+       int var5 = var4.length;
+ 
+       for(int var6 = 0; var6 < var5; ++var6) {
+          Direction var7 = var4[var6];
+          if (this.isFaceSupported(var7)) {
+-            var3 = (BlockState)var3.setValue(getFaceProperty((Direction)var2.apply(var7)), var1.getValue(getFaceProperty(var7)));
++            var3 = (BlockState)var3.setValue(getFaceProperty((Direction)var2.apply(var7)), (Boolean)var1.getValue(getFaceProperty(var7)));
+          }
+       }
+ 
+       return var3;
+    }
+@@ -267,15 +267,11 @@
+       return this.stateDefinition.getProperties().contains(BlockStateProperties.WATERLOGGED);
+    }
+ 
+    private static BlockState removeFace(BlockState var0, BooleanProperty var1) {
+       BlockState var2 = (BlockState)var0.setValue(var1, false);
+-      if (hasAnyFace(var2)) {
+-         return var2;
+-      } else {
+-         return var0.hasProperty(BlockStateProperties.WATERLOGGED) && (Boolean)var0.getValue(BlockStateProperties.WATERLOGGED) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
+-      }
++      return hasAnyFace(var2) ? var2 : Blocks.AIR.defaultBlockState();
+    }
+ 
+    public static BooleanProperty getFaceProperty(Direction var0) {
+       return (BooleanProperty)PROPERTY_BY_DIRECTION.get(var0);
+    }

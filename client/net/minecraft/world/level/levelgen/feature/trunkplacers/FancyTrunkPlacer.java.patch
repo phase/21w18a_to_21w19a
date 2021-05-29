@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/levelgen/feature/trunkplacers/FancyTrunkPlacer.java
++++ net/minecraft/world/level/levelgen/feature/trunkplacers/FancyTrunkPlacer.java
+@@ -170,11 +170,11 @@
+          return var4 * 0.5F;
+       }
+    }
+ 
+    static class FoliageCoords {
+-      private final FoliagePlacer.FoliageAttachment attachment;
++      final FoliagePlacer.FoliageAttachment attachment;
+       private final int branchBase;
+ 
+       public FoliageCoords(BlockPos var1, int var2) {
+          this.attachment = new FoliagePlacer.FoliageAttachment(var1, 0, false);
+          this.branchBase = var2;

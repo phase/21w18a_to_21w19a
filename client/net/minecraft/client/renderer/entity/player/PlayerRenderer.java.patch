@@ -1,0 +1,26 @@
+--- net/minecraft/client/renderer/entity/player/PlayerRenderer.java
++++ net/minecraft/client/renderer/entity/player/PlayerRenderer.java
+@@ -1,9 +1,10 @@
+ package net.minecraft.client.renderer.entity.player;
+ 
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import com.mojang.math.Vector3f;
++import java.util.Objects;
+ import net.minecraft.client.model.HumanoidModel;
+ import net.minecraft.client.model.PlayerModel;
+ import net.minecraft.client.model.geom.ModelLayers;
+ import net.minecraft.client.model.geom.ModelPart;
+ import net.minecraft.client.player.AbstractClientPlayer;
+@@ -146,11 +147,11 @@
+          Scoreboard var8 = var1.getScoreboard();
+          Objective var9 = var8.getDisplayObjective(2);
+          if (var9 != null) {
+             Score var10 = var8.getOrCreatePlayerScore(var1.getScoreboardName(), var9);
+             super.renderNameTag(var1, (new TextComponent(Integer.toString(var10.getScore()))).append(" ").append(var9.getDisplayName()), var3, var4, var5);
+-            this.getFont().getClass();
++            Objects.requireNonNull(this.getFont());
+             var3.translate(0.0D, (double)(9.0F * 1.15F * 0.025F), 0.0D);
+          }
+       }
+ 
+       super.renderNameTag(var1, var2, var3, var4, var5);

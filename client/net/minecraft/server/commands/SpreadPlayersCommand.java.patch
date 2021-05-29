@@ -1,0 +1,46 @@
+--- net/minecraft/server/commands/SpreadPlayersCommand.java
++++ net/minecraft/server/commands/SpreadPlayersCommand.java
+@@ -105,19 +105,19 @@
+                   SpreadPlayersCommand.Position var25 = var14[var24];
+                   double var26 = var21.dist(var25);
+                   var18 = Math.min(var26, var18);
+                   if (var26 < var1) {
+                      ++var22;
+-                     var23.x = var23.x + (var25.x - var21.x);
+-                     var23.z = var23.z + (var25.z - var21.z);
++                     var23.x += var25.x - var21.x;
++                     var23.z += var25.z - var21.z;
+                   }
+                }
+             }
+ 
+             if (var22 > 0) {
+-               var23.x = var23.x / (double)var22;
+-               var23.z = var23.z / (double)var22;
++               var23.x /= (double)var22;
++               var23.z /= (double)var22;
+                double var30 = (double)var23.getLength();
+                if (var30 > 0.0D) {
+                   var23.normalize();
+                   var21.moveAway(var23);
+                } else {
+@@ -211,15 +211,15 @@
+       }
+ 
+       return var10;
+    }
+ 
+-   static class Position {
+-      private double x;
+-      private double z;
++   private static class Position {
++      double x;
++      double z;
+ 
+-      private Position() {
++      Position() {
+       }
+ 
+       double dist(SpreadPlayersCommand.Position var1) {
+          double var2 = this.x - var1.x;
+          double var4 = this.z - var1.z;

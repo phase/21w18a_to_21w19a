@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/ai/village/poi/PoiType.java
++++ net/minecraft/world/entity/ai/village/poi/PoiType.java
+@@ -127,11 +127,11 @@
+       });
+       return var0;
+    }
+ 
+    public static Optional<PoiType> forState(BlockState var0) {
+-      return Optional.ofNullable(TYPE_BY_STATE.get(var0));
++      return Optional.ofNullable((PoiType)TYPE_BY_STATE.get(var0));
+    }
+ 
+    static {
+       BEDS = (Set)ImmutableList.of(Blocks.RED_BED, Blocks.BLACK_BED, Blocks.BLUE_BED, Blocks.BROWN_BED, Blocks.CYAN_BED, Blocks.GRAY_BED, Blocks.GREEN_BED, Blocks.LIGHT_BLUE_BED, Blocks.LIGHT_GRAY_BED, Blocks.LIME_BED, Blocks.MAGENTA_BED, Blocks.ORANGE_BED, Blocks.PINK_BED, Blocks.PURPLE_BED, Blocks.WHITE_BED, Blocks.YELLOW_BED).stream().flatMap((var0) -> {
+          return var0.getStateDefinition().getPossibleStates().stream();

@@ -1,0 +1,17 @@
+--- net/minecraft/world/entity/player/Player.java
++++ net/minecraft/world/entity/player/Player.java
+@@ -821,12 +821,12 @@
+          this.disableShield(true);
+       }
+ 
+    }
+ 
+-   public boolean canBeTargeted() {
+-      return !this.getAbilities().invulnerable && super.canBeTargeted();
++   public boolean canBeSeenAsEnemy() {
++      return !this.getAbilities().invulnerable && super.canBeSeenAsEnemy();
+    }
+ 
+    public boolean canHarmPlayer(Player var1) {
+       Team var2 = this.getTeam();
+       Team var3 = var1.getTeam();

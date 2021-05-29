@@ -1,0 +1,101 @@
+--- net/minecraft/client/multiplayer/ServerAddress.java
++++ net/minecraft/client/multiplayer/ServerAddress.java
+@@ -1,98 +1,0 @@
+-package net.minecraft.client.multiplayer;
+-
+-import com.google.common.net.HostAndPort;
+-import java.net.IDN;
+-import java.util.Hashtable;
+-import javax.naming.directory.Attribute;
+-import javax.naming.directory.Attributes;
+-import javax.naming.directory.InitialDirContext;
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.Logger;
+-
+-public class ServerAddress {
+-   private static final Logger LOGGER = LogManager.getLogger();
+-   private final HostAndPort hostAndPort;
+-   private static final ServerAddress INVALID = new ServerAddress(HostAndPort.fromParts("server.invalid", 25565));
+-
+-   private ServerAddress(HostAndPort var1) {
+-      this.hostAndPort = var1;
+-   }
+-
+-   public String getHost() {
+-      try {
+-         return IDN.toASCII(this.hostAndPort.getHost());
+-      } catch (IllegalArgumentException var2) {
+-         return "";
+-      }
+-   }
+-
+-   public int getPort() {
+-      return this.hostAndPort.getPort();
+-   }
+-
+-   public static ServerAddress parseString(String var0) {
+-      if (var0 == null) {
+-         return INVALID;
+-      } else {
+-         HostAndPort var1;
+-         try {
+-            var1 = HostAndPort.fromString(var0).withDefaultPort(25565);
+-            if (var1.getHost().isEmpty()) {
+-               return INVALID;
+-            }
+-         } catch (IllegalArgumentException var3) {
+-            LOGGER.info("Failed to parse URL {}", var0, var3);
+-            return INVALID;
+-         }
+-
+-         return new ServerAddress(lookupSrv(var1));
+-      }
+-   }
+-
+-   public static boolean isValidAddress(String var0) {
+-      try {
+-         HostAndPort var1 = HostAndPort.fromString(var0);
+-         String var2 = var1.getHost();
+-         if (!var2.isEmpty()) {
+-            IDN.toASCII(var2);
+-            return true;
+-         }
+-      } catch (IllegalArgumentException var3) {
+-      }
+-
+-      return false;
+-   }
+-
+-   private static HostAndPort lookupSrv(HostAndPort var0) {
+-      if (var0.getPort() != 25565) {
+-         return var0;
+-      } else {
+-         try {
+-            String var1 = "com.sun.jndi.dns.DnsContextFactory";
+-            Class.forName("com.sun.jndi.dns.DnsContextFactory");
+-            Hashtable var2 = new Hashtable();
+-            var2.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
+-            var2.put("java.naming.provider.url", "dns:");
+-            var2.put("com.sun.jndi.dns.timeout.retries", "1");
+-            InitialDirContext var3 = new InitialDirContext(var2);
+-            Attributes var4 = var3.getAttributes("_minecraft._tcp." + var0.getHost(), new String[]{"SRV"});
+-            Attribute var5 = var4.get("srv");
+-            if (var5 != null) {
+-               String[] var6 = var5.get().toString().split(" ", 4);
+-               return HostAndPort.fromParts(var6[3], parseInt(var6[2], 25565));
+-            }
+-         } catch (Throwable var7) {
+-         }
+-
+-         return var0;
+-      }
+-   }
+-
+-   private static int parseInt(String var0, int var1) {
+-      try {
+-         return Integer.parseInt(var0.trim());
+-      } catch (Exception var3) {
+-         return var1;
+-      }
+-   }
+-}

@@ -1,0 +1,30 @@
+--- com/mojang/realmsclient/gui/screens/RealmsLongRunningMcoTaskScreen.java
++++ com/mojang/realmsclient/gui/screens/RealmsLongRunningMcoTaskScreen.java
+@@ -4,10 +4,12 @@
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import com.mojang.realmsclient.exception.RealmsDefaultUncaughtExceptionHandler;
+ import com.mojang.realmsclient.gui.ErrorCallback;
+ import com.mojang.realmsclient.util.task.LongRunningTask;
+ import java.util.HashSet;
++import java.util.List;
++import java.util.Objects;
+ import javax.annotation.Nullable;
+ import net.minecraft.client.gui.components.Button;
+ import net.minecraft.client.gui.screens.Screen;
+ import net.minecraft.network.chat.CommonComponents;
+ import net.minecraft.network.chat.Component;
+@@ -91,11 +93,13 @@
+       }));
+    }
+ 
+    private void buttonsClear() {
+       HashSet var1 = Sets.newHashSet(this.buttons);
+-      this.children.removeIf(var1::contains);
++      List var10000 = this.children;
++      Objects.requireNonNull(var1);
++      var10000.removeIf(var1::contains);
+       this.buttons.clear();
+    }
+ 
+    public void setTitle(Component var1) {
+       this.title = var1;

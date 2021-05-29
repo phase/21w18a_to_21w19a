@@ -1,0 +1,16 @@
+--- net/minecraft/client/gui/screens/DirectJoinServerScreen.java
++++ net/minecraft/client/gui/screens/DirectJoinServerScreen.java
+@@ -3,12 +3,12 @@
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.components.Button;
+ import net.minecraft.client.gui.components.EditBox;
+-import net.minecraft.client.multiplayer.ServerAddress;
+ import net.minecraft.client.multiplayer.ServerData;
++import net.minecraft.client.multiplayer.resolver.ServerAddress;
+ import net.minecraft.network.chat.CommonComponents;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.TranslatableComponent;
+ 
+ public class DirectJoinServerScreen extends Screen {

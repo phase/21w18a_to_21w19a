@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/block/entity/ChestBlockEntity.java
++++ net/minecraft/world/level/block/entity/ChestBlockEntity.java
+@@ -90,11 +90,11 @@
+ 
+    public static void lidAnimateTick(Level var0, BlockPos var1, BlockState var2, ChestBlockEntity var3) {
+       var3.chestLidController.tickLid();
+    }
+ 
+-   private static void playSound(Level var0, BlockPos var1, BlockState var2, SoundEvent var3) {
++   static void playSound(Level var0, BlockPos var1, BlockState var2, SoundEvent var3) {
+       ChestType var4 = (ChestType)var2.getValue(ChestBlock.TYPE);
+       if (var4 != ChestType.LEFT) {
+          double var5 = (double)var1.getX() + 0.5D;
+          double var7 = (double)var1.getY() + 0.5D;
+          double var9 = (double)var1.getZ() + 0.5D;

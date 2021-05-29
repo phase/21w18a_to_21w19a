@@ -1,0 +1,19 @@
+--- net/minecraft/world/level/levelgen/Heightmap.java
++++ net/minecraft/world/level/levelgen/Heightmap.java
+@@ -18,14 +18,14 @@
+ import net.minecraft.world.level.block.LeavesBlock;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.chunk.ChunkAccess;
+ 
+ public class Heightmap {
+-   private static final Predicate<BlockState> NOT_AIR = (var0) -> {
++   static final Predicate<BlockState> NOT_AIR = (var0) -> {
+       return !var0.isAir();
+    };
+-   private static final Predicate<BlockState> MATERIAL_MOTION_BLOCKING = (var0) -> {
++   static final Predicate<BlockState> MATERIAL_MOTION_BLOCKING = (var0) -> {
+       return var0.getMaterial().blocksMotion();
+    };
+    private final BitStorage data;
+    private final Predicate<BlockState> isOpaque;
+    private final ChunkAccess chunk;

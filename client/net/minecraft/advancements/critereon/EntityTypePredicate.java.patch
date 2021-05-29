@@ -1,0 +1,41 @@
+--- net/minecraft/advancements/critereon/EntityTypePredicate.java
++++ net/minecraft/advancements/critereon/EntityTypePredicate.java
+@@ -5,13 +5,15 @@
+ import com.google.gson.JsonNull;
+ import com.google.gson.JsonPrimitive;
+ import com.google.gson.JsonSyntaxException;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.Registry;
++import net.minecraft.resources.ResourceKey;
+ import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.tags.SerializationTags;
+ import net.minecraft.tags.Tag;
++import net.minecraft.tags.TagContainer;
+ import net.minecraft.util.GsonHelper;
+ import net.minecraft.world.entity.EntityType;
+ 
+ public abstract class EntityTypePredicate {
+    public static final EntityTypePredicate ANY = new EntityTypePredicate() {
+@@ -71,17 +73,20 @@
+       public boolean matches(EntityType<?> var1) {
+          return var1.is(this.tag);
+       }
+ 
+       public JsonElement serializeToJson() {
+-         return new JsonPrimitive("#" + SerializationTags.getInstance().getIdOrThrow(Registry.ENTITY_TYPE_REGISTRY, this.tag, () -> {
++         TagContainer var10002 = SerializationTags.getInstance();
++         ResourceKey var10003 = Registry.ENTITY_TYPE_REGISTRY;
++         Tag var10004 = this.tag;
++         return new JsonPrimitive("#" + var10002.getIdOrThrow(var10003, var10004, () -> {
+             return new IllegalStateException("Unknown entity type tag");
+          }));
+       }
+    }
+ 
+-   static class TypePredicate extends EntityTypePredicate {
++   private static class TypePredicate extends EntityTypePredicate {
+       private final EntityType<?> type;
+ 
+       public TypePredicate(EntityType<?> var1) {
+          this.type = var1;
+       }

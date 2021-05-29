@@ -1,0 +1,12 @@
+--- net/minecraft/world/entity/ambient/Bat.java
++++ net/minecraft/world/entity/ambient/Bat.java
+@@ -223,8 +223,8 @@
+       return var2.height / 2.0F;
+    }
+ 
+    static {
+       DATA_ID_FLAGS = SynchedEntityData.defineId(Bat.class, EntityDataSerializers.BYTE);
+-      BAT_RESTING_TARGETING = (new TargetingConditions()).range(4.0D).allowSameTeam();
++      BAT_RESTING_TARGETING = TargetingConditions.forNonCombat().range(4.0D);
+    }
+ }

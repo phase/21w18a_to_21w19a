@@ -1,0 +1,201 @@
+--- net/minecraft/client/particle/ParticleEngine.java
++++ net/minecraft/client/particle/ParticleEngine.java
+@@ -19,10 +19,11 @@
+ import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Queue;
+ import java.util.Random;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.concurrent.ConcurrentMap;
+@@ -202,11 +203,11 @@
+          TextureAtlas.Preparations var5 = this.textureAtlas.prepareToStitch(var2, var7.values().stream().flatMap(Collection::stream), var3, 0);
+          var3.pop();
+          var3.endTick();
+          return var5;
+       }, var5);
+-      var1.getClass();
++      Objects.requireNonNull(var1);
+       return var10000.thenCompose(var1::wait).thenAcceptAsync((var3x) -> {
+          this.particles.clear();
+          var4.startTick();
+          var4.push("upload");
+          this.textureAtlas.reload(var3x);
+@@ -217,11 +218,11 @@
+             if (var3.isEmpty()) {
+                var10000 = ImmutableList.of(var4x);
+             } else {
+                Stream var5 = var3.stream();
+                TextureAtlas var10001 = this.textureAtlas;
+-               var10001.getClass();
++               Objects.requireNonNull(var10001);
+                var10000 = (ImmutableList)var5.map(var10001::getSprite).collect(ImmutableList.toImmutableList());
+             }
+ 
+             ImmutableList var4 = var10000;
+             ((ParticleEngine.MutableSpriteSet)this.spriteSets.get(var2)).rebind(var4);
+@@ -238,70 +239,60 @@
+    private void loadParticleDescription(ResourceManager var1, ResourceLocation var2, Map<ResourceLocation, List<ResourceLocation>> var3) {
+       ResourceLocation var4 = new ResourceLocation(var2.getNamespace(), "particles/" + var2.getPath() + ".json");
+ 
+       try {
+          Resource var5 = var1.getResource(var4);
+-         Throwable var6 = null;
+ 
+          try {
+-            InputStreamReader var7 = new InputStreamReader(var5.getInputStream(), Charsets.UTF_8);
+-            Throwable var8 = null;
++            InputStreamReader var6 = new InputStreamReader(var5.getInputStream(), Charsets.UTF_8);
+ 
+             try {
+-               ParticleDescription var9 = ParticleDescription.fromJson(GsonHelper.parse((Reader)var7));
+-               List var10 = var9.getTextures();
+-               boolean var11 = this.spriteSets.containsKey(var2);
+-               if (var10 == null) {
+-                  if (var11) {
++               ParticleDescription var7 = ParticleDescription.fromJson(GsonHelper.parse((Reader)var6));
++               List var8 = var7.getTextures();
++               boolean var9 = this.spriteSets.containsKey(var2);
++               if (var8 == null) {
++                  if (var9) {
+                      throw new IllegalStateException("Missing texture list for particle " + var2);
+                   }
+                } else {
+-                  if (!var11) {
++                  if (!var9) {
+                      throw new IllegalStateException("Redundant texture list for particle " + var2);
+                   }
+ 
+-                  var3.put(var2, var10.stream().map((var0) -> {
++                  var3.put(var2, (List)var8.stream().map((var0) -> {
+                      return new ResourceLocation(var0.getNamespace(), "particle/" + var0.getPath());
+                   }).collect(Collectors.toList()));
+                }
+-            } catch (Throwable var35) {
+-               var8 = var35;
+-               throw var35;
+-            } finally {
+-               if (var7 != null) {
+-                  if (var8 != null) {
+-                     try {
+-                        var7.close();
+-                     } catch (Throwable var34) {
+-                        var8.addSuppressed(var34);
+-                     }
+-                  } else {
+-                     var7.close();
+-                  }
++            } catch (Throwable var12) {
++               try {
++                  var6.close();
++               } catch (Throwable var11) {
++                  var12.addSuppressed(var11);
+                }
+ 
++               throw var12;
+             }
+-         } catch (Throwable var37) {
+-            var6 = var37;
+-            throw var37;
+-         } finally {
++
++            var6.close();
++         } catch (Throwable var13) {
+             if (var5 != null) {
+-               if (var6 != null) {
+-                  try {
+-                     var5.close();
+-                  } catch (Throwable var33) {
+-                     var6.addSuppressed(var33);
+-                  }
+-               } else {
++               try {
+                   var5.close();
++               } catch (Throwable var10) {
++                  var13.addSuppressed(var10);
+                }
+             }
+ 
++            throw var13;
+          }
+ 
+-      } catch (IOException var39) {
+-         throw new IllegalStateException("Failed to load description for particle " + var2, var39);
++         if (var5 != null) {
++            var5.close();
++         }
++
++      } catch (IOException var14) {
++         throw new IllegalStateException("Failed to load description for particle " + var2, var14);
+       }
+    }
+ 
+    public void createTrackingEmitter(Entity var1, ParticleOptions var2) {
+       this.trackingEmitters.add(new TrackingEmitter(this.level, var1, var2));
+@@ -399,12 +390,14 @@
+       try {
+          var1.tick();
+       } catch (Throwable var5) {
+          CrashReport var3 = CrashReport.forThrowable(var5, "Ticking Particle");
+          CrashReportCategory var4 = var3.addCategory("Particle being ticked");
++         Objects.requireNonNull(var1);
+          var4.setDetail("Particle", var1::toString);
+          ParticleRenderType var10002 = var1.getRenderType();
++         Objects.requireNonNull(var10002);
+          var4.setDetail("Particle Type", var10002::toString);
+          throw new ReportedException(var3);
+       }
+    }
+ 
+@@ -447,11 +440,13 @@
+             try {
+                var13.render(var11, var4, var5);
+             } catch (Throwable var17) {
+                CrashReport var15 = CrashReport.forThrowable(var17, "Rendering Particle");
+                CrashReportCategory var16 = var15.addCategory("Particle being rendered");
++               Objects.requireNonNull(var13);
+                var16.setDetail("Particle", var13::toString);
++               Objects.requireNonNull(var8);
+                var16.setDetail("Particle Type", var8::toString);
+                throw new ReportedException(var15);
+             }
+          }
+ 
+@@ -545,14 +540,19 @@
+ 
+    static {
+       RENDER_ORDER = ImmutableList.of(ParticleRenderType.TERRAIN_SHEET, ParticleRenderType.PARTICLE_SHEET_OPAQUE, ParticleRenderType.PARTICLE_SHEET_LIT, ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT, ParticleRenderType.CUSTOM);
+    }
+ 
+-   class MutableSpriteSet implements SpriteSet {
++   @FunctionalInterface
++   interface SpriteParticleRegistration<T extends ParticleOptions> {
++      ParticleProvider<T> create(SpriteSet var1);
++   }
++
++   private class MutableSpriteSet implements SpriteSet {
+       private List<TextureAtlasSprite> sprites;
+ 
+-      private MutableSpriteSet() {
++      MutableSpriteSet() {
+       }
+ 
+       public TextureAtlasSprite get(int var1, int var2) {
+          return (TextureAtlasSprite)this.sprites.get(var1 * (this.sprites.size() - 1) / var2);
+       }
+@@ -563,11 +563,6 @@
+ 
+       public void rebind(List<TextureAtlasSprite> var1) {
+          this.sprites = ImmutableList.copyOf(var1);
+       }
+    }
+-
+-   @FunctionalInterface
+-   interface SpriteParticleRegistration<T extends ParticleOptions> {
+-      ParticleProvider<T> create(SpriteSet var1);
+-   }
+ }

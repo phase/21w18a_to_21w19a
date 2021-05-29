@@ -1,0 +1,153 @@
+--- net/minecraft/network/protocol/game/ClientboundPlayerInfoPacket.java
++++ net/minecraft/network/protocol/game/ClientboundPlayerInfoPacket.java
+@@ -6,10 +6,11 @@
+ import com.mojang.authlib.properties.Property;
+ import com.mojang.authlib.properties.PropertyMap;
+ import java.util.Collection;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import javax.annotation.Nullable;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.server.level.ServerPlayer;
+@@ -45,18 +46,20 @@
+    }
+ 
+    public ClientboundPlayerInfoPacket(FriendlyByteBuf var1) {
+       this.action = (ClientboundPlayerInfoPacket.Action)var1.readEnum(ClientboundPlayerInfoPacket.Action.class);
+       ClientboundPlayerInfoPacket.Action var10002 = this.action;
+-      var10002.getClass();
++      Objects.requireNonNull(var10002);
+       this.entries = var1.readList(var10002::read);
+    }
+ 
+    public void write(FriendlyByteBuf var1) {
+       var1.writeEnum(this.action);
++      List var10001 = this.entries;
+       ClientboundPlayerInfoPacket.Action var10002 = this.action;
+-      var1.writeCollection(this.entries, var10002::write);
++      Objects.requireNonNull(var10002);
++      var1.writeCollection(var10001, var10002::write);
+    }
+ 
+    public void handle(ClientGamePacketListener var1) {
+       var1.handlePlayerInfo(this);
+    }
+@@ -68,15 +71,15 @@
+    public ClientboundPlayerInfoPacket.Action getAction() {
+       return this.action;
+    }
+ 
+    @Nullable
+-   private static Component readDisplayName(FriendlyByteBuf var0) {
++   static Component readDisplayName(FriendlyByteBuf var0) {
+       return var0.readBoolean() ? var0.readComponent() : null;
+    }
+ 
+-   private static void writeDisplayName(FriendlyByteBuf var0, @Nullable Component var1) {
++   static void writeDisplayName(FriendlyByteBuf var0, @Nullable Component var1) {
+       if (var1 == null) {
+          var0.writeBoolean(false);
+       } else {
+          var0.writeBoolean(true);
+          var0.writeComponent(var1);
+@@ -86,46 +89,10 @@
+ 
+    public String toString() {
+       return MoreObjects.toStringHelper((Object)this).add("action", this.action).add("entries", this.entries).toString();
+    }
+ 
+-   public static class PlayerUpdate {
+-      private final int latency;
+-      private final GameType gameMode;
+-      private final GameProfile profile;
+-      @Nullable
+-      private final Component displayName;
+-
+-      public PlayerUpdate(GameProfile var1, int var2, @Nullable GameType var3, @Nullable Component var4) {
+-         this.profile = var1;
+-         this.latency = var2;
+-         this.gameMode = var3;
+-         this.displayName = var4;
+-      }
+-
+-      public GameProfile getProfile() {
+-         return this.profile;
+-      }
+-
+-      public int getLatency() {
+-         return this.latency;
+-      }
+-
+-      public GameType getGameMode() {
+-         return this.gameMode;
+-      }
+-
+-      @Nullable
+-      public Component getDisplayName() {
+-         return this.displayName;
+-      }
+-
+-      public String toString() {
+-         return MoreObjects.toStringHelper((Object)this).add("latency", this.latency).add("gameMode", this.gameMode).add("profile", this.profile).add("displayName", this.displayName == null ? null : Component.Serializer.toJson(this.displayName)).toString();
+-      }
+-   }
+-
+    public static enum Action {
+       ADD_PLAYER {
+          protected ClientboundPlayerInfoPacket.PlayerUpdate read(FriendlyByteBuf var1) {
+             GameProfile var2 = new GameProfile(var1.readUUID(), var1.readUtf(16));
+             PropertyMap var3 = var2.getProperties();
+@@ -210,13 +177,49 @@
+          protected void write(FriendlyByteBuf var1, ClientboundPlayerInfoPacket.PlayerUpdate var2) {
+             var1.writeUUID(var2.getProfile().getId());
+          }
+       };
+ 
+-      private Action() {
++      Action() {
+       }
+ 
+       protected abstract ClientboundPlayerInfoPacket.PlayerUpdate read(FriendlyByteBuf var1);
+ 
+       protected abstract void write(FriendlyByteBuf var1, ClientboundPlayerInfoPacket.PlayerUpdate var2);
+    }
++
++   public static class PlayerUpdate {
++      private final int latency;
++      private final GameType gameMode;
++      private final GameProfile profile;
++      @Nullable
++      private final Component displayName;
++
++      public PlayerUpdate(GameProfile var1, int var2, @Nullable GameType var3, @Nullable Component var4) {
++         this.profile = var1;
++         this.latency = var2;
++         this.gameMode = var3;
++         this.displayName = var4;
++      }
++
++      public GameProfile getProfile() {
++         return this.profile;
++      }
++
++      public int getLatency() {
++         return this.latency;
++      }
++
++      public GameType getGameMode() {
++         return this.gameMode;
++      }
++
++      @Nullable
++      public Component getDisplayName() {
++         return this.displayName;
++      }
++
++      public String toString() {
++         return MoreObjects.toStringHelper((Object)this).add("latency", this.latency).add("gameMode", this.gameMode).add("profile", this.profile).add("displayName", this.displayName == null ? null : Component.Serializer.toJson(this.displayName)).toString();
++      }
++   }
+ }

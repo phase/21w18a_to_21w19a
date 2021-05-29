@@ -1,0 +1,67 @@
+--- net/minecraft/client/gui/screens/CreateBuffetWorldScreen.java
++++ net/minecraft/client/gui/screens/CreateBuffetWorldScreen.java
+@@ -22,13 +22,13 @@
+ 
+ public class CreateBuffetWorldScreen extends Screen {
+    private static final Component BIOME_SELECT_INFO = new TranslatableComponent("createWorld.customize.buffet.biome");
+    private final Screen parent;
+    private final Consumer<Biome> applySettings;
+-   private final Registry<Biome> biomes;
++   final Registry<Biome> biomes;
+    private CreateBuffetWorldScreen.BiomeList list;
+-   private Biome biome;
++   Biome biome;
+    private Button doneButton;
+ 
+    public CreateBuffetWorldScreen(Screen var1, RegistryAccess var2, Consumer<Biome> var3, Biome var4) {
+       super(new TranslatableComponent("createWorld.customize.buffet.title"));
+       this.parent = var1;
+@@ -55,11 +55,11 @@
+       this.list.setSelected((CreateBuffetWorldScreen.BiomeList.Entry)this.list.children().stream().filter((var1) -> {
+          return Objects.equals(var1.biome, this.biome);
+       }).findFirst().orElse((Object)null));
+    }
+ 
+-   private void updateButtonValidity() {
++   void updateButtonValidity() {
+       this.doneButton.active = this.list.getSelected() != null;
+    }
+ 
+    public void render(PoseStack var1, int var2, int var3, float var4) {
+       this.renderDirtBackground(0);
+@@ -67,12 +67,12 @@
+       drawCenteredString(var1, this.font, this.title, this.width / 2, 8, 16777215);
+       drawCenteredString(var1, this.font, BIOME_SELECT_INFO, this.width / 2, 28, 10526880);
+       super.render(var1, var2, var3, var4);
+    }
+ 
+-   class BiomeList extends ObjectSelectionList<CreateBuffetWorldScreen.BiomeList.Entry> {
+-      private BiomeList() {
++   private class BiomeList extends ObjectSelectionList<CreateBuffetWorldScreen.BiomeList.Entry> {
++      BiomeList() {
+          super(CreateBuffetWorldScreen.this.minecraft, CreateBuffetWorldScreen.this.width, CreateBuffetWorldScreen.this.height, 40, CreateBuffetWorldScreen.this.height - 37, 16);
+          CreateBuffetWorldScreen.this.biomes.entrySet().stream().sorted(Comparator.comparing((var0) -> {
+             return ((ResourceKey)var0.getKey()).location().toString();
+          })).forEach((var1x) -> {
+             this.addEntry(new CreateBuffetWorldScreen.BiomeList.Entry((Biome)var1x.getValue()));
+@@ -92,17 +92,18 @@
+ 
+          CreateBuffetWorldScreen.this.updateButtonValidity();
+       }
+ 
+       class Entry extends ObjectSelectionList.Entry<CreateBuffetWorldScreen.BiomeList.Entry> {
+-         private final Biome biome;
++         final Biome biome;
+          private final Component name;
+ 
+          public Entry(Biome var2) {
+             this.biome = var2;
+             ResourceLocation var3 = CreateBuffetWorldScreen.this.biomes.getKey(var2);
+-            String var4 = "biome." + var3.getNamespace() + "." + var3.getPath();
++            String var10000 = var3.getNamespace();
++            String var4 = "biome." + var10000 + "." + var3.getPath();
+             if (Language.getInstance().has(var4)) {
+                this.name = new TranslatableComponent(var4);
+             } else {
+                this.name = new TextComponent(var3.toString());
+             }

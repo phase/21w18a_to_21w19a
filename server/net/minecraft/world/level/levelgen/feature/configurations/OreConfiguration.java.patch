@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/levelgen/feature/configurations/OreConfiguration.java
++++ net/minecraft/world/level/levelgen/feature/configurations/OreConfiguration.java
+@@ -58,11 +58,11 @@
+          })).apply(var0, (BiFunction)(OreConfiguration.TargetBlockState::new));
+       });
+       public final RuleTest target;
+       public final BlockState state;
+ 
+-      private TargetBlockState(RuleTest var1, BlockState var2) {
++      TargetBlockState(RuleTest var1, BlockState var2) {
+          this.target = var1;
+          this.state = var2;
+       }
+    }
+ 

@@ -1,0 +1,56 @@
+--- net/minecraft/commands/arguments/item/ItemPredicateArgument.java
++++ net/minecraft/commands/arguments/item/ItemPredicateArgument.java
+@@ -73,39 +73,39 @@
+ 
+    public Collection<String> getExamples() {
+       return EXAMPLES;
+    }
+ 
+-   static class TagPredicate implements Predicate<ItemStack> {
+-      private final Tag<Item> tag;
++   private static class ItemPredicate implements Predicate<ItemStack> {
++      private final Item item;
+       @Nullable
+       private final CompoundTag nbt;
+ 
+-      public TagPredicate(Tag<Item> var1, @Nullable CompoundTag var2) {
+-         this.tag = var1;
++      public ItemPredicate(Item var1, @Nullable CompoundTag var2) {
++         this.item = var1;
+          this.nbt = var2;
+       }
+ 
+       public boolean test(ItemStack var1) {
+-         return var1.is(this.tag) && NbtUtils.compareNbt(this.nbt, var1.getTag(), true);
++         return var1.is(this.item) && NbtUtils.compareNbt(this.nbt, var1.getTag(), true);
+       }
+    }
+ 
+-   static class ItemPredicate implements Predicate<ItemStack> {
+-      private final Item item;
++   public interface Result {
++      Predicate<ItemStack> create(CommandContext<CommandSourceStack> var1) throws CommandSyntaxException;
++   }
++
++   static class TagPredicate implements Predicate<ItemStack> {
++      private final Tag<Item> tag;
+       @Nullable
+       private final CompoundTag nbt;
+ 
+-      public ItemPredicate(Item var1, @Nullable CompoundTag var2) {
+-         this.item = var1;
++      public TagPredicate(Tag<Item> var1, @Nullable CompoundTag var2) {
++         this.tag = var1;
+          this.nbt = var2;
+       }
+ 
+       public boolean test(ItemStack var1) {
+-         return var1.is(this.item) && NbtUtils.compareNbt(this.nbt, var1.getTag(), true);
++         return var1.is(this.tag) && NbtUtils.compareNbt(this.nbt, var1.getTag(), true);
+       }
+    }
+-
+-   public interface Result {
+-      Predicate<ItemStack> create(CommandContext<CommandSourceStack> var1) throws CommandSyntaxException;
+-   }
+ }

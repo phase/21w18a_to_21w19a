@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/pathfinder/Node.java
++++ net/minecraft/world/level/pathfinder/Node.java
+@@ -112,11 +112,11 @@
+    public boolean inOpenSet() {
+       return this.heapIdx >= 0;
+    }
+ 
+    public String toString() {
+-      return "Node{x=" + this.x + ", y=" + this.y + ", z=" + this.z + '}';
++      return "Node{x=" + this.x + ", y=" + this.y + ", z=" + this.z + "}";
+    }
+ 
+    public void writeToStream(FriendlyByteBuf var1) {
+       var1.writeInt(this.x);
+       var1.writeInt(this.y);

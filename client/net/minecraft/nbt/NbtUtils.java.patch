@@ -1,0 +1,108 @@
+--- net/minecraft/nbt/NbtUtils.java
++++ net/minecraft/nbt/NbtUtils.java
+@@ -16,10 +16,11 @@
+ import java.util.Collections;
+ import java.util.Comparator;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.UUID;
+ import java.util.Map.Entry;
+ import java.util.function.Function;
+ import java.util.stream.Collectors;
+@@ -207,11 +208,12 @@
+       return new IntArrayTag(SerializableUUID.uuidToIntArray(var0));
+    }
+ 
+    public static UUID loadUUID(Tag var0) {
+       if (var0.getType() != IntArrayTag.TYPE) {
+-         throw new IllegalArgumentException("Expected UUID-Tag to be of type " + IntArrayTag.TYPE.getName() + ", but found " + var0.getType().getName() + ".");
++         String var10002 = IntArrayTag.TYPE.getName();
++         throw new IllegalArgumentException("Expected UUID-Tag to be of type " + var10002 + ", but found " + var0.getType().getName() + ".");
+       } else {
+          int[] var1 = ((IntArrayTag)var0).getAsIntArray();
+          if (var1.length != 4) {
+             throw new IllegalArgumentException("Expected UUID-Array to be of length 4, but found " + var1.length + ".");
+          } else {
+@@ -549,20 +551,20 @@
+       } else {
+          var1 = var0.getList("palette", 10);
+       }
+ 
+       Stream var10000 = var1.stream();
+-      CompoundTag.class.getClass();
++      Objects.requireNonNull(CompoundTag.class);
+       ListTag var3 = (ListTag)var10000.map(CompoundTag.class::cast).map(NbtUtils::packBlockState).map(StringTag::valueOf).collect(Collectors.toCollection(ListTag::new));
+       var0.put("palette", var3);
+       ListTag var4;
+       ListTag var5;
+       if (var2) {
+          var4 = new ListTag();
+          var5 = var0.getList("palettes", 9);
+          var10000 = var5.stream();
+-         ListTag.class.getClass();
++         Objects.requireNonNull(ListTag.class);
+          var10000.map(ListTag.class::cast).forEach((var2x) -> {
+             CompoundTag var3x = new CompoundTag();
+ 
+             for(int var4x = 0; var4x < var2x.size(); ++var4x) {
+                var3x.putString(var3.getString(var4x), packBlockState(var2x.getCompound(var4x)));
+@@ -574,19 +576,19 @@
+       }
+ 
+       if (var0.contains("entities", 10)) {
+          var4 = var0.getList("entities", 10);
+          var10000 = var4.stream();
+-         CompoundTag.class.getClass();
++         Objects.requireNonNull(CompoundTag.class);
+          var5 = (ListTag)var10000.map(CompoundTag.class::cast).sorted(Comparator.comparing((var0x) -> {
+             return var0x.getList("pos", 6);
+          }, YXZ_LISTTAG_DOUBLE_COMPARATOR)).collect(Collectors.toCollection(ListTag::new));
+          var0.put("entities", var5);
+       }
+ 
+       var10000 = var0.getList("blocks", 10).stream();
+-      CompoundTag.class.getClass();
++      Objects.requireNonNull(CompoundTag.class);
+       var4 = (ListTag)var10000.map(CompoundTag.class::cast).sorted(Comparator.comparing((var0x) -> {
+          return var0x.getList("pos", 3);
+       }, YXZ_LISTTAG_INT_COMPARATOR)).peek((var1x) -> {
+          var1x.putString("state", var3.getString(var1x.getInt("state")));
+       }).collect(Collectors.toCollection(ListTag::new));
+@@ -597,18 +599,18 @@
+ 
+    @VisibleForTesting
+    static CompoundTag unpackStructureTemplate(CompoundTag var0) {
+       ListTag var1 = var0.getList("palette", 8);
+       Stream var10000 = var1.stream();
+-      StringTag.class.getClass();
++      Objects.requireNonNull(StringTag.class);
+       Map var2 = (Map)var10000.map(StringTag.class::cast).map(StringTag::getAsString).collect(ImmutableMap.toImmutableMap(Function.identity(), NbtUtils::unpackBlockState));
+       if (var0.contains("palettes", 9)) {
+          Stream var10002 = var0.getList("palettes", 10).stream();
+-         CompoundTag.class.getClass();
++         Objects.requireNonNull(CompoundTag.class);
+          var0.put("palettes", (Tag)var10002.map(CompoundTag.class::cast).map((var1x) -> {
+             Stream var10000 = var2.keySet().stream();
+-            var1x.getClass();
++            Objects.requireNonNull(var1x);
+             return (ListTag)var10000.map(var1x::getString).map(NbtUtils::unpackBlockState).collect(Collectors.toCollection(ListTag::new));
+          }).collect(Collectors.toCollection(ListTag::new)));
+          var0.remove("palette");
+       } else {
+          var0.put("palette", (Tag)var2.values().stream().collect(Collectors.toCollection(ListTag::new)));
+@@ -646,11 +648,11 @@
+    static String packBlockState(CompoundTag var0) {
+       StringBuilder var1 = new StringBuilder(var0.getString("Name"));
+       if (var0.contains("Properties", 10)) {
+          CompoundTag var2 = var0.getCompound("Properties");
+          String var3 = (String)var2.getAllKeys().stream().sorted().map((var1x) -> {
+-            return var1x + ':' + var2.get(var1x).getAsString();
++            return var1x + ":" + var2.get(var1x).getAsString();
+          }).collect(Collectors.joining(","));
+          var1.append('{').append(var3).append('}');
+       }
+ 
+       return var1.toString();

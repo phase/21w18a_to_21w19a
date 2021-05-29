@@ -1,0 +1,15 @@
+--- net/minecraft/nbt/ListTag.java
++++ net/minecraft/nbt/ListTag.java
+@@ -45,11 +45,11 @@
+       }
+    };
+    private final List<Tag> list;
+    private byte type;
+ 
+-   private ListTag(List<Tag> var1, byte var2) {
++   ListTag(List<Tag> var1, byte var2) {
+       this.list = var1;
+       this.type = var2;
+    }
+ 
+    public ListTag() {

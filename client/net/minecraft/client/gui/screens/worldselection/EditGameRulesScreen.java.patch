@@ -1,0 +1,110 @@
+--- net/minecraft/client/gui/screens/worldselection/EditGameRulesScreen.java
++++ net/minecraft/client/gui/screens/worldselection/EditGameRulesScreen.java
+@@ -8,18 +8,18 @@
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import java.util.Comparator;
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Optional;
+ import java.util.Set;
+ import java.util.Map.Entry;
+ import java.util.function.Consumer;
+ import javax.annotation.Nullable;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.client.gui.GuiComponent;
+-import net.minecraft.client.gui.components.AbstractSelectionList;
+ import net.minecraft.client.gui.components.Button;
+ import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+ import net.minecraft.client.gui.components.CycleButton;
+ import net.minecraft.client.gui.components.EditBox;
+ import net.minecraft.client.gui.components.events.GuiEventListener;
+@@ -79,24 +79,24 @@
+          this.renderTooltip(var1, this.tooltip, var2, var3);
+       }
+ 
+    }
+ 
+-   private void setTooltip(@Nullable List<FormattedCharSequence> var1) {
++   void setTooltip(@Nullable List<FormattedCharSequence> var1) {
+       this.tooltip = var1;
+    }
+ 
+    private void updateDoneButton() {
+       this.doneButton.active = this.invalidEntries.isEmpty();
+    }
+ 
+-   private void markInvalid(EditGameRulesScreen.RuleEntry var1) {
++   void markInvalid(EditGameRulesScreen.RuleEntry var1) {
+       this.invalidEntries.add(var1);
+       this.updateDoneButton();
+    }
+ 
+-   private void clearInvalid(EditGameRulesScreen.RuleEntry var1) {
++   void clearInvalid(EditGameRulesScreen.RuleEntry var1) {
+       this.invalidEntries.remove(var1);
+       this.updateDoneButton();
+    }
+ 
+    public class RuleList extends ContainerObjectSelectionList<EditGameRulesScreen.RuleEntry> {
+@@ -126,13 +126,16 @@
+                ImmutableList var9;
+                String var10;
+                if (I18n.exists(var8)) {
+                   Builder var11 = ImmutableList.builder().add(var4.getVisualOrderText());
+                   TranslatableComponent var12 = new TranslatableComponent(var8);
+-                  EditGameRulesScreen.this.font.split(var12, 150).forEach(var11::add);
++                  List var10000 = EditGameRulesScreen.this.font.split(var12, 150);
++                  Objects.requireNonNull(var11);
++                  var10000.forEach(var11::add);
+                   var9 = var11.add(var7.getVisualOrderText()).build();
+-                  var10 = var12.getString() + "\n" + var7.getString();
++                  String var13 = var12.getString();
++                  var10 = var13 + "\n" + var7.getString();
+                } else {
+                   var9 = ImmutableList.of(var4.getVisualOrderText(), var7.getVisualOrderText());
+                   var10 = var7.getString();
+                }
+ 
+@@ -142,11 +145,11 @@
+             }
+          });
+          var3.entrySet().stream().sorted(Entry.comparingByKey()).forEach((var1x) -> {
+             this.addEntry(EditGameRulesScreen.this.new CategoryRuleEntry((new TranslatableComponent(((GameRules.Category)var1x.getKey()).getDescriptionId())).withStyle(new ChatFormatting[]{ChatFormatting.BOLD, ChatFormatting.YELLOW})));
+             ((Map)var1x.getValue()).entrySet().stream().sorted(Entry.comparingByKey(Comparator.comparing(GameRules.Key::getId))).forEach((var1) -> {
+-               this.addEntry((AbstractSelectionList.Entry)var1.getValue());
++               this.addEntry((EditGameRulesScreen.RuleEntry)var1.getValue());
+             });
+          });
+       }
+ 
+       public void render(PoseStack var1, int var2, int var3, float var4) {
+@@ -212,11 +215,11 @@
+ 
+    public abstract class GameRuleEntry extends EditGameRulesScreen.RuleEntry {
+       private final List<FormattedCharSequence> label;
+       protected final List<GuiEventListener> children = Lists.newArrayList();
+ 
+-      public GameRuleEntry(List<FormattedCharSequence> var2, @Nullable Component var3) {
++      public GameRuleEntry(@Nullable List<FormattedCharSequence> var2, Component var3) {
+          super(var2);
+          this.label = EditGameRulesScreen.this.minecraft.font.split(var3, 175);
+       }
+ 
+       public List<? extends GuiEventListener> children() {
+@@ -256,12 +259,12 @@
+       }
+    }
+ 
+    public abstract class RuleEntry extends ContainerObjectSelectionList.Entry<EditGameRulesScreen.RuleEntry> {
+       @Nullable
+-      private final List<FormattedCharSequence> tooltip;
++      final List<FormattedCharSequence> tooltip;
+ 
+-      public RuleEntry(List<FormattedCharSequence> var2) {
++      public RuleEntry(@Nullable List<FormattedCharSequence> var2) {
+          this.tooltip = var2;
+       }
+    }
+ }

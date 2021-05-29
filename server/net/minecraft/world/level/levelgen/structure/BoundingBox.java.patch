@@ -1,0 +1,26 @@
+--- net/minecraft/world/level/levelgen/structure/BoundingBox.java
++++ net/minecraft/world/level/levelgen/structure/BoundingBox.java
+@@ -87,10 +87,11 @@
+       Iterator var1 = var0.iterator();
+       if (!var1.hasNext()) {
+          return Optional.empty();
+       } else {
+          BoundingBox var2 = new BoundingBox((BlockPos)var1.next());
++         Objects.requireNonNull(var2);
+          var1.forEachRemaining(var2::encapsulate);
+          return Optional.of(var2);
+       }
+    }
+ 
+@@ -99,10 +100,11 @@
+       if (!var1.hasNext()) {
+          return Optional.empty();
+       } else {
+          BoundingBox var2 = (BoundingBox)var1.next();
+          BoundingBox var3 = new BoundingBox(var2.minX, var2.minY, var2.minZ, var2.maxX, var2.maxY, var2.maxZ);
++         Objects.requireNonNull(var3);
+          var1.forEachRemaining(var3::encapsulate);
+          return Optional.of(var3);
+       }
+    }
+ 

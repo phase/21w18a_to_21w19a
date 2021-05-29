@@ -1,0 +1,15 @@
+--- net/minecraft/client/renderer/debug/GameTestDebugRenderer.java
++++ net/minecraft/client/renderer/debug/GameTestDebugRenderer.java
+@@ -47,11 +47,11 @@
+ 
+       RenderSystem.enableTexture();
+       RenderSystem.disableBlend();
+    }
+ 
+-   static class Marker {
++   private static class Marker {
+       public int color;
+       public String text;
+       public long removeAtTime;
+ 
+       public Marker(int var1, String var2, long var3) {

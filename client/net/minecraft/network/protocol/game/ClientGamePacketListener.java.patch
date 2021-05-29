@@ -1,0 +1,15 @@
+--- net/minecraft/network/protocol/game/ClientGamePacketListener.java
++++ net/minecraft/network/protocol/game/ClientGamePacketListener.java
+@@ -77,10 +77,12 @@
+ 
+    void handleMovePlayer(ClientboundPlayerPositionPacket var1);
+ 
+    void handleParticleEvent(ClientboundLevelParticlesPacket var1);
+ 
++   void handlePing(ClientboundPingPacket var1);
++
+    void handlePlayerAbilities(ClientboundPlayerAbilitiesPacket var1);
+ 
+    void handlePlayerInfo(ClientboundPlayerInfoPacket var1);
+ 
+    void handleRemoveEntity(ClientboundRemoveEntityPacket var1);

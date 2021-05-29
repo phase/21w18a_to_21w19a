@@ -1,0 +1,16 @@
+--- net/minecraft/client/particle/Particle.java
++++ net/minecraft/client/particle/Particle.java
+@@ -145,11 +145,12 @@
+    public abstract void render(VertexConsumer var1, Camera var2, float var3);
+ 
+    public abstract ParticleRenderType getRenderType();
+ 
+    public String toString() {
+-      return this.getClass().getSimpleName() + ", Pos (" + this.x + "," + this.y + "," + this.z + "), RGBA (" + this.rCol + "," + this.gCol + "," + this.bCol + "," + this.alpha + "), Age " + this.age;
++      String var10000 = this.getClass().getSimpleName();
++      return var10000 + ", Pos (" + this.x + "," + this.y + "," + this.z + "), RGBA (" + this.rCol + "," + this.gCol + "," + this.bCol + "," + this.alpha + "), Age " + this.age;
+    }
+ 
+    public void remove() {
+       this.removed = true;
+    }

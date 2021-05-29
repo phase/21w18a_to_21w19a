@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/levelgen/feature/Feature.java
++++ net/minecraft/world/level/levelgen/feature/Feature.java
+@@ -158,11 +158,11 @@
+       int var5 = var4.length;
+ 
+       for(int var6 = 0; var6 < var5; ++var6) {
+          Direction var7 = var4[var6];
+          var3.setWithOffset(var1, (Direction)var7);
+-         if (var2.test(var0.apply(var3))) {
++         if (var2.test((BlockState)var0.apply(var3))) {
+             return true;
+          }
+       }
+ 
+       return false;

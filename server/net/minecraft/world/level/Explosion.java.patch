@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/Explosion.java
++++ net/minecraft/world/level/Explosion.java
+@@ -296,11 +296,11 @@
+       for(int var4 = 0; var4 < var3; ++var4) {
+          Pair var5 = (Pair)var0.get(var4);
+          ItemStack var6 = (ItemStack)var5.getFirst();
+          if (ItemEntity.areMergable(var6, var1)) {
+             ItemStack var7 = ItemEntity.merge(var6, var1, 16);
+-            var0.set(var4, Pair.of(var7, var5.getSecond()));
++            var0.set(var4, Pair.of(var7, (BlockPos)var5.getSecond()));
+             if (var1.isEmpty()) {
+                return;
+             }
+          }
+       }

@@ -1,0 +1,15 @@
+--- net/minecraft/world/item/CrossbowItem.java
++++ net/minecraft/world/item/CrossbowItem.java
+@@ -226,11 +226,11 @@
+          var0.playSound((Player)null, var1.getX(), var1.getY(), var1.getZ(), SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 1.0F, var5);
+       }
+    }
+ 
+    private static AbstractArrow getArrow(Level var0, LivingEntity var1, ItemStack var2, ItemStack var3) {
+-      ArrowItem var4 = (ArrowItem)((ArrowItem)(var3.getItem() instanceof ArrowItem ? var3.getItem() : Items.ARROW));
++      ArrowItem var4 = (ArrowItem)(var3.getItem() instanceof ArrowItem ? var3.getItem() : Items.ARROW);
+       AbstractArrow var5 = var4.createArrow(var0, var3, var1);
+       if (var1 instanceof Player) {
+          var5.setCritArrow(true);
+       }
+ 

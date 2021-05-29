@@ -1,0 +1,16 @@
+--- net/minecraft/core/Registry.java
++++ net/minecraft/core/Registry.java
+@@ -238,11 +238,12 @@
+    }
+ 
+    public static <T extends WritableRegistry<?>> void checkRegistry(WritableRegistry<T> var0) {
+       var0.forEach((var1) -> {
+          if (var1.keySet().isEmpty()) {
+-            Util.logAndPauseIfInIde("Registry '" + var0.getKey(var1) + "' was empty after loading");
++            ResourceLocation var10000 = var0.getKey(var1);
++            Util.logAndPauseIfInIde("Registry '" + var10000 + "' was empty after loading");
+          }
+ 
+          if (var1 instanceof DefaultedRegistry) {
+             ResourceLocation var2 = ((DefaultedRegistry)var1).getDefaultKey();
+             Validate.notNull(var1.get(var2), "Missing default of DefaultedMappedRegistry: " + var2);

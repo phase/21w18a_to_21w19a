@@ -1,0 +1,15 @@
+--- net/minecraft/world/entity/ai/goal/TemptGoal.java
++++ net/minecraft/world/entity/ai/goal/TemptGoal.java
+@@ -7,11 +7,11 @@
+ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.item.crafting.Ingredient;
+ 
+ public class TemptGoal extends Goal {
+-   private static final TargetingConditions TEMP_TARGETING = (new TargetingConditions()).range(10.0D).allowInvulnerable().allowSameTeam().allowNonAttackable().allowUnseeable();
++   private static final TargetingConditions TEMP_TARGETING = TargetingConditions.forNonCombat().range(10.0D).ignoreLineOfSight();
+    private final TargetingConditions targetingConditions;
+    protected final PathfinderMob mob;
+    private final double speedModifier;
+    private double px;
+    private double py;

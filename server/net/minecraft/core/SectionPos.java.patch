@@ -1,0 +1,15 @@
+--- net/minecraft/core/SectionPos.java
++++ net/minecraft/core/SectionPos.java
+@@ -26,11 +26,11 @@
+    private static final int X_OFFSET = 42;
+    private static final int RELATIVE_X_SHIFT = 8;
+    private static final int RELATIVE_Y_SHIFT = 0;
+    private static final int RELATIVE_Z_SHIFT = 4;
+ 
+-   private SectionPos(int var1, int var2, int var3) {
++   SectionPos(int var1, int var2, int var3) {
+       super(var1, var2, var3);
+    }
+ 
+    public static SectionPos of(int var0, int var1, int var2) {
+       return new SectionPos(var0, var1, var2);

@@ -1,0 +1,120 @@
+--- net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent.java
++++ net/minecraft/client/gui/screens/recipebook/OverlayRecipeComponent.java
+@@ -20,22 +20,23 @@
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.crafting.Ingredient;
+ import net.minecraft.world.item.crafting.Recipe;
+ 
+ public class OverlayRecipeComponent extends GuiComponent implements Widget, GuiEventListener {
+-   private static final ResourceLocation RECIPE_BOOK_LOCATION = new ResourceLocation("textures/gui/recipe_book.png");
++   static final ResourceLocation RECIPE_BOOK_LOCATION = new ResourceLocation("textures/gui/recipe_book.png");
+    private static final int MAX_ROW = 4;
+    private static final int MAX_ROW_LARGE = 5;
++   private static final float ITEM_RENDER_SCALE = 0.375F;
+    private final List<OverlayRecipeComponent.OverlayRecipeButton> recipeButtons = Lists.newArrayList();
+    private boolean isVisible;
+    private int x;
+    private int y;
+-   private Minecraft minecraft;
++   Minecraft minecraft;
+    private RecipeCollection collection;
+    private Recipe<?> lastRecipeClicked;
+-   private float time;
+-   private boolean isFurnaceMenu;
++   float time;
++   boolean isFurnaceMenu;
+ 
+    public OverlayRecipeComponent() {
+    }
+ 
+    public void init(Minecraft var1, RecipeCollection var2, int var3, int var4, int var5, int var6, float var7) {
+@@ -193,12 +194,23 @@
+ 
+    public boolean isVisible() {
+       return this.isVisible;
+    }
+ 
+-   class OverlayRecipeButton extends AbstractWidget implements PlaceRecipe<Ingredient> {
+-      private final Recipe<?> recipe;
++   private class OverlaySmeltingRecipeButton extends OverlayRecipeComponent.OverlayRecipeButton {
++      public OverlaySmeltingRecipeButton(int var2, int var3, Recipe<?> var4, boolean var5) {
++         super(var2, var3, var4, var5);
++      }
++
++      protected void calculateIngredientsPositions(Recipe<?> var1) {
++         ItemStack[] var2 = ((Ingredient)var1.getIngredients().get(0)).getItems();
++         this.ingredientPos.add(new OverlayRecipeComponent.OverlayRecipeButton.Pos(10, 10, var2));
++      }
++   }
++
++   private class OverlayRecipeButton extends AbstractWidget implements PlaceRecipe<Ingredient> {
++      final Recipe<?> recipe;
+       private final boolean isCraftable;
+       protected final List<OverlayRecipeComponent.OverlayRecipeButton.Pos> ingredientPos = Lists.newArrayList();
+ 
+       public OverlayRecipeButton(int var2, int var3, Recipe<?> var4, boolean var5) {
+          super(var2, var3, 200, 20, TextComponent.EMPTY);
+@@ -232,30 +244,31 @@
+          if (this.isHovered()) {
+             var6 += 26;
+          }
+ 
+          this.blit(var1, this.x, this.y, var5, var6, this.width, this.height);
+-         float var7 = 0.42F;
+-         PoseStack var8 = RenderSystem.getModelViewStack();
+-         var8.pushPose();
+-         var8.translate(0.0D, 0.0D, 125.0D);
+-         var8.scale(0.42F, 0.42F, 1.0F);
+-         RenderSystem.applyModelViewMatrix();
+-         Iterator var9 = this.ingredientPos.iterator();
++         PoseStack var7 = RenderSystem.getModelViewStack();
++         var7.pushPose();
++         var7.translate((double)(this.x + 2), (double)(this.y + 2), 125.0D);
++         Iterator var8 = this.ingredientPos.iterator();
+ 
+-         while(var9.hasNext()) {
+-            OverlayRecipeComponent.OverlayRecipeButton.Pos var10 = (OverlayRecipeComponent.OverlayRecipeButton.Pos)var9.next();
+-            int var11 = (int)((float)(this.x + var10.x) / 0.42F - 3.0F);
+-            int var12 = (int)((float)(this.y + var10.y) / 0.42F - 3.0F);
+-            OverlayRecipeComponent.this.minecraft.getItemRenderer().renderAndDecorateItem(var10.ingredients[Mth.floor(OverlayRecipeComponent.this.time / 30.0F) % var10.ingredients.length], var11, var12);
++         while(var8.hasNext()) {
++            OverlayRecipeComponent.OverlayRecipeButton.Pos var9 = (OverlayRecipeComponent.OverlayRecipeButton.Pos)var8.next();
++            var7.pushPose();
++            var7.translate((double)var9.x, (double)var9.y, 0.0D);
++            var7.scale(0.375F, 0.375F, 1.0F);
++            var7.translate(-8.0D, -8.0D, 0.0D);
++            RenderSystem.applyModelViewMatrix();
++            OverlayRecipeComponent.this.minecraft.getItemRenderer().renderAndDecorateItem(var9.ingredients[Mth.floor(OverlayRecipeComponent.this.time / 30.0F) % var9.ingredients.length], 0, 0);
++            var7.popPose();
+          }
+ 
+-         var8.popPose();
++         var7.popPose();
+          RenderSystem.applyModelViewMatrix();
+       }
+ 
+-      public class Pos {
++      protected class Pos {
+          public final ItemStack[] ingredients;
+          public final int x;
+          public final int y;
+ 
+          public Pos(int var2, int var3, ItemStack[] var4) {
+@@ -263,17 +276,6 @@
+             this.y = var3;
+             this.ingredients = var4;
+          }
+       }
+    }
+-
+-   class OverlaySmeltingRecipeButton extends OverlayRecipeComponent.OverlayRecipeButton {
+-      public OverlaySmeltingRecipeButton(int var2, int var3, Recipe<?> var4, boolean var5) {
+-         super(var2, var3, var4, var5);
+-      }
+-
+-      protected void calculateIngredientsPositions(Recipe<?> var1) {
+-         ItemStack[] var2 = ((Ingredient)var1.getIngredients().get(0)).getItems();
+-         this.ingredientPos.add(new OverlayRecipeComponent.OverlayRecipeButton.Pos(10, 10, var2));
+-      }
+-   }
+ }

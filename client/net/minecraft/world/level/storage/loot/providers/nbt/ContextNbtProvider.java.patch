@@ -1,0 +1,64 @@
+--- net/minecraft/world/level/storage/loot/providers/nbt/ContextNbtProvider.java
++++ net/minecraft/world/level/storage/loot/providers/nbt/ContextNbtProvider.java
+@@ -34,11 +34,11 @@
+       public Set<LootContextParam<?>> getReferencedContextParams() {
+          return ImmutableSet.of(LootContextParams.BLOCK_ENTITY);
+       }
+    };
+    public static final ContextNbtProvider BLOCK_ENTITY;
+-   private final ContextNbtProvider.Getter getter;
++   final ContextNbtProvider.Getter getter;
+ 
+    private static ContextNbtProvider.Getter forEntity(final LootContext.EntityTarget var0) {
+       return new ContextNbtProvider.Getter() {
+          @Nullable
+          public Tag get(LootContext var1) {
+@@ -75,11 +75,11 @@
+ 
+    public static NbtProvider forContextEntity(LootContext.EntityTarget var0) {
+       return new ContextNbtProvider(forEntity(var0));
+    }
+ 
+-   private static ContextNbtProvider createFromContext(String var0) {
++   static ContextNbtProvider createFromContext(String var0) {
+       if (var0.equals("block_entity")) {
+          return new ContextNbtProvider(BLOCK_ENTITY_PROVIDER);
+       } else {
+          LootContext.EntityTarget var1 = LootContext.EntityTarget.getByName(var0);
+          return new ContextNbtProvider(forEntity(var1));
+@@ -88,10 +88,19 @@
+ 
+    static {
+       BLOCK_ENTITY = new ContextNbtProvider(BLOCK_ENTITY_PROVIDER);
+    }
+ 
++   private interface Getter {
++      @Nullable
++      Tag get(LootContext var1);
++
++      String getId();
++
++      Set<LootContextParam<?>> getReferencedContextParams();
++   }
++
+    public static class InlineSerializer implements GsonAdapterFactory.InlineSerializer<ContextNbtProvider> {
+       public InlineSerializer() {
+       }
+ 
+       public JsonElement serialize(ContextNbtProvider var1, JsonSerializationContext var2) {
+@@ -115,15 +124,6 @@
+       public ContextNbtProvider deserialize(JsonObject var1, JsonDeserializationContext var2) {
+          String var3 = GsonHelper.getAsString(var1, "target");
+          return ContextNbtProvider.createFromContext(var3);
+       }
+    }
+-
+-   interface Getter {
+-      @Nullable
+-      Tag get(LootContext var1);
+-
+-      String getId();
+-
+-      Set<LootContextParam<?>> getReferencedContextParams();
+-   }
+ }

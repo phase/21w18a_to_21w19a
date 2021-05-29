@@ -1,0 +1,23 @@
+--- net/minecraft/world/effect/MobEffectInstance.java
++++ net/minecraft/world/effect/MobEffectInstance.java
+@@ -166,15 +166,18 @@
+    public String getDescriptionId() {
+       return this.effect.getDescriptionId();
+    }
+ 
+    public String toString() {
++      String var10000;
+       String var1;
+       if (this.amplifier > 0) {
+-         var1 = this.getDescriptionId() + " x " + (this.amplifier + 1) + ", Duration: " + this.duration;
++         var10000 = this.getDescriptionId();
++         var1 = var10000 + " x " + (this.amplifier + 1) + ", Duration: " + this.duration;
+       } else {
+-         var1 = this.getDescriptionId() + ", Duration: " + this.duration;
++         var10000 = this.getDescriptionId();
++         var1 = var10000 + ", Duration: " + this.duration;
+       }
+ 
+       if (!this.visible) {
+          var1 = var1 + ", Particles: false";
+       }

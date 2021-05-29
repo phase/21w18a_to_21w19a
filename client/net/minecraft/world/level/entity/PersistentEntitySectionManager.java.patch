@@ -1,0 +1,151 @@
+--- net/minecraft/world/level/entity/PersistentEntitySectionManager.java
++++ net/minecraft/world/level/entity/PersistentEntitySectionManager.java
+@@ -12,10 +12,11 @@
+ import it.unimi.dsi.fastutil.objects.ObjectIterator;
+ import java.io.IOException;
+ import java.io.UncheckedIOException;
+ import java.io.Writer;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Queue;
+ import java.util.Set;
+ import java.util.UUID;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.function.Consumer;
+@@ -30,16 +31,16 @@
+ import net.minecraft.world.level.ChunkPos;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class PersistentEntitySectionManager<T extends EntityAccess> implements AutoCloseable {
+-   private static final Logger LOGGER = LogManager.getLogger();
+-   private final Set<UUID> knownUuids = Sets.newHashSet();
+-   private final LevelCallback<T> callbacks;
++   static final Logger LOGGER = LogManager.getLogger();
++   final Set<UUID> knownUuids = Sets.newHashSet();
++   final LevelCallback<T> callbacks;
+    private final EntityPersistentStorage<T> permanentStorage;
+    private final EntityLookup<T> visibleEntityStorage = new EntityLookup();
+-   private final EntitySectionStorage<T> sectionStorage;
++   final EntitySectionStorage<T> sectionStorage;
+    private final LevelEntityGetter<T> entityGetter;
+    private final Long2ObjectMap<Visibility> chunkVisibility = new Long2ObjectOpenHashMap();
+    private final Long2ObjectMap<PersistentEntitySectionManager.ChunkLoadStatus> chunkLoadStatuses = new Long2ObjectOpenHashMap();
+    private final LongSet chunksToUnload = new LongOpenHashSet();
+    private final Queue<ChunkEntities<T>> loadingInbox = Queues.newConcurrentLinkedQueue();
+@@ -51,11 +52,11 @@
+       this.callbacks = var2;
+       this.permanentStorage = var3;
+       this.entityGetter = new LevelEntityGetterAdapter(this.visibleEntityStorage, this.sectionStorage);
+    }
+ 
+-   private void removeSectionIfEmpty(long var1, EntitySection<T> var3) {
++   void removeSectionIfEmpty(long var1, EntitySection<T> var3) {
+       if (var3.isEmpty()) {
+          this.sectionStorage.remove(var1);
+       }
+ 
+    }
+@@ -96,11 +97,11 @@
+ 
+          return true;
+       }
+    }
+ 
+-   private static <T extends EntityAccess> Visibility getEffectiveStatus(T var0, Visibility var1) {
++   static <T extends EntityAccess> Visibility getEffectiveStatus(T var0, Visibility var1) {
+       return var0.isAlwaysTicking() ? Visibility.TICKING : var1;
+    }
+ 
+    public void addLegacyChunkEntities(Stream<T> var1) {
+       var1.forEach((var1x) -> {
+@@ -112,24 +113,24 @@
+       var1.forEach((var1x) -> {
+          this.addEntity(var1x, false);
+       });
+    }
+ 
+-   private void startTicking(T var1) {
++   void startTicking(T var1) {
+       this.callbacks.onTickingStart(var1);
+    }
+ 
+-   private void stopTicking(T var1) {
++   void stopTicking(T var1) {
+       this.callbacks.onTickingEnd(var1);
+    }
+ 
+-   private void startTracking(T var1) {
++   void startTracking(T var1) {
+       this.visibleEntityStorage.add(var1);
+       this.callbacks.onTrackingStart(var1);
+    }
+ 
+-   private void stopTracking(T var1) {
++   void stopTracking(T var1) {
+       this.callbacks.onTrackingEnd(var1);
+       this.visibleEntityStorage.remove(var1);
+    }
+ 
+    public void updateChunkStatus(ChunkPos var1, ChunkHolder.FullChunkStatus var2) {
+@@ -215,11 +216,11 @@
+    private void requestChunkLoad(long var1) {
+       this.chunkLoadStatuses.put(var1, PersistentEntitySectionManager.ChunkLoadStatus.PENDING);
+       ChunkPos var3 = new ChunkPos(var1);
+       CompletableFuture var10000 = this.permanentStorage.loadEntities(var3);
+       Queue var10001 = this.loadingInbox;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       var10000.thenAccept(var10001::add).exceptionally((var1x) -> {
+          LOGGER.error("Failed to read chunk {}", var3, var1x);
+          return null;
+       });
+    }
+@@ -336,19 +337,29 @@
+       });
+    }
+ 
+    @VisibleForDebug
+    public String gatherStats() {
+-      return this.knownUuids.size() + "," + this.visibleEntityStorage.count() + "," + this.sectionStorage.count() + "," + this.chunkLoadStatuses.size() + "," + this.chunkVisibility.size() + "," + this.loadingInbox.size() + "," + this.chunksToUnload.size();
++      int var10000 = this.knownUuids.size();
++      return var10000 + "," + this.visibleEntityStorage.count() + "," + this.sectionStorage.count() + "," + this.chunkLoadStatuses.size() + "," + this.chunkVisibility.size() + "," + this.loadingInbox.size() + "," + this.chunksToUnload.size();
+    }
+ 
++   static enum ChunkLoadStatus {
++      FRESH,
++      PENDING,
++      LOADED;
++
++      private ChunkLoadStatus() {
++      }
++   }
++
+    class Callback implements EntityInLevelCallback {
+       private final T entity;
+       private long currentSectionKey;
+       private EntitySection<T> currentSection;
+ 
+-      private Callback(T var2, long var3, EntitySection<T> var5) {
++      Callback(T var2, long var3, EntitySection<T> var5) {
+          this.entity = var2;
+          this.currentSectionKey = var3;
+          this.currentSection = var5;
+       }
+ 
+@@ -415,15 +426,6 @@
+          PersistentEntitySectionManager.this.knownUuids.remove(this.entity.getUUID());
+          this.entity.setLevelCallback(NULL);
+          PersistentEntitySectionManager.this.removeSectionIfEmpty(this.currentSectionKey, this.currentSection);
+       }
+    }
+-
+-   static enum ChunkLoadStatus {
+-      FRESH,
+-      PENDING,
+-      LOADED;
+-
+-      private ChunkLoadStatus() {
+-      }
+-   }
+ }

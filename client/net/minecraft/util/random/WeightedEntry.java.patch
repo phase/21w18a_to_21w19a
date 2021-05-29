@@ -1,0 +1,15 @@
+--- net/minecraft/util/random/WeightedEntry.java
++++ net/minecraft/util/random/WeightedEntry.java
+@@ -12,11 +12,11 @@
+ 
+    public static class Wrapper<T> implements WeightedEntry {
+       private final T data;
+       private final Weight weight;
+ 
+-      private Wrapper(T var1, Weight var2) {
++      Wrapper(T var1, Weight var2) {
+          this.data = var1;
+          this.weight = var2;
+       }
+ 
+       public T getData() {

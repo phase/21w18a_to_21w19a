@@ -1,0 +1,39 @@
+--- net/minecraft/world/entity/monster/ZombieVillager.java
++++ net/minecraft/world/entity/monster/ZombieVillager.java
+@@ -1,9 +1,10 @@
+ package net.minecraft.world.entity.monster;
+ 
+ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.Dynamic;
++import java.util.Objects;
+ import java.util.UUID;
+ import javax.annotation.Nullable;
+ import net.minecraft.advancements.CriteriaTriggers;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Registry;
+@@ -72,11 +73,11 @@
+ 
+    public void addAdditionalSaveData(CompoundTag var1) {
+       super.addAdditionalSaveData(var1);
+       DataResult var10000 = VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, this.getVillagerData());
+       Logger var10001 = LOGGER;
+-      var10001.getClass();
++      Objects.requireNonNull(var10001);
+       var10000.resultOrPartial(var10001::error).ifPresent((var1x) -> {
+          var1.put("VillagerData", var1x);
+       });
+       if (this.tradeOffers != null) {
+          var1.put("Offers", this.tradeOffers);
+@@ -97,11 +98,11 @@
+    public void readAdditionalSaveData(CompoundTag var1) {
+       super.readAdditionalSaveData(var1);
+       if (var1.contains("VillagerData", 10)) {
+          DataResult var2 = VillagerData.CODEC.parse(new Dynamic(NbtOps.INSTANCE, var1.get("VillagerData")));
+          Logger var10001 = LOGGER;
+-         var10001.getClass();
++         Objects.requireNonNull(var10001);
+          var2.resultOrPartial(var10001::error).ifPresent(this::setVillagerData);
+       }
+ 
+       if (var1.contains("Offers", 10)) {
+          this.tradeOffers = var1.getCompound("Offers");

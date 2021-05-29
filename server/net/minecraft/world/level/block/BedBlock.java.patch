@@ -1,0 +1,15 @@
+--- net/minecraft/world/level/block/BedBlock.java
++++ net/minecraft/world/level/block/BedBlock.java
+@@ -147,11 +147,11 @@
+ 
+    }
+ 
+    public BlockState updateShape(BlockState var1, Direction var2, BlockState var3, LevelAccessor var4, BlockPos var5, BlockPos var6) {
+       if (var2 == getNeighbourDirection((BedPart)var1.getValue(PART), (Direction)var1.getValue(FACING))) {
+-         return var3.is(this) && var3.getValue(PART) != var1.getValue(PART) ? (BlockState)var1.setValue(OCCUPIED, var3.getValue(OCCUPIED)) : Blocks.AIR.defaultBlockState();
++         return var3.is(this) && var3.getValue(PART) != var1.getValue(PART) ? (BlockState)var1.setValue(OCCUPIED, (Boolean)var3.getValue(OCCUPIED)) : Blocks.AIR.defaultBlockState();
+       } else {
+          return super.updateShape(var1, var2, var3, var4, var5, var6);
+       }
+    }
+ 

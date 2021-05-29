@@ -1,0 +1,43 @@
+--- net/minecraft/world/level/block/entity/LecternBlockEntity.java
++++ net/minecraft/world/level/block/entity/LecternBlockEntity.java
+@@ -108,12 +108,12 @@
+ 
+       public int getCount() {
+          return 1;
+       }
+    };
+-   private ItemStack book;
+-   private int page;
++   ItemStack book;
++   int page;
+    private int pageCount;
+ 
+    public LecternBlockEntity(BlockPos var1, BlockState var2) {
+       super(BlockEntityType.LECTERN, var1, var2);
+       this.book = ItemStack.EMPTY;
+@@ -129,11 +129,11 @@
+ 
+    public void setBook(ItemStack var1) {
+       this.setBook(var1, (Player)null);
+    }
+ 
+-   private void onBookItemRemove() {
++   void onBookItemRemove() {
+       this.page = 0;
+       this.pageCount = 0;
+       LecternBlock.resetBookState(this.getLevel(), this.getBlockPos(), this.getBlockState(), false);
+    }
+ 
+@@ -142,11 +142,11 @@
+       this.page = 0;
+       this.pageCount = WrittenBookItem.getPageCount(this.book);
+       this.setChanged();
+    }
+ 
+-   private void setPage(int var1) {
++   void setPage(int var1) {
+       int var2 = Mth.clamp((int)var1, (int)0, (int)(this.pageCount - 1));
+       if (var2 != this.page) {
+          this.page = var2;
+          this.setChanged();
+          LecternBlock.signalPageChange(this.getLevel(), this.getBlockPos(), this.getBlockState());

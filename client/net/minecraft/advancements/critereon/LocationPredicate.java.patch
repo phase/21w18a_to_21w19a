@@ -1,0 +1,74 @@
+--- net/minecraft/advancements/critereon/LocationPredicate.java
++++ net/minecraft/advancements/critereon/LocationPredicate.java
+@@ -3,10 +3,11 @@
+ import com.google.gson.JsonElement;
+ import com.google.gson.JsonNull;
+ import com.google.gson.JsonObject;
+ import com.mojang.serialization.DataResult;
+ import com.mojang.serialization.JsonOps;
++import java.util.Objects;
+ import java.util.Optional;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Registry;
+ import net.minecraft.resources.ResourceKey;
+@@ -82,20 +83,24 @@
+          Optional var7 = var1.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getResourceKey(var1.getBiome(var5));
+          if (!var7.isPresent()) {
+             return false;
+          } else if (this.biome != null && (!var6 || this.biome != var7.get())) {
+             return false;
+-         } else if (this.feature != null && (!var6 || !var1.structureFeatureManager().getStructureAt(var5, true, this.feature).isValid())) {
+-            return false;
+-         } else if (this.smokey != null && (!var6 || this.smokey != CampfireBlock.isSmokeyPos(var1, var5))) {
+-            return false;
+-         } else if (!this.light.matches(var1, var5)) {
+-            return false;
+-         } else if (!this.block.matches(var1, var5)) {
+-            return false;
++         } else if (this.feature == null || var6 && var1.structureFeatureManager().getStructureAt(var5, true, this.feature).isValid()) {
++            if (this.smokey == null || var6 && this.smokey == CampfireBlock.isSmokeyPos(var1, var5)) {
++               if (!this.light.matches(var1, var5)) {
++                  return false;
++               } else if (!this.block.matches(var1, var5)) {
++                  return false;
++               } else {
++                  return this.fluid.matches(var1, var5);
++               }
++            } else {
++               return false;
++            }
+          } else {
+-            return this.fluid.matches(var1, var5);
++            return false;
+          }
+       }
+    }
+ 
+    public JsonElement serializeToJson() {
+@@ -112,11 +117,11 @@
+          }
+ 
+          if (this.dimension != null) {
+             DataResult var10000 = Level.RESOURCE_KEY_CODEC.encodeStart(JsonOps.INSTANCE, this.dimension);
+             Logger var10001 = LOGGER;
+-            var10001.getClass();
++            Objects.requireNonNull(var10001);
+             var10000.resultOrPartial(var10001::error).ifPresent((var1x) -> {
+                var1.add("dimension", var1x);
+             });
+          }
+ 
+@@ -148,11 +153,11 @@
+          MinMaxBounds.Floats var5 = MinMaxBounds.Floats.fromJson(var2.get("z"));
+          ResourceKey var13;
+          if (var1.has("dimension")) {
+             DataResult var10000 = ResourceLocation.CODEC.parse(JsonOps.INSTANCE, var1.get("dimension"));
+             Logger var10001 = LOGGER;
+-            var10001.getClass();
++            Objects.requireNonNull(var10001);
+             var13 = (ResourceKey)var10000.resultOrPartial(var10001::error).map((var0x) -> {
+                return ResourceKey.create(Registry.DIMENSION_REGISTRY, var0x);
+             }).orElse((Object)null);
+          } else {
+             var13 = null;

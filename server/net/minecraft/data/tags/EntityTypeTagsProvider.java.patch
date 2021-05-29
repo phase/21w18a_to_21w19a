@@ -1,0 +1,17 @@
+--- net/minecraft/data/tags/EntityTypeTagsProvider.java
++++ net/minecraft/data/tags/EntityTypeTagsProvider.java
+@@ -24,11 +24,13 @@
+       this.tag(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES).add((Object[])(EntityType.STRAY, EntityType.POLAR_BEAR, EntityType.SNOW_GOLEM, EntityType.WITHER));
+       this.tag(EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES).add((Object[])(EntityType.STRIDER, EntityType.BLAZE, EntityType.MAGMA_CUBE));
+    }
+ 
+    protected Path getPath(ResourceLocation var1) {
+-      return this.generator.getOutputFolder().resolve("data/" + var1.getNamespace() + "/tags/entity_types/" + var1.getPath() + ".json");
++      Path var10000 = this.generator.getOutputFolder();
++      String var10001 = var1.getNamespace();
++      return var10000.resolve("data/" + var10001 + "/tags/entity_types/" + var1.getPath() + ".json");
+    }
+ 
+    public String getName() {
+       return "Entity Type Tags";
+    }

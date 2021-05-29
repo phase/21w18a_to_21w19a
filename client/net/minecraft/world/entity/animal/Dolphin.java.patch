@@ -1,0 +1,41 @@
+--- net/minecraft/world/entity/animal/Dolphin.java
++++ net/minecraft/world/entity/animal/Dolphin.java
+@@ -69,11 +69,11 @@
+ 
+ public class Dolphin extends WaterAnimal {
+    private static final EntityDataAccessor<BlockPos> TREASURE_POS;
+    private static final EntityDataAccessor<Boolean> GOT_FISH;
+    private static final EntityDataAccessor<Integer> MOISTNESS_LEVEL;
+-   private static final TargetingConditions SWIM_WITH_PLAYER_TARGETING;
++   static final TargetingConditions SWIM_WITH_PLAYER_TARGETING;
+    public static final int TOTAL_AIR_SUPPLY = 4800;
+    private static final int TOTAL_MOISTNESS_LEVEL = 2400;
+    public static final Predicate<ItemEntity> ALLOWED_ITEMS;
+ 
+    public Dolphin(EntityType<? extends Dolphin> var1, Level var2) {
+@@ -357,11 +357,11 @@
+ 
+    static {
+       TREASURE_POS = SynchedEntityData.defineId(Dolphin.class, EntityDataSerializers.BLOCK_POS);
+       GOT_FISH = SynchedEntityData.defineId(Dolphin.class, EntityDataSerializers.BOOLEAN);
+       MOISTNESS_LEVEL = SynchedEntityData.defineId(Dolphin.class, EntityDataSerializers.INT);
+-      SWIM_WITH_PLAYER_TARGETING = (new TargetingConditions()).range(10.0D).allowSameTeam().allowInvulnerable().allowUnseeable();
++      SWIM_WITH_PLAYER_TARGETING = TargetingConditions.forNonCombat().range(10.0D).ignoreLineOfSight();
+       ALLOWED_ITEMS = (var0) -> {
+          return !var0.hasPickUpDelay() && var0.isAlive() && var0.isInWater();
+       };
+    }
+ 
+@@ -500,11 +500,11 @@
+    }
+ 
+    class PlayWithItemsGoal extends Goal {
+       private int cooldown;
+ 
+-      private PlayWithItemsGoal() {
++      PlayWithItemsGoal() {
+       }
+ 
+       public boolean canUse() {
+          if (this.cooldown > Dolphin.this.tickCount) {
+             return false;

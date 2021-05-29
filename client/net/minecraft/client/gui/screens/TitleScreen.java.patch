@@ -1,0 +1,150 @@
+--- net/minecraft/client/gui/screens/TitleScreen.java
++++ net/minecraft/client/gui/screens/TitleScreen.java
+@@ -167,73 +167,67 @@
+       this.resetDemoButton = (Button)this.addButton(new Button(this.width / 2 - 100, var1 + var2 * 1, 200, 20, new TranslatableComponent("menu.resetdemo"), (var1x) -> {
+          LevelStorageSource var2 = this.minecraft.getLevelSource();
+ 
+          try {
+             LevelStorageSource.LevelStorageAccess var3 = var2.createAccess("Demo_World");
+-            Throwable var4 = null;
+ 
+             try {
+-               LevelSummary var5 = var3.getSummary();
+-               if (var5 != null) {
+-                  this.minecraft.setScreen(new ConfirmScreen(this::confirmDemo, new TranslatableComponent("selectWorld.deleteQuestion"), new TranslatableComponent("selectWorld.deleteWarning", new Object[]{var5.getLevelName()}), new TranslatableComponent("selectWorld.deleteButton"), CommonComponents.GUI_CANCEL));
++               LevelSummary var4 = var3.getSummary();
++               if (var4 != null) {
++                  this.minecraft.setScreen(new ConfirmScreen(this::confirmDemo, new TranslatableComponent("selectWorld.deleteQuestion"), new TranslatableComponent("selectWorld.deleteWarning", new Object[]{var4.getLevelName()}), new TranslatableComponent("selectWorld.deleteButton"), CommonComponents.GUI_CANCEL));
+                }
+-            } catch (Throwable var14) {
+-               var4 = var14;
+-               throw var14;
+-            } finally {
++            } catch (Throwable var7) {
+                if (var3 != null) {
+-                  if (var4 != null) {
+-                     try {
+-                        var3.close();
+-                     } catch (Throwable var13) {
+-                        var4.addSuppressed(var13);
+-                     }
+-                  } else {
++                  try {
+                      var3.close();
++                  } catch (Throwable var6) {
++                     var7.addSuppressed(var6);
+                   }
+                }
+ 
++               throw var7;
+             }
+-         } catch (IOException var16) {
++
++            if (var3 != null) {
++               var3.close();
++            }
++         } catch (IOException var8) {
+             SystemToast.onWorldAccessFailure(this.minecraft, "Demo_World");
+-            LOGGER.warn("Failed to access demo world", var16);
++            LOGGER.warn("Failed to access demo world", var8);
+          }
+ 
+       }));
+       this.resetDemoButton.active = var3;
+    }
+ 
+    private boolean checkDemoWorldPresence() {
+       try {
+          LevelStorageSource.LevelStorageAccess var1 = this.minecraft.getLevelSource().createAccess("Demo_World");
+-         Throwable var2 = null;
+ 
+-         boolean var3;
++         boolean var2;
+          try {
+-            var3 = var1.getSummary() != null;
+-         } catch (Throwable var13) {
+-            var2 = var13;
+-            throw var13;
+-         } finally {
++            var2 = var1.getSummary() != null;
++         } catch (Throwable var5) {
+             if (var1 != null) {
+-               if (var2 != null) {
+-                  try {
+-                     var1.close();
+-                  } catch (Throwable var12) {
+-                     var2.addSuppressed(var12);
+-                  }
+-               } else {
++               try {
+                   var1.close();
++               } catch (Throwable var4) {
++                  var5.addSuppressed(var4);
+                }
+             }
+ 
++            throw var5;
+          }
+ 
+-         return var3;
+-      } catch (IOException var15) {
++         if (var1 != null) {
++            var1.close();
++         }
++
++         return var2;
++      } catch (IOException var6) {
+          SystemToast.onWorldAccessFailure(this.minecraft, "Demo_World");
+-         LOGGER.warn("Failed to read demo world data", var15);
++         LOGGER.warn("Failed to read demo world data", var6);
+          return false;
+       }
+    }
+ 
+    private void realmsButtonClicked() {
+@@ -346,34 +340,31 @@
+ 
+    private void confirmDemo(boolean var1) {
+       if (var1) {
+          try {
+             LevelStorageSource.LevelStorageAccess var2 = this.minecraft.getLevelSource().createAccess("Demo_World");
+-            Throwable var3 = null;
+ 
+             try {
+                var2.deleteLevel();
+-            } catch (Throwable var13) {
+-               var3 = var13;
+-               throw var13;
+-            } finally {
++            } catch (Throwable var6) {
+                if (var2 != null) {
+-                  if (var3 != null) {
+-                     try {
+-                        var2.close();
+-                     } catch (Throwable var12) {
+-                        var3.addSuppressed(var12);
+-                     }
+-                  } else {
++                  try {
+                      var2.close();
++                  } catch (Throwable var5) {
++                     var6.addSuppressed(var5);
+                   }
+                }
+ 
++               throw var6;
+             }
+-         } catch (IOException var15) {
++
++            if (var2 != null) {
++               var2.close();
++            }
++         } catch (IOException var7) {
+             SystemToast.onWorldDeleteFailure(this.minecraft, "Demo_World");
+-            LOGGER.warn("Failed to delete demo world", var15);
++            LOGGER.warn("Failed to delete demo world", var7);
+          }
+       }
+ 
+       this.minecraft.setScreen(this);
+    }

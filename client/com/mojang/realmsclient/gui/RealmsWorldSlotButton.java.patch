@@ -1,0 +1,27 @@
+--- com/mojang/realmsclient/gui/RealmsWorldSlotButton.java
++++ com/mojang/realmsclient/gui/RealmsWorldSlotButton.java
+@@ -174,19 +174,19 @@
+       blit(var1, var2, var3, 0.0F, 0.0F, 80, 80, 80, 80);
+       drawCenteredString(var1, var17.font, var7, var2 + 40, var3 + 66, 16777215);
+    }
+ 
+    public static class State {
+-      private final boolean isCurrentlyActiveSlot;
+-      private final String slotName;
+-      private final long imageId;
+-      private final String image;
++      final boolean isCurrentlyActiveSlot;
++      final String slotName;
++      final long imageId;
++      final String image;
+       public final boolean empty;
+       public final boolean minigame;
+       public final RealmsWorldSlotButton.Action action;
+       @Nullable
+-      private final Component actionPrompt;
++      final Component actionPrompt;
+ 
+       State(boolean var1, String var2, long var3, @Nullable String var5, boolean var6, boolean var7, RealmsWorldSlotButton.Action var8, @Nullable Component var9) {
+          this.isCurrentlyActiveSlot = var1;
+          this.slotName = var2;
+          this.imageId = var3;

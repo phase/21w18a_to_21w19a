@@ -1,0 +1,41 @@
+--- net/minecraft/client/gui/screens/LevelLoadingScreen.java
++++ net/minecraft/client/gui/screens/LevelLoadingScreen.java
+@@ -1,10 +1,11 @@
+ package net.minecraft.client.gui.screens;
+ 
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import it.unimi.dsi.fastutil.objects.Object2IntMap;
+ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
++import java.util.Objects;
+ import net.minecraft.Util;
+ import net.minecraft.client.gui.Font;
+ import net.minecraft.client.gui.chat.NarratorChatListener;
+ import net.minecraft.network.chat.TranslatableComponent;
+ import net.minecraft.server.level.progress.StoringChunkProgressListener;
+@@ -45,11 +46,12 @@
+       NarratorChatListener.INSTANCE.sayNow((new TranslatableComponent("narrator.loading.done")).getString());
+    }
+ 
+    public void render(PoseStack var1, int var2, int var3, float var4) {
+       this.renderBackground(var1);
+-      String var5 = Mth.clamp((int)this.progressListener.getProgress(), (int)0, (int)100) + "%";
++      int var10000 = this.progressListener.getProgress();
++      String var5 = Mth.clamp((int)var10000, (int)0, (int)100) + "%";
+       long var6 = Util.getMillis();
+       if (var6 - this.lastNarration > 2000L) {
+          this.lastNarration = var6;
+          NarratorChatListener.INSTANCE.sayNow((new TranslatableComponent("narrator.loading", new Object[]{var5})).getString());
+       }
+@@ -57,11 +59,11 @@
+       int var8 = this.width / 2;
+       int var9 = this.height / 2;
+       boolean var10 = true;
+       renderChunks(var1, this.progressListener, var8, var9 + 30, 2, 0);
+       Font var10001 = this.font;
+-      this.font.getClass();
++      Objects.requireNonNull(this.font);
+       drawCenteredString(var1, var10001, var5, var8, var9 - 9 / 2 - 30, 16777215);
+    }
+ 
+    public static void renderChunks(PoseStack var0, StoringChunkProgressListener var1, int var2, int var3, int var4, int var5) {
+       int var6 = var4 + var5;

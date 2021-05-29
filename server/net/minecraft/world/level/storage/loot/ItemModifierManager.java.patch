@@ -1,0 +1,47 @@
+--- net/minecraft/world/level/storage/loot/ItemModifierManager.java
++++ net/minecraft/world/level/storage/loot/ItemModifierManager.java
+@@ -3,10 +3,11 @@
+ import com.google.common.collect.ImmutableMap;
+ import com.google.gson.Gson;
+ import com.google.gson.JsonElement;
+ import java.util.Collections;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+ import java.util.function.BiFunction;
+ import java.util.function.Function;
+ import javax.annotation.Nullable;
+ import net.minecraft.resources.ResourceLocation;
+@@ -60,14 +61,16 @@
+          }
+ 
+       });
+       ImmutableMap var5 = var4.build();
+       LootContextParamSet var10002 = LootContextParamSets.ALL_PARAMS;
+-      Function var10003 = this.predicateManager::get;
++      PredicateManager var10003 = this.predicateManager;
++      Objects.requireNonNull(var10003);
++      Function var7 = var10003::get;
+       LootTables var10004 = this.lootTables;
+-      var10004.getClass();
+-      ValidationContext var6 = new ValidationContext(var10002, var10003, var10004::get);
++      Objects.requireNonNull(var10004);
++      ValidationContext var6 = new ValidationContext(var10002, var7, var10004::get);
+       var5.forEach((var1x, var2x) -> {
+          var2x.validate(var6);
+       });
+       var6.getProblems().forEach((var0, var1x) -> {
+          LOGGER.warn((String)"Found item modifier validation problem in {}: {}", (Object)var0, (Object)var1x);
+@@ -77,11 +80,11 @@
+ 
+    public Set<ResourceLocation> getKeys() {
+       return Collections.unmodifiableSet(this.functions.keySet());
+    }
+ 
+-   static class FunctionSequence implements LootItemFunction {
++   private static class FunctionSequence implements LootItemFunction {
+       protected final LootItemFunction[] functions;
+       private final BiFunction<ItemStack, LootContext, ItemStack> compositeFunction;
+ 
+       public FunctionSequence(LootItemFunction[] var1) {
+          this.functions = var1;

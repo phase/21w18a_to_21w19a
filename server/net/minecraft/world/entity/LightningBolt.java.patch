@@ -1,0 +1,56 @@
+--- net/minecraft/world/entity/LightningBolt.java
++++ net/minecraft/world/entity/LightningBolt.java
+@@ -23,10 +23,11 @@
+ import net.minecraft.world.level.block.LightningRodBlock;
+ import net.minecraft.world.level.block.WeatheringCopper;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.gameevent.GameEvent;
+ import net.minecraft.world.phys.AABB;
++import net.minecraft.world.phys.Vec3;
+ 
+ public class LightningBolt extends Entity {
+    private static final int START_LIFE = 2;
+    private int life;
+    public long seed;
+@@ -59,11 +60,11 @@
+    public void setCause(@Nullable ServerPlayer var1) {
+       this.cause = var1;
+    }
+ 
+    private void powerLightningRod() {
+-      BlockPos var1 = this.blockPosition().below();
++      BlockPos var1 = this.getStrikePosition();
+       BlockState var2 = this.level.getBlockState(var1);
+       if (var2.is(Blocks.LIGHTNING_ROD)) {
+          ((LightningRodBlock)var2.getBlock()).onLightningStrike(var2, this.level, var1);
+       }
+ 
+@@ -80,11 +81,11 @@
+             if (var1 == Difficulty.NORMAL || var1 == Difficulty.HARD) {
+                this.spawnFire(4);
+             }
+ 
+             this.powerLightningRod();
+-            clearCopperOnLightningStrike(this.level, this.blockPosition().below());
++            clearCopperOnLightningStrike(this.level, this.getStrikePosition());
+             this.gameEvent(GameEvent.LIGHTNING_STRIKE);
+          }
+       }
+ 
+       --this.life;
+@@ -118,10 +119,15 @@
+          }
+       }
+ 
+    }
+ 
++   private BlockPos getStrikePosition() {
++      Vec3 var1 = this.position();
++      return new BlockPos(var1.x, var1.y - 1.0E-6D, var1.z);
++   }
++
+    private void spawnFire(int var1) {
+       if (!this.visualOnly && !this.level.isClientSide && this.level.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
+          BlockPos var2 = this.blockPosition();
+          BlockState var3 = BaseFireBlock.getState(this.level, var2);
+          if (this.level.getBlockState(var2).isAir() && var3.canSurvive(this.level, var2)) {

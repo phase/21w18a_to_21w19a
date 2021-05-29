@@ -1,0 +1,17 @@
+--- net/minecraft/world/entity/ai/sensing/Sensor.java
++++ net/minecraft/world/entity/ai/sensing/Sensor.java
+@@ -9,12 +9,12 @@
+ 
+ public abstract class Sensor<E extends LivingEntity> {
+    private static final Random RANDOM = new Random();
+    private static final int DEFAULT_SCAN_RATE = 20;
+    protected static final int TARGETING_RANGE = 16;
+-   private static final TargetingConditions TARGET_CONDITIONS = (new TargetingConditions()).range(16.0D).allowSameTeam().allowNonAttackable();
+-   private static final TargetingConditions TARGET_CONDITIONS_IGNORE_INVISIBILITY_TESTING = (new TargetingConditions()).range(16.0D).allowSameTeam().allowNonAttackable().ignoreInvisibilityTesting();
++   private static final TargetingConditions TARGET_CONDITIONS = TargetingConditions.forNonCombat().range(16.0D);
++   private static final TargetingConditions TARGET_CONDITIONS_IGNORE_INVISIBILITY_TESTING = TargetingConditions.forNonCombat().range(16.0D).ignoreInvisibilityTesting();
+    private final int scanRate;
+    private long timeToTick;
+ 
+    public Sensor(int var1) {
+       this.scanRate = var1;
